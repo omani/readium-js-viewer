@@ -458,6 +458,7 @@ BookmarkData){
                 _debugBookmarkData_goto = undefined;
             }
             
+            updateURL();
             savePlace();
             updateUI(pageChangeData);
 
@@ -768,6 +769,40 @@ BookmarkData){
         Settings.put(ebookURL_filepath, readium.reader.bookmarkCurrentPage(), $.noop);
     }
 
+    var getBookmarkURL = function(){
+        var urlParams = Helpers.getURLQueryParams();
+        var ebookURL = urlParams['epub'];
+        if (!ebookURL) return;
+        
+        var bookmark = readium.reader.bookmarkCurrentPage();
+        bookmark = JSON.parse(bookmark);
+        
+        var cfi = new BookmarkData(bookmark.idref, bookmark.contentCFI);
+        debugBookmarkData(cfi);
+        
+        bookmark.elementCfi = bookmark.contentCFI;
+        bookmark.contentCFI = undefined;
+        bookmark = JSON.stringify(bookmark);
+        
+        ebookURL = ensureUrlIsRelativeToApp(ebookURL);
+
+        var url = Helpers.buildUrlQueryParameters(undefined, {
+            epub: ebookURL,
+            epubs: " ",
+            embedded: " ",
+            goto: bookmark
+        });
+
+        return url;
+    }
+
+    var updateURL = function(){
+
+        var url = getBookmarkURL()
+        
+        history['replaceState'](null, null, url);
+    }
+
     var nextPage = function () {
 
         readium.reader.openPageRight();
@@ -787,28 +822,7 @@ BookmarkData){
         } else {
             $(".icon-shareUrl").on("click", function () {
                 
-                var urlParams = Helpers.getURLQueryParams();
-                var ebookURL = urlParams['epub'];
-                if (!ebookURL) return;
-                
-                var bookmark = readium.reader.bookmarkCurrentPage();
-                bookmark = JSON.parse(bookmark);
-                
-                var cfi = new BookmarkData(bookmark.idref, bookmark.contentCFI);
-                debugBookmarkData(cfi);
-                
-                bookmark.elementCfi = bookmark.contentCFI;
-                bookmark.contentCFI = undefined;
-                bookmark = JSON.stringify(bookmark);
-                
-                ebookURL = ensureUrlIsRelativeToApp(ebookURL);
-
-                var url = Helpers.buildUrlQueryParameters(undefined, {
-                    epub: ebookURL,
-                    epubs: " ",
-                    embedded: " ",
-                    goto: bookmark
-                });
+                var url = getBookmarkURL();
                 
                 //showModalMessage
                 //showErrorWithDetails
