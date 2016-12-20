@@ -5,7 +5,7 @@
         "**/.DS_Store": true,
         "**/.vscode": true,
         "**/.github": true,
-        "**/.gitignore": true,
+        "**/.gitignore": false,
         "**/.gitmodules": true,
         "**/.idea": true,
         "**/firebase_from_divshot.json": true,
@@ -23,7 +23,7 @@
     "search.exclude": {
     },
     
-    "git.enabled": false,
+    "git.enabled": true,
 
     "telemetry.enableCrashReporter": false,
 
