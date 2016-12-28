@@ -14,7 +14,7 @@
         "**/http_ebooks.log": true,
         "**/build-output": true,
         "**/dist": true,
-        "**/epub_content": true,
+        "**/epub_content": false,
         "**/api-docs": true,
         "**/node_modules": true,
         "**/bower_components": true
