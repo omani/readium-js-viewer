@@ -6,7 +6,7 @@
         "**/.vscode": true,
         "**/.github": true,
         "**/.gitignore": false,
-        "**/.gitmodules": true,
+        "**/.gitmodules": false,
         "**/.idea": true,
         "**/firebase_from_divshot.json": true,
         "**/http_app.log": true,
