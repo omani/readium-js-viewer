@@ -101,14 +101,11 @@
     'http:app': '
 
         node
-            readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/http-server.js
-            
-            -LOGFILE
-            http_app.log
-            
+            readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/app.js
+
             -OPEN
             /dev/index_RequireJS_no-optimize.html
-            
+
             -p 9090
 
             -c-1
@@ -119,12 +116,8 @@
     'http:ebooks': '
 
         node
-            readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/http-server.js
-            
-            -LOGFILE
-            http_ebooks.log
-            
-            -a 127.0.0.1
+            readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/app.js
+
             -p 8080
 
             -c-1
@@ -137,17 +130,13 @@
     'http:app_ebooks': '
 
         node
-            readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/http-server.js
-            
-            -LOGFILE
-            http_app-ebooks.log
-            
+            readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/app.js
+
             -OPEN
             /dev/index_RequireJS_no-optimize.html
-            
-            -a 127.0.0.1
+
             -p 8080
-    
+
             -c-1
             .
     '
@@ -157,15 +146,8 @@
     'http:cloudReaderDist': '
 
         node
-            readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/http-server.js
+            readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/app.js
             
-            -LOGFILE
-            http_app-ebooks.log
-            
-            -OPEN
-            /dist/cloud-reader/?epubs=http://127.0.0.1:8080/epub_content/epub_library.opds
-            
-            -a 127.0.0.1
             -p 8080
     
             -c-1

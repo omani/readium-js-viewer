@@ -110,7 +110,8 @@ BookmarkData){
             + "//"
             + window.location.hostname
             + (window.location.port ? (':' + window.location.port) : '')
-            + window.location.pathname
+            // + window.location.pathname
+            + "/"
         ) : undefined;
         
         if (appUrl) {

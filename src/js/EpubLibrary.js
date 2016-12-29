@@ -301,7 +301,8 @@ Helpers){
                     + "//"
                     + window.location.hostname
                     + (window.location.port ? (':' + window.location.port) : '')
-                    + window.location.pathname
+                    // + window.location.pathname
+                    + '/'
                 ) : 'index.html'
                 ;
                 
