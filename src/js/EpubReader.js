@@ -853,10 +853,12 @@ BookmarkData){
 
         if(spotInfo.bookId) {
             initUserDataBook(spotInfo.bookId);
-            userData.books[spotInfo.bookId].latest_location = spotInfo.ebookSpot;
-            userData.books[spotInfo.bookId].updated_at = Helpers.getUTCTimeStamp();
+            if(userData.books[spotInfo.bookId].latest_location != spotInfo.ebookSpot) {
+                userData.books[spotInfo.bookId].latest_location = spotInfo.ebookSpot;
+                userData.books[spotInfo.bookId].updated_at = Helpers.getUTCTimeStamp();
 
-            Settings.patch(userData);
+                Settings.patch(userData);
+            }
         }
     }
 
