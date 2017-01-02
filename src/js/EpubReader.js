@@ -1185,7 +1185,8 @@ BookmarkData){
                 try {
                     var bookmark = JSON.parse(userData.books[spotInfo.bookId].latest_location);
                     //console.log("Bookmark restore: " + JSON.stringify(bookmark));
-                    openPageRequest = {idref: bookmark.idref, elementCfi: bookmark.contentCFI};
+                    // openPageRequest = {idref: bookmark.idref, elementCfi: bookmark.contentCFI};
+                    openPageRequest = bookmark;
                     console.debug("Open request (bookmark): " + JSON.stringify(openPageRequest));
                 } catch(err) {
                     console.error(err);
