@@ -1,10 +1,10 @@
-.rd-highlight.test-highlight {
+.rd-highlight.user-highlight {
     position: absolute;
     opacity: 0.2;
     background-color: red;
 }
 
-.rd-highlight.hover-test-highlight {
+.rd-highlight.hover-user-highlight {
     position: absolute;
     opacity: 0.4;
     background-color: red;
