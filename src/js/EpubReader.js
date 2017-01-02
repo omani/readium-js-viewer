@@ -804,7 +804,9 @@ BookmarkData){
                 }
                 // without this line, highlights are sometimes not added on the next because they are listed as still there
                 readium.reader.plugins.highlights.removeHighlight(highlight.cfi);
-                readium.reader.plugins.highlights.addHighlight(idRef, highlight.cfi, highlight.cfi, "user-highlight");
+                if(!highlight._delete) {
+                    readium.reader.plugins.highlights.addHighlight(idRef, highlight.cfi, highlight.cfi, "user-highlight");
+                }
             });
         }
     }
@@ -824,16 +826,6 @@ BookmarkData){
             $("#right-page-btn").hide();
 
         drawHighlights();
-    }
-
-    var saveUserData = function(){
-        // The apps should record the last time they successfully sent a user-data update to the server. Then, when they go offline and come back online, they can clone the user-data book objects and filter them down to those objects which are newer than the last successful update to the server. This clone can be sent to the server as a full batch of the needed updates.
-        console.log('save');
-        console.log(userData);
-    }
-
-    var getUTCTimeStamp = function(){
-        return parseInt(new Date().getTime() / 1000);
     }
 
     var initUserDataBook = function(bookId){
@@ -862,9 +854,9 @@ BookmarkData){
         if(spotInfo.bookId) {
             initUserDataBook(spotInfo.bookId);
             userData.books[spotInfo.bookId].latest_location = spotInfo.ebookSpot;
-            userData.books[spotInfo.bookId].updated_at = getUTCTimeStamp();
+            userData.books[spotInfo.bookId].updated_at = Helpers.getUTCTimeStamp();
 
-            saveUserData();
+            Settings.patch(userData);
         }
     }
 
@@ -939,13 +931,24 @@ BookmarkData){
             var highlight = readium.reader.plugins.highlights.addSelectionHighlight(false, "user-highlight");
 
             initUserDataBook(spotInfo.bookId);
-            userData.books[spotInfo.bookId].highlights.push({
+
+            var highlightData = {
                 cfi: highlight.contentCFI,
                 color: 1,
                 note: "",
-                updated_at: getUTCTimeStamp
-            });
-            saveUserData();
+                updated_at: Helpers.getUTCTimeStamp()
+            };
+
+            var existingHighlight = getHighlightDataObj(highlight.contentCFI, spotInfo)
+
+            if(existingHighlight) {
+                // might exist with the _delete flag
+                userData.books[spotInfo.bookId].highlights[existingHighlight.idx] = highlightData;
+            } else {
+                userData.books[spotInfo.bookId].highlights.push(highlightData);
+            }
+            
+            Settings.patch(userData);
         });
 
         var isWithinForbiddenNavKeysArea = function()
@@ -1152,10 +1155,13 @@ BookmarkData){
         console.log("MODULE CONFIG:");
         console.log(moduleConfig);
 
-        Settings.getMultiple(['reader', ebookURL_filepath], function(settings){
+        var spotInfo = getCurrentSpotInfo();
+        var bookKey = 'books/' + spotInfo.bookId;
 
-            var spotInfo = getCurrentSpotInfo();
-            
+        Settings.getMultiple(['reader', bookKey], function(settings){
+
+            userData.books[spotInfo.bookId] = settings[bookKey] || null;
+
             var readerOptions =  {
                 el: "#epub-reader-frame",
                 annotationCSSUrl: moduleConfig.annotationCSSUrl,
@@ -1254,10 +1260,11 @@ BookmarkData){
                         if(highlightToRemove) {
                             userData.books[spotInfo.bookId].highlights[highlightToRemove.idx] = {
                                 cfi: cfi,
+                                updated_at: Helpers.getUTCTimeStamp(),
                                 _delete: true
                             }
                         }
-                        saveUserData();
+                        Settings.patch(userData);
                     });
                 }
     
@@ -1329,7 +1336,7 @@ BookmarkData){
 
             var readerSettings;
             if (settings.reader){
-                readerSettings = JSON.parse(settings.reader);
+                readerSettings = settings.reader;
             }
             if (!embedded){
                 readerSettings = readerSettings || SettingsDialog.defaultSettings;
