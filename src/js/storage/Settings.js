@@ -31,6 +31,13 @@ function(Helpers){
         }
     };
     
+    var emptyLocalStorageUserPatch = function() {
+        if (isLocalStorageEnabled()) {
+            localStorage.removeItem('userDataPatch');
+            console.log("Local storage patch emptied.");
+        }
+    }
+
     Settings = {
         put : function(key, val, callback){
             if (isLocalStorageEnabled()) {
@@ -45,7 +52,7 @@ function(Helpers){
             if (callback) callback();
 
         },
-        patch : function(userData, staleDataCallback, skipRefresh){
+        patch : function(userData, staleDataCallback, forceOnceCallback){
 
             // The apps should record the last time they successfully sent a user-data update to the server.
             // Then, when they go offline and come back online, they can clone the user-data book objects
@@ -65,7 +72,7 @@ function(Helpers){
 
                     newUserData.books[bookId] = { highlights: [] };
 
-                    if(bookUserData.updated_at > lastSuccessfulPatch) {
+                    if(forceOnceCallback || bookUserData.updated_at > lastSuccessfulPatch) {
                         newUserData.books[bookId].latest_location = bookUserData.latest_location;
                         newUserData.books[bookId].updated_at = bookUserData.updated_at;
                         somethingToPatch = true;
@@ -73,7 +80,7 @@ function(Helpers){
 
                     if(bookUserData.highlights) {
                         for(var highlightIdx in bookUserData.highlights) {
-                            if(bookUserData.highlights[highlightIdx].updated_at > lastSuccessfulPatch) {
+                            if(forceOnceCallback || bookUserData.highlights[highlightIdx].updated_at > lastSuccessfulPatch) {
                                 newUserData.books[bookId].highlights.push(bookUserData.highlights[highlightIdx]);
                                 somethingToPatch = true;
                             }
@@ -86,6 +93,7 @@ function(Helpers){
 
                     if (isLocalStorageEnabled()) {
                         localStorage['userDataPatch'] = JSON.stringify(newUserData);
+                        console.log("Local storage patch: ", localStorage['userDataPatch']);
                     }
 
                     // send necessary patch requests
@@ -107,14 +115,20 @@ function(Helpers){
                                     console.log("Patch successful.");
                                     currentlyPatching = false;
                                     lastSuccessfulPatch = patchTime;
-                                    runPatch();
+                                    if(forceOnceCallback) {
+                                        forceOnceCallback();
+                                    } else {
+                                        runPatch();
+                                    }
                                 },
                                 error: function (xhr, status, errorThrown) {
                                     currentlyPatching = false;
                                     if(xhr.status == 412) {
                                         console.log("userData is stale.");
                                         lastSuccessfulPatch = patchTime;
-                                        if(!skipRefresh) {
+                                        if(forceOnceCallback) {
+                                            forceOnceCallback();
+                                        } else {
                                             // update the userData on this book
                                             Settings.refreshUserData(bookId, userData, staleDataCallback);
                                         }
@@ -123,7 +137,9 @@ function(Helpers){
                                         console.error(status);
                                         console.error(errorThrown);
                                         console.error('Will rerun in 10 seconds.');
-                                        setTimeout(runPatch, 10000);
+                                        setTimeout(function() {
+                                            runPatch();
+                                        }, 10000);
                                     }
                                 }
                             }
@@ -136,10 +152,7 @@ function(Helpers){
 
                 } else {
                     console.log("Nothing to patch.");
-
-                    if (isLocalStorageEnabled()) {
-                        localStorage.removeItem('userDataPatch');
-                    }
+                    emptyLocalStorageUserPatch();
                 }
             }
 
@@ -228,14 +241,19 @@ function(Helpers){
             });
         },
 //what if this takes longer
-        patchFromLocalStorage: function() {
+        patchFromLocalStorage: function(callback) {
             if (isLocalStorageEnabled()) {
                 if(localStorage['userDataPatch']) {
                     try {
-                        String.patch(JSON.parse(localStorage['userDataPatch']), null, true);
+                        Settings.patch(JSON.parse(localStorage['userDataPatch']), null, function() {
+                            emptyLocalStorageUserPatch();
+                            if(callback) callback();
+                        });
+                        return;
                     } catch(e) {}
                 }
             }
+            if(callback) callback();
         }
     }
     return Settings;

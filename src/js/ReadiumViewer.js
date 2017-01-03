@@ -3,36 +3,39 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
     var _initialLoad = true; // replaces pushState() with replaceState() at first load 
     var initialLoad = function(){
 
-        var urlParams = Helpers.getURLQueryParams();
+        Settings.patchFromLocalStorage(function() {
+            
+            var urlParams = Helpers.getURLQueryParams();
 
-        var ebookURL = urlParams['epub'];
-        var libraryURL = urlParams['epubs'];
-        var embedded = urlParams['embedded'];
-         
-        Settings.patchFromLocalStorage();
+            var ebookURL = urlParams['epub'];
+            var libraryURL = urlParams['epubs'];
+            var embedded = urlParams['embedded'];
 
-         // we use triggerHandler() so that the pushState logic is invoked from the first-time open 
-         
-        if (ebookURL) {
-              //EpubReader.loadUI(urlParams);
-            var eventPayload = {embedded: embedded, epub: ebookURL, epubs: libraryURL};
-            $(window).triggerHandler('readepub', eventPayload);
-        }
-        else {
-            //EpubLibrary.loadUI({epubs: libraryURL});
-            var eventPayload = libraryURL;
-            $(window).triggerHandler('loadlibrary', eventPayload);
-        }
+            // we use triggerHandler() so that the pushState logic is invoked from the first-time open 
+            
+            if (ebookURL) {
+                //EpubReader.loadUI(urlParams);
+                var eventPayload = {embedded: embedded, epub: ebookURL, epubs: libraryURL};
+                $(window).triggerHandler('readepub', eventPayload);
+            }
+            else {
+                //EpubLibrary.loadUI({epubs: libraryURL});
+                var eventPayload = libraryURL;
+                $(window).triggerHandler('loadlibrary', eventPayload);
+            }
 
-        $(document.body).on('click', function()
-        {
-            $(document.body).removeClass("keyboard");
+            $(document.body).on('click', function()
+            {
+                $(document.body).removeClass("keyboard");
+            });
+
+            $(document).on('keyup', function(e)
+            {
+                $(document.body).addClass("keyboard");
+            });
+
         });
 
-        $(document).on('keyup', function(e)
-        {
-            $(document.body).addClass("keyboard");
-        });
     };
 
     var pushState = $.noop;
