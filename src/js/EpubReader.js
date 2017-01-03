@@ -63,6 +63,7 @@ BookmarkData){
     // initialised in loadReaderUI(), with passed data.epub
     var ebookURL = undefined;
     var ebookURL_filepath = undefined;
+    var bookId = undefined;
     
     // initialised in loadEbook() >> readium.openPackageDocument()
     var currentPackageDocument = undefined;
@@ -90,7 +91,8 @@ BookmarkData){
             …
         }
     */
-    
+
+    var userDataRefreshInterval = 0;
     
     // TODO: is this variable actually used anywhere here??
     // (bad naming convention, hard to find usages of "el")
@@ -771,11 +773,10 @@ BookmarkData){
         }
     }
 
-    var getHighlightDataObj = function(cfi, spotInfo) {
+    var getHighlightDataObj = function(cfi) {
         var returnObj = false;
-        spotInfo = spotInfo || getCurrentSpotInfo();
 
-        userData.books[spotInfo.bookId].highlights.forEach(function(highlight, idx) {
+        userData.books[bookId].highlights.forEach(function(highlight, idx) {
             if(highlight.cfi == cfi) {
                 returnObj = {
                     highlight: highlight,
@@ -790,12 +791,12 @@ BookmarkData){
     var drawHighlights = function() {
         if (readium && readium.reader.plugins.highlights) {
 
-            var spotInfo = getCurrentSpotInfo();
+            var spotInfo = Helpers.getCurrentSpotInfo();
 
             // next line needed especially for switching between books
             readium.reader.plugins.highlights.removeHighlightsByType("user-highlight");
 
-            userData.books[spotInfo.bookId].highlights.forEach(function(highlight) {
+            userData.books[bookId].highlights.forEach(function(highlight) {
                 var idRef;
                 try {
                     idRef = JSON.parse(spotInfo.ebookSpot).idref;
@@ -828,7 +829,7 @@ BookmarkData){
         drawHighlights();
     }
 
-    var initUserDataBook = function(bookId){
+    var initUserDataBook = function(){
         if(!userData.books[bookId]) {
             userData.books[bookId] = {
                 latest_location: '',
@@ -838,33 +839,46 @@ BookmarkData){
         }
     }
 
-    var getCurrentSpotInfo = function() {
-        var urlParams = Helpers.getURLQueryParams();
-        return {
-            ebookURL: urlParams['epub'],
-            ebookSpot: urlParams['goto'],
-            bookId: parseInt((ebookURL || "").replace(/^.*?book_([0-9]+).*$/, '$1') , 10) || 0
-        };
+    var askedAboutLocationUpdate = false;
+    var refreshUserDataCallback = function() {
+        var spotInfo = Helpers.getCurrentSpotInfo();
+
+        drawHighlights();
+
+        if(!askedAboutLocationUpdate) {
+            try {
+                var latLoc = userData.books[bookId].latest_location;
+                if(latLoc && latLoc != spotInfo.ebookSpot) {
+                    var dataLoc = JSON.parse(latLoc);
+                    if(dataLoc.idref && dataLoc.elementCfi) {
+                        Dialogs.showModalPrompt(Strings.biblemesh_location_update, Strings.biblemesh_execute_location_update,
+                                                Strings.biblemesh_i18n_update, Strings.i18n_cancel,
+                                                function(){
+                                                    readium.reader.openSpineItemElementCfi(dataLoc.idref, dataLoc.elementCfi);
+                                                });
+                        askedAboutLocationUpdate = true;
+                    }
+                }
+            } catch (e) {}
+        }
     }
 
     var savePlace = function(){
         // Settings.put(ebookURL_filepath, readium.reader.bookmarkCurrentPage(), $.noop);
-        var spotInfo = getCurrentSpotInfo();
+        var spotInfo = Helpers.getCurrentSpotInfo();
 
-        if(spotInfo.bookId) {
-            initUserDataBook(spotInfo.bookId);
-            if(userData.books[spotInfo.bookId].latest_location != spotInfo.ebookSpot) {
-                userData.books[spotInfo.bookId].latest_location = spotInfo.ebookSpot;
-                userData.books[spotInfo.bookId].updated_at = Helpers.getUTCTimeStamp();
-
-                Settings.patch(userData);
+        if(bookId) {
+            initUserDataBook(bookId);
+            if(userData.books[bookId].latest_location != spotInfo.ebookSpot) {
+                userData.books[bookId].latest_location = spotInfo.ebookSpot;
+                userData.books[bookId].updated_at = Helpers.getUTCTimeStamp();
+                Settings.patch(userData, refreshUserDataCallback);
             }
         }
     }
 
     var getBookmarkURL = function(){
-        var spotInfo = getCurrentSpotInfo();
-        if (!spotInfo.ebookURL) return;
+        if (!ebookURL) return;
         
         var bookmark = readium.reader.bookmarkCurrentPage();
         bookmark = JSON.parse(bookmark);
@@ -876,10 +890,10 @@ BookmarkData){
         bookmark.contentCFI = undefined;
         bookmark = JSON.stringify(bookmark);
         
-        spotInfo.ebookURL = ensureUrlIsRelativeToApp(spotInfo.ebookURL);
+        ebookURL = ensureUrlIsRelativeToApp(ebookURL);
 
         var url = Helpers.buildUrlQueryParameters(undefined, {
-            epub: spotInfo.ebookURL,
+            epub: ebookURL,
             epubs: " ",
             embedded: " ",
             goto: bookmark
@@ -928,11 +942,9 @@ BookmarkData){
 
         // Set handlers for click events
         $(".icon-annotations").on("click", function () {
-            var spotInfo = getCurrentSpotInfo();
-
             var highlight = readium.reader.plugins.highlights.addSelectionHighlight(false, "user-highlight");
 
-            initUserDataBook(spotInfo.bookId);
+            initUserDataBook(bookId);
 
             var highlightData = {
                 cfi: highlight.contentCFI,
@@ -941,16 +953,16 @@ BookmarkData){
                 updated_at: Helpers.getUTCTimeStamp()
             };
 
-            var existingHighlight = getHighlightDataObj(highlight.contentCFI, spotInfo)
+            var existingHighlight = getHighlightDataObj(highlight.contentCFI)
 
             if(existingHighlight) {
                 // might exist with the _delete flag
-                userData.books[spotInfo.bookId].highlights[existingHighlight.idx] = highlightData;
+                userData.books[bookId].highlights[existingHighlight.idx] = highlightData;
             } else {
-                userData.books[spotInfo.bookId].highlights.push(highlightData);
+                userData.books[bookId].highlights.push(highlightData);
             }
             
-            Settings.patch(userData);
+            Settings.patch(userData, refreshUserDataCallback);
         });
 
         var isWithinForbiddenNavKeysArea = function()
@@ -1157,12 +1169,13 @@ BookmarkData){
         console.log("MODULE CONFIG:");
         console.log(moduleConfig);
 
-        var spotInfo = getCurrentSpotInfo();
-        var bookKey = 'books/' + spotInfo.bookId;
+        var spotInfo = Helpers.getCurrentSpotInfo();
+        bookId = spotInfo.bookId;
+        var bookKey = 'books/' + bookId;
 
         Settings.getMultiple(['reader', bookKey], function(settings){
 
-            userData.books[spotInfo.bookId] = settings[bookKey] || null;
+            userData.books[bookId] = settings[bookKey] || null;
 
             var readerOptions =  {
                 el: "#epub-reader-frame",
@@ -1181,9 +1194,9 @@ BookmarkData){
 
             _debugBookmarkData_goto = undefined;
             var openPageRequest;
-            if (userData.books[spotInfo.bookId]){
+            if (userData.books[bookId]){
                 try {
-                    var bookmark = JSON.parse(userData.books[spotInfo.bookId].latest_location);
+                    var bookmark = JSON.parse(userData.books[bookId].latest_location);
                     //console.log("Bookmark restore: " + JSON.stringify(bookmark));
                     // openPageRequest = {idref: bookmark.idref, elementCfi: bookmark.contentCFI};
                     openPageRequest = bookmark;
@@ -1254,20 +1267,18 @@ BookmarkData){
                     readium.reader.plugins.highlights.on("annotationClicked", function(type, idref, cfi, id) {
                         console.debug("ANNOTATION CLICK: " + id);
 
-                        var spotInfo = getCurrentSpotInfo();
-
                         readium.reader.plugins.highlights.removeHighlight(id);
 
-                        initUserDataBook(spotInfo.bookId);
-                        var highlightToRemove = getHighlightDataObj(cfi, spotInfo);
+                        initUserDataBook(bookId);
+                        var highlightToRemove = getHighlightDataObj(cfi);
                         if(highlightToRemove) {
-                            userData.books[spotInfo.bookId].highlights[highlightToRemove.idx] = {
+                            userData.books[bookId].highlights[highlightToRemove.idx] = {
                                 cfi: cfi,
                                 updated_at: Helpers.getUTCTimeStamp(),
                                 _delete: true
                             }
                         }
-                        Settings.patch(userData);
+                        Settings.patch(userData, refreshUserDataCallback);
                     });
                 }
     
@@ -1461,9 +1472,15 @@ BookmarkData){
                 loadEbook(readerSettings, openPageRequest);
             });
         });
+        
+        userDataRefreshInterval = setInterval(function() {
+            Settings.refreshUserData(bookId, userData, refreshUserDataCallback);
+        }, (1000*60*60));
     }
 
     var unloadReaderUI = function(){
+
+        clearInterval(userDataRefreshInterval);
 
         if (readium) {
             readium.closePackageDocument();

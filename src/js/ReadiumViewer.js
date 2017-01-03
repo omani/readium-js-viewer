@@ -1,4 +1,4 @@
-define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 'URIjs'], function($, EpubLibrary, EpubReader, Helpers, URI){
+define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 'URIjs', 'Settings'], function($, EpubLibrary, EpubReader, Helpers, URI, Settings){
 
     var _initialLoad = true; // replaces pushState() with replaceState() at first load 
     var initialLoad = function(){
@@ -9,6 +9,8 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
         var libraryURL = urlParams['epubs'];
         var embedded = urlParams['embedded'];
          
+        Settings.patchFromLocalStorage();
+
          // we use triggerHandler() so that the pushState logic is invoked from the first-time open 
          
         if (ebookURL) {

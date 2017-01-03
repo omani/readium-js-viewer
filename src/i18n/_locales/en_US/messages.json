@@ -452,5 +452,14 @@
         "example": "en-US,ja,sr,de,zh_CN"
       }
     }
+  },
+  "biblemesh_i18n_update" : {
+    "message" : "Update"
+  },
+  "biblemesh_location_update" : {
+    "message": "Location Update"
+  },
+  "biblemesh_execute_location_update" : {
+    "message": "Would you like to update your location to the last place read on another device?"
   }
 }

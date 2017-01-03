@@ -5,7 +5,7 @@ function(Helpers){
     
     var userId = 1;  // TODO: this is just a placeholder
 
-    var settingsInLocalStorage = ['reader', 'needsMigration', 'replaceByDefault'];
+    var settingsInLocalStorageOnly = ['reader', 'needsMigration', 'replaceByDefault'];
     var userDataPathPreface = location.origin + '/users/' + userId + '/';
 
     var lastSuccessfulPatch = Helpers.getUTCTimeStamp();
@@ -33,26 +33,19 @@ function(Helpers){
     
     Settings = {
         put : function(key, val, callback){
-            if(settingsInLocalStorage.indexOf(key) != -1) {
-                if (!isLocalStorageEnabled()) {
-                    if (callback) callback();
-                    return;
-                }
-                
+            if (isLocalStorageEnabled()) {
                 var val = JSON.stringify(val);
                 localStorage[key] = val;
-                
-                if (callback){
-                    callback();
-                }
-
-            } else {
-                console.error('Put not supported to the server.'); 
-                callback();
-
             }
+
+            if(settingsInLocalStorageOnly.indexOf(key) == -1) {
+                console.error('Put method not supported to the server.'); 
+            }
+
+            if (callback) callback();
+
         },
-        patch : function(userData){
+        patch : function(userData, staleDataCallback, skipRefresh){
 
             // The apps should record the last time they successfully sent a user-data update to the server.
             // Then, when they go offline and come back online, they can clone the user-data book objects
@@ -64,6 +57,7 @@ function(Helpers){
 
                 var patchTime = Helpers.getUTCTimeStamp();
                 var newUserData = { books: {} };
+                var somethingToPatch = false;
 
                 // filter down the userData object to only new items
                 for(var bookId in userData.books) {
@@ -74,61 +68,77 @@ function(Helpers){
                     if(bookUserData.updated_at > lastSuccessfulPatch) {
                         newUserData.books[bookId].latest_location = bookUserData.latest_location;
                         newUserData.books[bookId].updated_at = bookUserData.updated_at;
+                        somethingToPatch = true;
                     }
 
                     if(bookUserData.highlights) {
                         for(var highlightIdx in bookUserData.highlights) {
                             if(bookUserData.highlights[highlightIdx].updated_at > lastSuccessfulPatch) {
                                 newUserData.books[bookId].highlights.push(bookUserData.highlights[highlightIdx]);
+                                somethingToPatch = true;
                             }
                         }
                     }
                 }
 
-                console.log("Time-filtered userData object for patch request(s):", newUserData);
+                if(somethingToPatch) {
+                    console.log("Time-filtered userData object for patch request(s):", newUserData);
 
-                // send necessary patch requests
-                for(var bookId in newUserData.books) {
+                    if (isLocalStorageEnabled()) {
+                        localStorage['userDataPatch'] = JSON.stringify(newUserData);
+                    }
 
-                    var bookUserData = newUserData.books[bookId];
+                    // send necessary patch requests
+                    for(var bookId in newUserData.books) {
 
-                    if(bookUserData.latest_location || bookUserData.highlights.length > 0) {
+                        var bookUserData = newUserData.books[bookId];
 
-                        var path = userDataPathPreface + 'books/' + bookId + '.json';
+                        if(bookUserData.latest_location || bookUserData.highlights.length > 0) {
 
-                        currentlyPatching = true;
+                            var path = userDataPathPreface + 'books/' + bookId + '.json';
 
-                        var patch = {
-                            url: path,
-                            method: 'PATCH',
-                            data: bookUserData,
-                            success: function () {
-                                console.log("Patch successful.");
-                                currentlyPatching = false;
-                                lastSuccessfulPatch = patchTime;
-                                runPatch();
-                            },
-                            error: function (xhr, status, errorThrown) {
-                                currentlyPatching = false;
-                                if(status == 412) {
-                                    console.log("userData is stale.");
+                            currentlyPatching = true;
+
+                            var patch = {
+                                url: path,
+                                method: 'PATCH',
+                                data: bookUserData,
+                                success: function () {
+                                    console.log("Patch successful.");
+                                    currentlyPatching = false;
                                     lastSuccessfulPatch = patchTime;
-                                    // update the userData on this book
-                                    // runPatch();
-
-                                } else {
-                                    console.error('Patch error when AJAX fetching ' + path);
-                                    console.error(status);
-                                    console.error(errorThrown);
-                                    console.error('Will rerun in 10 seconds.');
-                                    setTimeout(runPatch, 10000);
+                                    runPatch();
+                                },
+                                error: function (xhr, status, errorThrown) {
+                                    currentlyPatching = false;
+                                    if(xhr.status == 412) {
+                                        console.log("userData is stale.");
+                                        lastSuccessfulPatch = patchTime;
+                                        if(!skipRefresh) {
+                                            // update the userData on this book
+                                            Settings.refreshUserData(bookId, userData, staleDataCallback);
+                                        }
+                                    } else {
+                                        console.error('Patch error when AJAX fetching ' + path);
+                                        console.error(status);
+                                        console.error(errorThrown);
+                                        console.error('Will rerun in 10 seconds.');
+                                        setTimeout(runPatch, 10000);
+                                    }
                                 }
                             }
+
+                            console.log("Patch:", patch);
+
+                            $.ajax(patch);
                         }
+                    }
 
-                        console.log("Patch:", patch);
+                } else {
+                    console.log("Nothing to patch.");
 
-                        $.ajax(patch);
+                    if (isLocalStorageEnabled()) {
+                        localStorage.removeItem('userDataPatch');
                     }
                 }
             }
@@ -136,7 +146,7 @@ function(Helpers){
             runPatch();
         },
         get : function(key, callback){
-            if(settingsInLocalStorage.indexOf(key) != -1) {
+            if(settingsInLocalStorageOnly.indexOf(key) != -1) {
                 if (!isLocalStorageEnabled()) {
                     if (callback) callback(null);
                     return;
@@ -177,7 +187,7 @@ function(Helpers){
             }
             
             keys.forEach(function(key, i) {
-                if(settingsInLocalStorage.indexOf(key) != -1) {
+                if(settingsInLocalStorageOnly.indexOf(key) != -1) {
                     if (!isLocalStorageEnabled()) {
                         retVal['_err_' + key] = true;
                     } else {
@@ -206,6 +216,26 @@ function(Helpers){
                     });
                 }
             });
+        },
+        refreshUserData: function(bookId, userData, callback) {
+            var bookKey = 'books/' + bookId;
+            Settings.get(bookKey, function(bookUserData) {
+                if(!bookUserData) throw "Unexpected blank response on refreshUserData";
+
+                userData.books[bookId] = bookUserData;
+                console.log("userData has been refreshed.");
+                if(callback) callback();
+            });
+        },
+//what if this takes longer
+        patchFromLocalStorage: function() {
+            if (isLocalStorageEnabled()) {
+                if(localStorage['userDataPatch']) {
+                    try {
+                        String.patch(JSON.parse(localStorage['userDataPatch']), null, true);
+                    } catch(e) {}
+                }
+            }
         }
     }
     return Settings;
