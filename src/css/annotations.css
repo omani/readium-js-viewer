@@ -9,3 +9,19 @@
     opacity: 0.4;
     background-color: red;
 }
+
+.rd-highlight.sel-highlight {
+    position: absolute;
+    opacity: 0.2;
+    background-color: gray;
+}
+
+#highlightOpts {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 200px;
+  background: yellow;
+  z-index: 2000;
+}

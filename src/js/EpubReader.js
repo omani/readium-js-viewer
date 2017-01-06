@@ -819,6 +819,15 @@ BookmarkData){
             });
         }
     }
+    
+    var biblemesh_delHighlightOpts = function() {
+        var iframe = $("#epub-reader-frame iframe")[0];
+        var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
+        var docEl = $( doc.documentElement );
+
+        readium.reader.plugins.highlights.removeHighlight("highlightOpts-sel-highlight");
+        docEl.children("#highlightOpts").remove();
+    }
 
     //TODO: also update "previous/next page" commands status (disabled/enabled), not just button visibility.
     // https://github.com/readium/readium-js-viewer/issues/188
@@ -975,6 +984,83 @@ BookmarkData){
         var url = biblemesh_getBookmarkURL()
         
         history['replaceState'](null, null, url);
+    }
+
+    var biblemesh_showHighlightOptions = function(){
+        
+        var iframe = $("#epub-reader-frame iframe")[0];
+        var win = iframe.contentWindow || iframe;
+        var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
+        var docEl = $( doc.documentElement );
+        var sel = win.getSelection();
+        var selStr = sel.toString().replace(/\n/g,' ').trim();
+        var cfiObj = readium.reader.plugins.highlights.getCurrentSelectionCfi();
+
+        biblemesh_delHighlightOpts();
+
+        if(!sel.isCollapsed && selStr!='' && cfiObj) {
+
+            var docHt = docEl.height();
+            var docWd = docEl.width();
+
+            var docLeft = parseInt(docEl.css("left"), 10);
+
+            
+            // see if selection is over highlight
+            var selHighlight = undefined;
+            biblemesh_userData.books[biblemesh_bookId].highlights.some(function(highlight) {
+                if(highlight.cfi == cfiObj.cfi) {
+                    selHighlight = highlight;
+                    return true;
+                }
+            });
+
+            // get selection bounding box
+            var rg = sel.getRangeAt(0);
+            var cRect = rg.getBoundingClientRect();
+            var selectionVeryTop = cRect.top;
+            var selectionVeryBottom = cRect.top+cRect.height;
+            var selectionVeryLeft = cRect.left;
+            var selectionVeryRight = cRect.left+cRect.width;
+
+            var highlightOptsEl = $( "<div id='highlightOpts'></div>" );
+
+            var style = {
+                width: Math.min( 400 , docWd ),
+                height: Math.min( 300 , docHt )
+            }
+
+            var midLeft = docLeft * -1 + parseInt((selectionVeryLeft + selectionVeryRight) / 2);
+            var moreRoomAtTop = (selectionVeryTop + selectionVeryBottom) / 2 > docHt / 2;
+
+            style.left = Math.max( 0 , Math.min( docWd - docLeft - style.width , midLeft - parseInt(style.width/2) ) );
+            style.top = Math.max( 0 , Math.min( docHt - style.height , moreRoomAtTop ? selectionVeryTop - style.height : selectionVeryBottom ) );;
+
+            highlightOptsEl.css(style);
+
+            if(selHighlight) {
+                highlightOptsEl.html(selHighlight.cfi);
+            }
+
+                        // readium.reader.plugins.highlights.removeHighlight(id);
+
+                        // // biblemesh : the rest of this function is new
+                        // biblemesh_initUserDataBook(biblemesh_bookId);
+                        // var highlightToRemove = biblemesh_getHighlightDataObj(cfi);
+                        // if(highlightToRemove) {
+                        //     biblemesh_userData.books[biblemesh_bookId].highlights[highlightToRemove.idx] = {
+                        //         cfi: cfi,
+                        //         updated_at: biblemesh_Helpers.getUTCTimeStamp(),
+                        //         _delete: true
+                        //     }
+                        // }
+                        // Settings.patch(biblemesh_userData, biblemesh_refreshUserDataCallback);
+
+            docEl.append(highlightOptsEl);
+
+            readium.reader.plugins.highlights.addSelectionHighlight("highlightOpts-sel-highlight", "sel-highlight", undefined, true);
+
+        }
     }
 
     var nextPage = function () {
@@ -1341,20 +1427,21 @@ BookmarkData){
 
                     readium.reader.plugins.highlights.on("annotationClicked", function(type, idref, cfi, id) {
                         console.debug("ANNOTATION CLICK: " + id);
+                        // biblemesh_ : this function has all new contents
 
-                        readium.reader.plugins.highlights.removeHighlight(id);
+                        var iframe = $("#epub-reader-frame iframe")[0];
+                        var win = iframe.contentWindow || iframe;
+                        var sel = win.getSelection();
 
-                        // biblemesh : the rest of this function is new
-                        biblemesh_initUserDataBook(biblemesh_bookId);
-                        var highlightToRemove = biblemesh_getHighlightDataObj(cfi);
-                        if(highlightToRemove) {
-                            biblemesh_userData.books[biblemesh_bookId].highlights[highlightToRemove.idx] = {
-                                cfi: cfi,
-                                updated_at: biblemesh_Helpers.getUTCTimeStamp(),
-                                _delete: true
-                            }
-                        }
-                        Settings.patch(biblemesh_userData, biblemesh_refreshUserDataCallback);
+                        // select the text of a highlight
+                        var highlightBookmarkData = new BookmarkData(idref, cfi);
+                        var highlightRange = readium.reader.getDomRangeFromRangeCfi(highlightBookmarkData);
+
+                        sel.removeAllRanges();
+                        sel.addRange(highlightRange);
+        
+                        biblemesh_showHighlightOptions();
+
                     });
                 }
     
@@ -1391,6 +1478,38 @@ BookmarkData){
             
             readium.reader.addIFrameEventListener('blur', function(e) {
                 $('#reading-area').removeClass("contentFocus");
+            });
+
+            // biblemesh_ : the following two listeners are new
+            readium.reader.addIFrameEventListener('mousedown', function(e) {
+                if(!e || !e.target) { return; }
+
+                if($(e.target).attr('id') == "highlightOpts" || $(e.target).parents("#highlightOpts").length != 0) {
+                    // e.preventDefault();
+                    // e.stopPropogation();
+                    return;
+                } else {
+                    var iframe = $("#epub-reader-frame iframe")[0];
+                    var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
+                    var docEl = $( doc.documentElement );
+
+                    biblemesh_delHighlightOpts();
+                }
+            });
+            readium.reader.addIFrameEventListener('mouseup', function(e) {
+                if(!e || !e.target) { return; }
+
+                if($(e.target).attr('id') == "highlightOpts" || $(e.target).parents("#highlightOpts").length != 0) {
+                    // e.preventDefault();
+                    // e.stopPropogation();
+                    return;
+                }
+
+                setTimeout(function() {
+// test on touch
+                    biblemesh_showHighlightOptions();
+                }, 1);
+                
             });
 
             SettingsDialog.initDialog(readium.reader);
