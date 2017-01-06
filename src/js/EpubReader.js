@@ -832,7 +832,12 @@ BookmarkData){
         else
             $("#right-page-btn").hide();
 
-        biblemesh_drawHighlights();
+        // biblemesh_ : IF and ELSE block new
+        if(pageChangeData.spineItem == undefined) {  // i.e. if they are on the same chapter
+            readium.reader.plugins.highlights.redrawAnnotations();  // quicker than running biblemesh_drawHighlights
+        } else {
+            biblemesh_drawHighlights();
+        }
     }
 
     var biblemesh_initUserDataBook = function(){
