@@ -4,7 +4,7 @@ define([
 'bootstrap',
 'bootstrapA11y',
 'StorageManager',
-'Settings',
+'biblemesh_Settings',
 './EpubLibraryManager',
 'i18nStrings',
 'hgn!readium_js_viewer_html_templates/library-navbar.html',
@@ -21,7 +21,8 @@ define([
 'Analytics',
 './Keyboard',
 './versioning/ReadiumVersioning',
-'readium_shared_js/helpers'],
+'readium_shared_js/helpers',
+'readium_shared_js/biblemesh_helpers'],
 
 function(
 moduleConfig,
@@ -46,7 +47,8 @@ Messages,
 Analytics,
 Keyboard,
 Versioning,
-Helpers){
+Helpers,
+biblemesh_Helpers){
 
     var detailsDialogStr = DetailsDialog({strings: Strings});
 
@@ -276,7 +278,7 @@ Helpers){
     }
 
     var readClick = function(e){
-        var urlParams = Helpers.getURLQueryParams();
+        var urlParams = biblemesh_Helpers.getURLQueryParams();
         //var ebookURL = urlParams['epub'];
         var libraryURL = urlParams['epubs'];
         var embedded = urlParams['embedded'];
@@ -301,7 +303,7 @@ Helpers){
                     + "//"
                     + window.location.hostname
                     + (window.location.port ? (':' + window.location.port) : '')
-                    // + window.location.pathname
+                    // + window.location.pathname  biblemesh_
                     + '/'
                 ) : 'index.html'
                 ;

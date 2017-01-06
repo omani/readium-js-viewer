@@ -1,4 +1,4 @@
-define(['hgn!readium_js_viewer_html_templates/settings-keyboard-item.html', 'i18nStrings', './Dialogs', 'Settings', './Keyboard', 'underscore'], function(KeyboardItem, Strings, Dialogs, Settings, Keyboard, _){
+define(['hgn!readium_js_viewer_html_templates/settings-keyboard-item.html', 'i18nStrings', './Dialogs', 'biblemesh_Settings', './Keyboard', 'underscore'], function(KeyboardItem, Strings, Dialogs, Settings, Keyboard, _){
 
 
     var checkKeyboardShortcuts = function($focusedInput, typing)

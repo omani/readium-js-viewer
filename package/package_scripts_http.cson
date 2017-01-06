@@ -101,7 +101,7 @@
     'http:app': '
 
         node
-            readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/app.js
+            readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/biblemesh_app.js
 
             -OPEN
             /dev/index_RequireJS_no-optimize.html
@@ -116,7 +116,7 @@
     'http:ebooks': '
 
         node
-            readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/app.js
+            readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/biblemesh_app.js
 
             -p 8080
 
@@ -130,7 +130,7 @@
     'http:app_ebooks': '
 
         node
-            readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/app.js
+            readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/biblemesh_app.js
 
             -OPEN
             /dev/index_RequireJS_no-optimize.html
@@ -146,7 +146,7 @@
     'http:cloudReaderDist': '
 
         node
-            readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/app.js
+            readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/biblemesh_app.js
             
             -p 8080
     

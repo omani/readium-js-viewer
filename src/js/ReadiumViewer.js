@@ -1,11 +1,11 @@
-define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 'URIjs', 'Settings'], function($, EpubLibrary, EpubReader, Helpers, URI, Settings){
+define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 'readium_shared_js/biblemesh_helpers', 'URIjs', 'biblemesh_Settings'], function($, EpubLibrary, EpubReader, Helpers, biblemesh_Helpers, URI, Settings){
 
     var _initialLoad = true; // replaces pushState() with replaceState() at first load 
     var initialLoad = function(){
 
-        Settings.patchFromLocalStorage(function() {
+        Settings.patchFromLocalStorage(function() {  // biblemesh_ : this wrapper is new
             
-            var urlParams = Helpers.getURLQueryParams();
+            var urlParams = biblemesh_Helpers.getURLQueryParams();
 
             var ebookURL = urlParams['epub'];
             var libraryURL = urlParams['epubs'];
@@ -121,7 +121,7 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
         var epubs = eventPayload.epubs;
         epubs = EpubReader.ensureUrlIsRelativeToApp(epubs);
         
-        var urlState = Helpers.buildUrlQueryParameters(undefined, {
+        var urlState = biblemesh_Helpers.buildUrlQueryParameters(undefined, {
             epub: ebookURL_filepath,
             epubs: (epubs ? epubs : undefined),
             embedded: (eventPayload.embedded ? eventPayload.embedded : undefined)
@@ -150,7 +150,7 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
         
         libraryURL = EpubReader.ensureUrlIsRelativeToApp(libraryURL);
         
-        var urlState = Helpers.buildUrlQueryParameters(undefined, {
+        var urlState = biblemesh_Helpers.buildUrlQueryParameters(undefined, {
             epubs: (libraryURL ? libraryURL : undefined),
             epub: " ",
             goto: " "
@@ -238,7 +238,7 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
                     
                     if (file.type == "application/epub+zip" || (/\.epub$/.test(file.name))) {
                     
-                        var urlParams = Helpers.getURLQueryParams();
+                        var urlParams = biblemesh_Helpers.getURLQueryParams();
                         //var ebookURL = urlParams['epub'];
                         var libraryURL = urlParams['epubs'];
                         var embedded = urlParams['embedded'];

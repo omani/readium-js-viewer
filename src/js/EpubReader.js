@@ -7,7 +7,7 @@ define([
 'bootstrapA11y',
 'URIjs',
 './Spinner',
-'Settings',
+'biblemesh_Settings',
 'i18nStrings',
 './Dialogs',
 './ReaderSettingsDialog',
@@ -24,6 +24,7 @@ define([
 './versioning/ReadiumVersioning',
 'readium_js/Readium',
 'readium_shared_js/helpers',
+'readium_shared_js/biblemesh_helpers',
 'readium_shared_js/models/bookmark_data'],
 
 function (
@@ -52,6 +53,7 @@ GesturesHandler,
 Versioning,
 Readium,
 Helpers,
+biblemesh_Helpers,
 BookmarkData){
 
     // initialised in initReadium()
@@ -63,7 +65,7 @@ BookmarkData){
     // initialised in loadReaderUI(), with passed data.epub
     var ebookURL = undefined;
     var ebookURL_filepath = undefined;
-    var bookId = undefined;
+    var biblemesh_bookId = undefined;
     
     // initialised in loadEbook() >> readium.openPackageDocument()
     var currentPackageDocument = undefined;
@@ -72,7 +74,7 @@ BookmarkData){
     // (variable not actually used anywhere here, but top-level to indicate that its lifespan is that of the reader object (not to be garbage-collected))
     var gesturesHandler = undefined;
 
-    var userData = { books: {} };
+    var biblemesh_userData = { books: {} };
     /*  EXAMPLE
         books: {
             <book_id>: {
@@ -92,7 +94,7 @@ BookmarkData){
         }
     */
 
-    var userDataRefreshInterval = 0;
+    var biblemesh_userDataRefreshInterval = 0;
     
     // TODO: is this variable actually used anywhere here??
     // (bad naming convention, hard to find usages of "el")
@@ -133,7 +135,7 @@ BookmarkData){
             + window.location.hostname
             + (window.location.port ? (':' + window.location.port) : '')
             // + window.location.pathname
-            + "/"
+            + "/"  // biblemesh_
         ) : undefined;
         
         if (appUrl) {
@@ -169,7 +171,7 @@ BookmarkData){
     var _debugBookmarkData_goto = undefined;
     var debugBookmarkData = function(cfi) {
             
-        var DEBUG = false; // change this to visualize the CFI range
+        var DEBUG = false; // change this to visualize the CFI range  biblemesh_
         if (!DEBUG) return;
                 
         if (!readium) return;
@@ -481,8 +483,8 @@ BookmarkData){
                 _debugBookmarkData_goto = undefined;
             }
             
-            updateURL();
-            savePlace();
+            biblemesh_updateURL();
+            biblemesh_savePlace();
             updateUI(pageChangeData);
 
             spin(false);
@@ -773,10 +775,10 @@ BookmarkData){
         }
     }
 
-    var getHighlightDataObj = function(cfi) {
+    var biblemesh_getHighlightDataObj = function(cfi) {
         var returnObj = false;
 
-        userData.books[bookId].highlights.forEach(function(highlight, idx) {
+        biblemesh_userData.books[biblemesh_bookId].highlights.forEach(function(highlight, idx) {
             if(highlight.cfi == cfi) {
                 returnObj = {
                     highlight: highlight,
@@ -788,15 +790,15 @@ BookmarkData){
         return returnObj;
     }
 
-    var drawHighlights = function() {
+    var biblemesh_drawHighlights = function() {
         if (readium && readium.reader.plugins.highlights) {
 
-            var spotInfo = Helpers.getCurrentSpotInfo();
+            var spotInfo = biblemesh_Helpers.getCurrentSpotInfo();
 
             // next line needed especially for switching between books
             readium.reader.plugins.highlights.removeHighlightsByType("user-highlight");
 
-            userData.books[bookId].highlights.forEach(function(highlight) {
+            biblemesh_userData.books[biblemesh_bookId].highlights.forEach(function(highlight) {
                 var idRef;
                 try {
                     idRef = JSON.parse(spotInfo.ebookSpot).idref;
@@ -806,7 +808,11 @@ BookmarkData){
                 // without this line, highlights are sometimes not added on the next because they are listed as still there
                 readium.reader.plugins.highlights.removeHighlight(highlight.cfi);
                 if(!highlight._delete) {
-                    readium.reader.plugins.highlights.addHighlight(idRef, highlight.cfi, highlight.cfi, "user-highlight");
+                    try {
+                        readium.reader.plugins.highlights.addHighlight(idRef, highlight.cfi, highlight.cfi, "user-highlight");
+                    } catch(e) {
+                        // may fail because the highlight is off the current page
+                    }
                 }
             });
         }
@@ -826,12 +832,12 @@ BookmarkData){
         else
             $("#right-page-btn").hide();
 
-        drawHighlights();
+        biblemesh_drawHighlights();
     }
 
-    var initUserDataBook = function(){
-        if(!userData.books[bookId]) {
-            userData.books[bookId] = {
+    var biblemesh_initUserDataBook = function(){
+        if(!biblemesh_userData.books[biblemesh_bookId]) {
+            biblemesh_userData.books[biblemesh_bookId] = {
                 latest_location: '',
                 updated_at: 0,
                 highlights: []
@@ -839,15 +845,15 @@ BookmarkData){
         }
     }
 
-    var askedAboutLocationUpdate = false;
-    var refreshUserDataCallback = function() {
-        var spotInfo = Helpers.getCurrentSpotInfo();
+    var biblemesh_askedAboutLocationUpdate = false;
+    var biblemesh_refreshUserDataCallback = function() {
+        var spotInfo = biblemesh_Helpers.getCurrentSpotInfo();
 
-        drawHighlights();
+        biblemesh_drawHighlights();
 
-        if(!askedAboutLocationUpdate) {
+        if(!biblemesh_askedAboutLocationUpdate) {
             try {
-                var latLoc = userData.books[bookId].latest_location;
+                var latLoc = biblemesh_userData.books[biblemesh_bookId].latest_location;
                 if(latLoc && latLoc != spotInfo.ebookSpot) {
                     var dataLoc = JSON.parse(latLoc);
                     if(dataLoc.idref && dataLoc.elementCfi) {
@@ -856,7 +862,7 @@ BookmarkData){
                                                 function(){
                                                     readium.reader.openSpineItemElementCfi(dataLoc.idref, dataLoc.elementCfi);
                                                 });
-                        askedAboutLocationUpdate = true;
+                        biblemesh_askedAboutLocationUpdate = true;
                     }
                 }
             } catch (e) {}
@@ -864,20 +870,23 @@ BookmarkData){
     }
 
     var savePlace = function(){
-        // Settings.put(ebookURL_filepath, readium.reader.bookmarkCurrentPage(), $.noop);
-        var spotInfo = Helpers.getCurrentSpotInfo();
+        Settings.put(ebookURL_filepath, readium.reader.bookmarkCurrentPage(), $.noop);
+    }
 
-        if(bookId) {
-            initUserDataBook(bookId);
-            if(userData.books[bookId].latest_location != spotInfo.ebookSpot) {
-                userData.books[bookId].latest_location = spotInfo.ebookSpot;
-                userData.books[bookId].updated_at = Helpers.getUTCTimeStamp();
-                Settings.patch(userData, refreshUserDataCallback);
+    var biblemesh_savePlace = function(){
+        var spotInfo = biblemesh_Helpers.getCurrentSpotInfo();
+
+        if(biblemesh_bookId) {
+            biblemesh_initUserDataBook(biblemesh_bookId);
+            if(biblemesh_userData.books[biblemesh_bookId].latest_location != spotInfo.ebookSpot) {
+                biblemesh_userData.books[biblemesh_bookId].latest_location = spotInfo.ebookSpot;
+                biblemesh_userData.books[biblemesh_bookId].updated_at = biblemesh_Helpers.getUTCTimeStamp();
+                Settings.patch(biblemesh_userData, biblemesh_refreshUserDataCallback);
             }
         }
     }
 
-    var getBookmarkURL = function(){
+    var biblemesh_getBookmarkURL = function(){
         if (!ebookURL) return;
         
         var bookmark = readium.reader.bookmarkCurrentPage();
@@ -892,7 +901,7 @@ BookmarkData){
         
         ebookURL = ensureUrlIsRelativeToApp(ebookURL);
 
-        var url = Helpers.buildUrlQueryParameters(undefined, {
+        var url = biblemesh_Helpers.buildUrlQueryParameters(undefined, {
             epub: ebookURL,
             epubs: " ",
             embedded: " ",
@@ -902,9 +911,9 @@ BookmarkData){
         return url;
     }
 
-    var updateURL = function(){
+    var biblemesh_updateURL = function(){
 
-        var url = getBookmarkURL()
+        var url = biblemesh_getBookmarkURL()
         
         history['replaceState'](null, null, url);
     }
@@ -928,7 +937,8 @@ BookmarkData){
         } else {
             $(".icon-shareUrl").on("click", function () {
                 
-                var url = getBookmarkURL();
+                // biblemesh_ : Next line replaces 17 lines of code
+                var url = biblemesh_getBookmarkURL();
                 
                 //showModalMessage
                 //showErrorWithDetails
@@ -942,27 +952,30 @@ BookmarkData){
 
         // Set handlers for click events
         $(".icon-annotations").on("click", function () {
-            var highlight = readium.reader.plugins.highlights.addSelectionHighlight(false, "user-highlight");
+            // biblemesh_ : this entire function replaced
+            var cfiObj = readium.reader.plugins.highlights.getCurrentSelectionCfi();
+            if(!cfiObj) return;
+            var highlight = readium.reader.plugins.highlights.addSelectionHighlight(cfiObj.cfi, "user-highlight");
 
-            initUserDataBook(bookId);
+            biblemesh_initUserDataBook(biblemesh_bookId);
 
             var highlightData = {
                 cfi: highlight.contentCFI,
                 color: 1,
                 note: "",
-                updated_at: Helpers.getUTCTimeStamp()
+                updated_at: biblemesh_Helpers.getUTCTimeStamp()
             };
 
-            var existingHighlight = getHighlightDataObj(highlight.contentCFI)
+            var existingHighlight = biblemesh_getHighlightDataObj(highlight.contentCFI)
 
             if(existingHighlight) {
                 // might exist with the _delete flag
-                userData.books[bookId].highlights[existingHighlight.idx] = highlightData;
+                biblemesh_userData.books[biblemesh_bookId].highlights[existingHighlight.idx] = highlightData;
             } else {
-                userData.books[bookId].highlights.push(highlightData);
+                biblemesh_userData.books[biblemesh_bookId].highlights.push(highlightData);
             }
             
-            Settings.patch(userData, refreshUserDataCallback);
+            Settings.patch(biblemesh_userData, biblemesh_refreshUserDataCallback);
         });
 
         var isWithinForbiddenNavKeysArea = function()
@@ -1020,7 +1033,7 @@ BookmarkData){
         {
             $("html").attr("data-theme", "library");
             
-            var urlParams = Helpers.getURLQueryParams();
+            var urlParams = biblemesh_Helpers.getURLQueryParams();
             //var ebookURL = urlParams['epub'];
             var libraryURL = urlParams['epubs'];
             
@@ -1169,13 +1182,14 @@ BookmarkData){
         console.log("MODULE CONFIG:");
         console.log(moduleConfig);
 
-        var spotInfo = Helpers.getCurrentSpotInfo();
-        bookId = spotInfo.bookId;
-        var bookKey = 'books/' + bookId;
+        // biblemesh_ : next lines through the call to to getMultiple and the setting of biblemesh_userData are new
+        var spotInfo = biblemesh_Helpers.getCurrentSpotInfo();
+        biblemesh_bookId = spotInfo.bookId;
+        var bookKey = 'books/' + biblemesh_bookId;
 
         Settings.getMultiple(['reader', bookKey], function(settings){
 
-            userData.books[bookId] = settings[bookKey] || null;
+            biblemesh_userData.books[biblemesh_bookId] = settings[bookKey] || null;
 
             var readerOptions =  {
                 el: "#epub-reader-frame",
@@ -1194,9 +1208,10 @@ BookmarkData){
 
             _debugBookmarkData_goto = undefined;
             var openPageRequest;
-            if (userData.books[bookId]){
+            // biblemesh_ : following IF block replaces original
+            if (biblemesh_userData.books[biblemesh_bookId]){
                 try {
-                    var bookmark = JSON.parse(userData.books[bookId].latest_location);
+                    var bookmark = JSON.parse(biblemesh_userData.books[biblemesh_bookId].latest_location);
                     //console.log("Bookmark restore: " + JSON.stringify(bookmark));
                     // openPageRequest = {idref: bookmark.idref, elementCfi: bookmark.contentCFI};
                     openPageRequest = bookmark;
@@ -1206,11 +1221,12 @@ BookmarkData){
                 }
             }
 
-            if (spotInfo.ebookSpot) {
-                console.log("Goto override? " + spotInfo.ebookSpot);
+            var goto = spotInfo.ebookSpot;  //biblemesh_
+            if (goto) {
+                console.log("Goto override? " + goto);
                 
                 try {
-                    var gotoObj = JSON.parse(spotInfo.ebookSpot);
+                    var gotoObj = JSON.parse(goto);
                     
                     var openPageRequest_ = undefined;
                     
@@ -1269,16 +1285,17 @@ BookmarkData){
 
                         readium.reader.plugins.highlights.removeHighlight(id);
 
-                        initUserDataBook(bookId);
-                        var highlightToRemove = getHighlightDataObj(cfi);
+                        // biblemesh : the rest of this function is new
+                        biblemesh_initUserDataBook(biblemesh_bookId);
+                        var highlightToRemove = biblemesh_getHighlightDataObj(cfi);
                         if(highlightToRemove) {
-                            userData.books[bookId].highlights[highlightToRemove.idx] = {
+                            biblemesh_userData.books[biblemesh_bookId].highlights[highlightToRemove.idx] = {
                                 cfi: cfi,
-                                updated_at: Helpers.getUTCTimeStamp(),
+                                updated_at: biblemesh_Helpers.getUTCTimeStamp(),
                                 _delete: true
                             }
                         }
-                        Settings.patch(userData, refreshUserDataCallback);
+                        Settings.patch(biblemesh_userData, biblemesh_refreshUserDataCallback);
                     });
                 }
     
@@ -1350,7 +1367,7 @@ BookmarkData){
 
             var readerSettings;
             if (settings.reader){
-                readerSettings = settings.reader;
+                readerSettings = settings.reader;   // biblemesh_
             }
             if (!embedded){
                 readerSettings = readerSettings || SettingsDialog.defaultSettings;
@@ -1473,14 +1490,15 @@ BookmarkData){
             });
         });
         
-        userDataRefreshInterval = setInterval(function() {
-            Settings.refreshUserData(bookId, userData, refreshUserDataCallback);
+        // biblemesh_ : Next statement is new
+        biblemesh_userDataRefreshInterval = setInterval(function() {
+            Settings.refreshUserData(biblemesh_bookId, biblemesh_userData, biblemesh_refreshUserDataCallback);
         }, (1000*60*60));
     }
 
     var unloadReaderUI = function(){
 
-        clearInterval(userDataRefreshInterval);
+        clearInterval(biblemesh_userDataRefreshInterval);  // biblemesh_
 
         if (readium) {
             readium.closePackageDocument();

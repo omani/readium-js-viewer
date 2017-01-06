@@ -1,4 +1,4 @@
-define(['i18nStrings', 'keymaster', 'Settings'], function(Strings, key, Settings){
+define(['i18nStrings', 'keymaster', 'biblemesh_Settings'], function(Strings, key, Settings){
 
     var keyBindings = {};
 
