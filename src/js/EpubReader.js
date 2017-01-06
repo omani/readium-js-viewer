@@ -219,6 +219,8 @@ BookmarkData){
     // This function will retrieve a package document and load an EPUB
     var loadEbook = function (readerSettings, openPageRequest) {
 
+        biblemesh_askedAboutLocationUpdate = false;
+
         readium.openPackageDocument(
             
             ebookURL,
@@ -850,6 +852,46 @@ BookmarkData){
         }
     }
 
+    //copied from readium-js/readium-shared-js/plugins/highlights
+    var biblemesh_parseContentCfi = function(cont) {
+        return cont.replace(/\[(.*?)\]/, "").split(/[\/,:]/).map(function(n) {
+            return parseInt(n);
+        }).filter(Boolean);
+    }
+
+    //copied from readium-js/readium-shared-js/plugins/highlights
+    var biblemesh_contentCfiComparator = function(cont1, cont2) {
+        cont1 = biblemesh_parseContentCfi(cont1);
+        cont2 = biblemesh_parseContentCfi(cont2);
+
+        //compare cont arrays looking for differences
+        for (var i = 0; i < cont1.length; i++) {
+            if (cont1[i] > cont2[i]) {
+                return 1;
+            } else if (cont1[i] < cont2[i]) {
+                return -1;
+            }
+        }
+
+        //no differences found, so confirm that cont2 did not have values we didn't check
+        if (cont1.length < cont2.length) {
+            return -1;
+        }
+
+        //cont arrays are identical
+        return 0;
+    }
+
+    //copied from readium-js/readium-shared-js/plugins/highlights
+    var biblemesh_cfiIsBetweenTwoCfis = function(cfi, firstVisibleCfi, lastVisibleCfi) {
+        if (!firstVisibleCfi || !lastVisibleCfi) {
+            return null;
+        }
+        var first = biblemesh_contentCfiComparator(cfi, firstVisibleCfi);
+        var second = biblemesh_contentCfiComparator(cfi, lastVisibleCfi);
+        return first >= 0 && second <= 0;
+    }
+
     var biblemesh_askedAboutLocationUpdate = false;
     var biblemesh_refreshUserDataCallback = function() {
         var spotInfo = biblemesh_Helpers.getCurrentSpotInfo();
@@ -862,12 +904,24 @@ BookmarkData){
                 if(latLoc && latLoc != spotInfo.ebookSpot) {
                     var dataLoc = JSON.parse(latLoc);
                     if(dataLoc.idref && dataLoc.elementCfi) {
-                        Dialogs.showModalPrompt(Strings.biblemesh_location_update, Strings.biblemesh_execute_location_update,
-                                                Strings.biblemesh_i18n_update, Strings.i18n_cancel,
-                                                function(){
-                                                    readium.reader.openSpineItemElementCfi(dataLoc.idref, dataLoc.elementCfi);
-                                                });
-                        biblemesh_askedAboutLocationUpdate = true;
+
+                        var firstVisibleCfi = readium.reader.getFirstVisibleCfi();
+                        var lastVisibleCfi = readium.reader.getLastVisibleCfi();
+
+                        if (firstVisibleCfi &&
+                            lastVisibleCfi &&
+                            !biblemesh_cfiIsBetweenTwoCfis(
+                                dataLoc.elementCfi,
+                                firstVisibleCfi.contentCFI,
+                                lastVisibleCfi.contentCFI)
+                        ) {
+                            Dialogs.showModalPrompt(Strings.biblemesh_location_update, Strings.biblemesh_execute_location_update,
+                                                    Strings.biblemesh_i18n_update, Strings.i18n_cancel,
+                                                    function(){
+                                                        readium.reader.openSpineItemElementCfi(dataLoc.idref, dataLoc.elementCfi);
+                                                    });
+                            biblemesh_askedAboutLocationUpdate = true;
+                        }
                     }
                 }
             } catch (e) {}
