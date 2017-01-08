@@ -461,5 +461,14 @@
   },
   "biblemesh_execute_location_update" : {
     "message": "Would you like to update your location to the last place read on another device?"
+  },
+  "biblemesh_highlight" : {
+    "message": "Highlight"
+  },
+  "biblemesh_notes" : {
+    "message": "Notes"
+  },
+  "biblemesh_share" : {
+    "message": "Share"
   }
 }

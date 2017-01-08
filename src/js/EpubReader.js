@@ -15,6 +15,7 @@ define([
 'hgn!readium_js_viewer_html_templates/reader-navbar.html',
 'hgn!readium_js_viewer_html_templates/reader-body.html',
 'hgn!readium_js_viewer_html_templates/reader-body-page-btns.html',
+'hgn!readium_js_viewer_html_templates/biblemesh_highlight-opts.html',
 'Analytics',
 'screenfull',
 './Keyboard',
@@ -44,6 +45,7 @@ AboutDialog,
 ReaderNavbar,
 ReaderBody,
 ReaderBodyPageButtons,
+biblemesh_highlightOptions,
 Analytics,
 screenfull,
 Keyboard,
@@ -825,6 +827,8 @@ BookmarkData){
         var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
         var docEl = $( doc.documentElement );
 
+        docEl.find('.highlightOpts-note-text').trigger('blur');
+
         readium.reader.plugins.highlights.removeHighlight("highlightOpts-sel-highlight");
         docEl.children("#highlightOpts").remove();
     }
@@ -996,24 +1000,46 @@ BookmarkData){
         var selStr = sel.toString().replace(/\n/g,' ').trim();
         var cfiObj = readium.reader.plugins.highlights.getCurrentSelectionCfi();
 
+        biblemesh_initUserDataBook(biblemesh_bookId);
         biblemesh_delHighlightOpts();
 
         if(!sel.isCollapsed && selStr!='' && cfiObj) {
 
+            var highlightOptsEl = $( biblemesh_highlightOptions(
+                {
+                    strings: Strings
+                }
+            ) );
+
+            var currentHighlight = biblemesh_getHighlightDataObj(cfiObj.cfi);
+
+            var hasCurrentHighlight = function() {
+                return currentHighlight && !currentHighlight.highlight._delete;
+            }
+
+            var setupVisually = function() {
+                highlightOptsEl
+                    .find('.highlightOpts-box-' + (hasCurrentHighlight() ? currentHighlight.highlight.color : 0))
+                    .addClass('highlightOpts-sel')
+                    .siblings('.highlightOpts-box')
+                    .removeClass('highlightOpts-sel');
+                highlightOptsEl
+                    .find('.highlightOpts-line')
+                    .removeClass('highlightOpts-faded')
+                    .slice(1)
+                    [hasCurrentHighlight() ? 'removeClass' : 'addClass']('highlightOpts-faded');
+                highlightOptsEl
+                    .find('.highlightOpts-note-text')
+                    .val(hasCurrentHighlight() ? currentHighlight.highlight.note : '');
+            }
+
+            setupVisually();
+
+            var SHADOW_WIDTH = 10;
             var docHt = docEl.height();
             var docWd = docEl.width();
 
             var docLeft = parseInt(docEl.css("left"), 10);
-
-            
-            // see if selection is over highlight
-            var selHighlight = undefined;
-            biblemesh_userData.books[biblemesh_bookId].highlights.some(function(highlight) {
-                if(highlight.cfi == cfiObj.cfi) {
-                    selHighlight = highlight;
-                    return true;
-                }
-            });
 
             // get selection bounding box
             var rg = sel.getRangeAt(0);
@@ -1023,38 +1049,79 @@ BookmarkData){
             var selectionVeryLeft = cRect.left;
             var selectionVeryRight = cRect.left+cRect.width;
 
-            var highlightOptsEl = $( "<div id='highlightOpts'></div>" );
-
             var style = {
-                width: Math.min( 400 , docWd ),
-                height: Math.min( 300 , docHt )
+                width: Math.min( 400 , docWd - SHADOW_WIDTH*2 ),
+                height: Math.min( 200 , docHt - SHADOW_WIDTH*2 )
             }
 
             var midLeft = docLeft * -1 + parseInt((selectionVeryLeft + selectionVeryRight) / 2);
             var moreRoomAtTop = (selectionVeryTop + selectionVeryBottom) / 2 > docHt / 2;
 
-            style.left = Math.max( 0 , Math.min( docWd - docLeft - style.width , midLeft - parseInt(style.width/2) ) );
-            style.top = Math.max( 0 , Math.min( docHt - style.height , moreRoomAtTop ? selectionVeryTop - style.height : selectionVeryBottom ) );;
+            style.left = Math.max( SHADOW_WIDTH , Math.min( docWd - docLeft - style.width - SHADOW_WIDTH*2 , midLeft - parseInt(style.width/2) ) );
+            style.top = Math.max( SHADOW_WIDTH , Math.min( docHt - style.height - SHADOW_WIDTH*2 , moreRoomAtTop ? selectionVeryTop - style.height : selectionVeryBottom ) );;
 
             highlightOptsEl.css(style);
 
-            if(selHighlight) {
-                highlightOptsEl.html(selHighlight.cfi);
-            }
+// a click on a highlight that includes a partial word does not then indicate a highlight is selected
 
-                        // readium.reader.plugins.highlights.removeHighlight(id);
+            highlightOptsEl.find('.highlightOpts-box').on('click', function() {
+                if($(this).hasClass('highlightOpts-sel')) return;
 
-                        // // biblemesh : the rest of this function is new
-                        // biblemesh_initUserDataBook(biblemesh_bookId);
-                        // var highlightToRemove = biblemesh_getHighlightDataObj(cfi);
-                        // if(highlightToRemove) {
-                        //     biblemesh_userData.books[biblemesh_bookId].highlights[highlightToRemove.idx] = {
-                        //         cfi: cfi,
-                        //         updated_at: biblemesh_Helpers.getUTCTimeStamp(),
-                        //         _delete: true
-                        //     }
-                        // }
-                        // Settings.patch(biblemesh_userData, biblemesh_refreshUserDataCallback);
+                var highlightChoice = parseInt($(this).attr('data-choice'));
+
+                if(highlightChoice == 0) {
+                    readium.reader.plugins.highlights.removeHighlight(cfiObj.cfi);
+
+                    if(currentHighlight) {
+                        currentHighlight.highlight = biblemesh_userData.books[biblemesh_bookId].highlights[currentHighlight.idx] = {
+                            cfi: cfiObj.cfi,
+                            updated_at: biblemesh_Helpers.getUTCTimeStamp(),
+                            _delete: true
+                        }
+                    }
+
+                } else {
+                    readium.reader.plugins.highlights.addHighlight(cfiObj.idref, cfiObj.cfi, cfiObj.cfi, "user-highlight");
+
+                    var highlightData = {
+                        cfi: cfiObj.cfi,
+                        color: highlightChoice,
+                        note: "",
+                        updated_at: biblemesh_Helpers.getUTCTimeStamp()
+                    };
+                    
+                    if(currentHighlight) {
+                        currentHighlight.highlight = biblemesh_userData.books[biblemesh_bookId].highlights[currentHighlight.idx] = highlightData;
+                    } else {
+                        biblemesh_userData.books[biblemesh_bookId].highlights.push(highlightData);
+                        currentHighlight = {
+                            idx: biblemesh_userData.books[biblemesh_bookId].highlights.length - 1,
+                            highlight: highlightData
+                        }
+                    }
+
+                }
+
+                Settings.patch(biblemesh_userData, biblemesh_refreshUserDataCallback);
+
+                setupVisually();
+            });
+
+            highlightOptsEl.find('.highlightOpts-note-text')
+                .on('mousedown', function(e) {
+                    if(!hasCurrentHighlight()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                })
+                .on('blur', function() {
+                    if(hasCurrentHighlight()) {  // should always be true
+                        currentHighlight.highlight.note = $(this).val();
+                        currentHighlight.highlight.updated_at = biblemesh_Helpers.getUTCTimeStamp();
+                        Settings.patch(biblemesh_userData, biblemesh_refreshUserDataCallback);
+                    }
+                });
+
 
             docEl.append(highlightOptsEl);
 
@@ -1096,32 +1163,7 @@ BookmarkData){
         }
 
         // Set handlers for click events
-        $(".icon-annotations").on("click", function () {
-            // biblemesh_ : this entire function replaced
-            var cfiObj = readium.reader.plugins.highlights.getCurrentSelectionCfi();
-            if(!cfiObj) return;
-            var highlight = readium.reader.plugins.highlights.addSelectionHighlight(cfiObj.cfi, "user-highlight");
-
-            biblemesh_initUserDataBook(biblemesh_bookId);
-
-            var highlightData = {
-                cfi: highlight.contentCFI,
-                color: 1,
-                note: "",
-                updated_at: biblemesh_Helpers.getUTCTimeStamp()
-            };
-
-            var existingHighlight = biblemesh_getHighlightDataObj(highlight.contentCFI)
-
-            if(existingHighlight) {
-                // might exist with the _delete flag
-                biblemesh_userData.books[biblemesh_bookId].highlights[existingHighlight.idx] = highlightData;
-            } else {
-                biblemesh_userData.books[biblemesh_bookId].highlights.push(highlightData);
-            }
-            
-            Settings.patch(biblemesh_userData, biblemesh_refreshUserDataCallback);
-        });
+        // $(".icon-annotations").on("click", function () { });  -- biblemesh_ : not needed
 
         var isWithinForbiddenNavKeysArea = function()
         {
@@ -1228,6 +1270,15 @@ BookmarkData){
         $(window).on('resize', setTocSize);
         setTocSize();
         hideLoop();
+
+        // biblemesh_ : new event to ensure save of highlight note
+        $(window).on('unload', function() {
+            var iframe = $("#epub-reader-frame iframe")[0];
+            var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
+            var docEl = $( doc.documentElement );
+
+            docEl.find('.highlightOpts-note-text').trigger('blur');
+        });
 
             // captures all clicks on the document on the capture phase. Not sure if it's possible with jquery
             // so I'm using DOM api directly
@@ -1420,6 +1471,7 @@ BookmarkData){
                 if (!readium.reader.plugins.highlights) {
                     $('.icon-annotations').css("display", "none");
                 } else {
+                    $('.icon-annotations').css("display", "none");  // biblemesh_ 
 
                     readium.reader.plugins.highlights.initialize({
                         annotationCSSUrl: readerOptions.annotationCSSUrl
@@ -1486,7 +1538,7 @@ BookmarkData){
 
                 if($(e.target).attr('id') == "highlightOpts" || $(e.target).parents("#highlightOpts").length != 0) {
                     // e.preventDefault();
-                    // e.stopPropogation();
+                    // e.stopPropagation();
                     return;
                 } else {
                     var iframe = $("#epub-reader-frame iframe")[0];
@@ -1501,12 +1553,11 @@ BookmarkData){
 
                 if($(e.target).attr('id') == "highlightOpts" || $(e.target).parents("#highlightOpts").length != 0) {
                     // e.preventDefault();
-                    // e.stopPropogation();
+                    // e.stopPropagation();
                     return;
                 }
 
                 setTimeout(function() {
-// test on touch
                     biblemesh_showHighlightOptions();
                 }, 1);
                 
@@ -1717,6 +1768,7 @@ BookmarkData){
         $(window).off('mousemove');
         $(window).off('keyup');
         $(window).off('message');
+        $(window).off('unload');  // biblemesh_
         window.clearTimeout(hideTimeoutId);
         $(document.body).removeClass('embedded');
         $('.book-title-header').remove();

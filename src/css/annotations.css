@@ -1,27 +1,85 @@
 .rd-highlight.user-highlight {
     position: absolute;
     opacity: 0.2;
-    background-color: red;
+    background-color: yellow;
 }
 
 .rd-highlight.hover-user-highlight {
     position: absolute;
     opacity: 0.4;
-    background-color: red;
+    background-color: yellow;
 }
 
-.rd-highlight.sel-highlight {
+.rd-highlight.sel-highlight, .rd-highlight.hover-sel-highlight {
     position: absolute;
     opacity: 0.2;
-    background-color: gray;
+    background-color: black;
 }
 
 #highlightOpts {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 200px;
-  height: 200px;
-  background: yellow;
-  z-index: 2000;
+    position: absolute;
+    background: white;
+    z-index: 2000;
+    box-shadow: 0 0 10px black;
+    border-radius: 4px;
+    overflow: hidden;
+    padding: 20px;
+    box-sizing: border-box;
 }
+
+.highlightOpts-label {
+}
+
+.highlightOpts-line {
+    margin-bottom: 5px;
+}
+
+.highlightOpts-line.highlightOpts-faded {
+    opacity: .2;
+}
+
+.highlightOpts-box {
+    display: inline-block;
+    width: 25px;
+    height: 20px;
+    border: 1px solid #999;
+    vertical-align: middle;
+    border-radius: 2px;
+    margin: 0 2px;
+    text-align: center;
+}
+
+.highlightOpts-box.highlightOpts-box-1 {
+    background: yellow;
+}
+
+.highlightOpts-note-text {
+    width: 100%;
+    box-sizing: border-box;
+    height: 90px;
+}
+
+.highlightOpts-share {
+    background: black;
+    color: white;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    text-align: center;
+    border-radius: 50%;
+    margin: 0 2px;
+}
+
+.highlightOpts-box.highlightOpts-sel::after {
+    content: '✓'
+}
+
+.highlightOpts-box:not(.highlightOpts-sel):hover {
+    cursor: pointer;
+    border-color: black;
+}
+
+
+
+
