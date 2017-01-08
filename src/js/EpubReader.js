@@ -802,6 +802,8 @@ BookmarkData){
             // next line needed especially for switching between books
             readium.reader.plugins.highlights.removeHighlightsByType("user-highlight");
 
+            biblemesh_initUserDataBook();
+
             biblemesh_userData.books[biblemesh_bookId].highlights.forEach(function(highlight) {
                 var idRef;
                 try {
@@ -949,7 +951,7 @@ BookmarkData){
         var spotInfo = biblemesh_Helpers.getCurrentSpotInfo();
 
         if(biblemesh_bookId) {
-            biblemesh_initUserDataBook(biblemesh_bookId);
+            biblemesh_initUserDataBook();
             if(biblemesh_userData.books[biblemesh_bookId].latest_location != spotInfo.ebookSpot) {
                 biblemesh_userData.books[biblemesh_bookId].latest_location = spotInfo.ebookSpot;
                 biblemesh_userData.books[biblemesh_bookId].updated_at = biblemesh_Helpers.getUTCTimeStamp();
@@ -1000,7 +1002,7 @@ BookmarkData){
         var selStr = sel.toString().replace(/\n/g,' ').trim();
         var cfiObj = readium.reader.plugins.highlights.getCurrentSelectionCfi();
 
-        biblemesh_initUserDataBook(biblemesh_bookId);
+        biblemesh_initUserDataBook();
         biblemesh_delHighlightOpts();
 
         if(!sel.isCollapsed && selStr!='' && cfiObj) {
