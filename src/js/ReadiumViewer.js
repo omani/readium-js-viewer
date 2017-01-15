@@ -3,35 +3,39 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
     var _initialLoad = true; // replaces pushState() with replaceState() at first load 
     var initialLoad = function(){
 
-        Settings.patchFromLocalStorage(function() {  // biblemesh_ : this wrapper is new
-            
-            var urlParams = biblemesh_Helpers.getURLQueryParams();
+        biblemesh_Helpers.setTimeRelativeToServer(function() {  // biblemesh_ : this wrapper is new
 
-            var ebookURL = urlParams['epub'];
-            var libraryURL = urlParams['epubs'];
-            var embedded = urlParams['embedded'];
+            Settings.patchFromLocalStorage(function() {  // biblemesh_ : this wrapper is new
+                
+                var urlParams = biblemesh_Helpers.getURLQueryParams();
 
-            // we use triggerHandler() so that the pushState logic is invoked from the first-time open 
-            
-            if (ebookURL) {
-                //EpubReader.loadUI(urlParams);
-                var eventPayload = {embedded: embedded, epub: ebookURL, epubs: libraryURL};
-                $(window).triggerHandler('readepub', eventPayload);
-            }
-            else {
-                //EpubLibrary.loadUI({epubs: libraryURL});
-                var eventPayload = libraryURL;
-                $(window).triggerHandler('loadlibrary', eventPayload);
-            }
+                var ebookURL = urlParams['epub'];
+                var libraryURL = urlParams['epubs'];
+                var embedded = urlParams['embedded'];
 
-            $(document.body).on('click', function()
-            {
-                $(document.body).removeClass("keyboard");
-            });
+                // we use triggerHandler() so that the pushState logic is invoked from the first-time open 
+                
+                if (ebookURL) {
+                    //EpubReader.loadUI(urlParams);
+                    var eventPayload = {embedded: embedded, epub: ebookURL, epubs: libraryURL};
+                    $(window).triggerHandler('readepub', eventPayload);
+                }
+                else {
+                    //EpubLibrary.loadUI({epubs: libraryURL});
+                    var eventPayload = libraryURL;
+                    $(window).triggerHandler('loadlibrary', eventPayload);
+                }
 
-            $(document).on('keyup', function(e)
-            {
-                $(document.body).addClass("keyboard");
+                $(document.body).on('click', function()
+                {
+                    $(document.body).removeClass("keyboard");
+                });
+
+                $(document).on('keyup', function(e)
+                {
+                    $(document.body).addClass("keyboard");
+                });
+
             });
 
         });
