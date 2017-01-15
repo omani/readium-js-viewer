@@ -38,6 +38,15 @@ function(biblemesh_Helpers){
         }
     }
 
+    var indicateSave = function() {
+        try {
+            var iframe = $("#epub-reader-frame iframe")[0];
+            var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
+            var docEl = $( doc.documentElement );
+            docEl[currentlyPatching ? 'addClass' : 'removeClass']('highlightssaving');
+        } catch(e) { }
+    }
+    
     Settings = {
         put : function(key, val, callback){
             if (isLocalStorageEnabled()) {
@@ -106,6 +115,7 @@ function(biblemesh_Helpers){
                             var path = userDataPathPreface + 'books/' + bookId + '.json';
 
                             currentlyPatching = true;
+                            indicateSave();
 
                             var patch = {
                                 url: path,
@@ -114,6 +124,7 @@ function(biblemesh_Helpers){
                                 success: function () {
                                     console.log("Patch successful.");
                                     currentlyPatching = false;
+                                    indicateSave();
                                     lastSuccessfulPatch = patchTime;
                                     if(forceOnceCallback) {
                                         forceOnceCallback();
@@ -123,6 +134,7 @@ function(biblemesh_Helpers){
                                 },
                                 error: function (xhr, status, errorThrown) {
                                     currentlyPatching = false;
+                                    indicateSave();
                                     if(xhr.status == 412) {
                                         console.log("userData is stale.");
                                         lastSuccessfulPatch = patchTime;

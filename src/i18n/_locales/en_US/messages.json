@@ -470,5 +470,11 @@
   },
   "biblemesh_share" : {
     "message": "Share"
+  },
+  "biblemesh_saving" : {
+    "message": "Saving..."
+  },
+  "biblemesh_saved" : {
+    "message": "Saved."
   }
 }

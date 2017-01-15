@@ -32,6 +32,7 @@
 
 .highlightOpts-line {
     margin-bottom: 5px;
+    position: relative;
 }
 
 .highlightOpts-line.highlightOpts-faded {
@@ -80,6 +81,19 @@
     border-color: black;
 }
 
+.highlightOpts-saving, .highlightOpts-saved {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.highlightssaving .highlightOpts-saved, .highlightOpts-saving {
+    display: none;
+}
+
+.highlightssaving .highlightOpts-saving, .highlightOpts-saved {
+    display: block;
+}
 
 
 

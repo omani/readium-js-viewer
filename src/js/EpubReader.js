@@ -1019,6 +1019,14 @@ BookmarkData){
                 return currentHighlight && !currentHighlight.highlight._delete;
             }
 
+            var saveHighlight = function() {
+                if(hasCurrentHighlight() && currentHighlight.highlight.note != $(this).val()) {  // should always be true
+                    currentHighlight.highlight.note = $(this).val();
+                    currentHighlight.highlight.updated_at = biblemesh_Helpers.getUTCTimeStamp();
+                    Settings.patch(biblemesh_userData, biblemesh_refreshUserDataCallback);
+                }
+            }
+
             var setupVisually = function() {
                 highlightOptsEl
                     .find('.highlightOpts-box-' + (hasCurrentHighlight() ? currentHighlight.highlight.color : 0))
@@ -1116,13 +1124,11 @@ BookmarkData){
                         e.stopPropagation();
                     }
                 })
-                .on('blur', function() {
-                    if(hasCurrentHighlight()) {  // should always be true
-                        currentHighlight.highlight.note = $(this).val();
-                        currentHighlight.highlight.updated_at = biblemesh_Helpers.getUTCTimeStamp();
-                        Settings.patch(biblemesh_userData, biblemesh_refreshUserDataCallback);
-                    }
-                });
+                .on('blur', saveHighlight)
+                .on('change', saveHighlight)
+                .on('mouseup', saveHighlight)
+                .on('touchend', saveHighlight)
+                .on('keyup', saveHighlight);
 
 
             docEl.append(highlightOptsEl);
