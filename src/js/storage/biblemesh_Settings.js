@@ -69,7 +69,6 @@ function(biblemesh_Helpers){
             // server. This clone can be sent to the server as a full batch of the needed updates.
 
             var runPatch = function() {
-                if(currentlyPatching) return;
 
                 var patchTime = biblemesh_Helpers.getUTCTimeStamp();
                 var newUserData = { books: {} };
@@ -98,12 +97,15 @@ function(biblemesh_Helpers){
                 }
 
                 if(somethingToPatch) {
-                    console.log("Time-filtered userData object for patch request(s):", newUserData);
 
                     if (isLocalStorageEnabled()) {
                         localStorage['userDataPatch'] = JSON.stringify(newUserData);
                         console.log("Local storage patch: ", localStorage['userDataPatch']);
                     }
+
+                    if(currentlyPatching) return;
+
+                    console.log("Time-filtered userData object for patch request(s):", newUserData);
 
                     // send necessary patch requests
                     for(var bookId in newUserData.books) {
