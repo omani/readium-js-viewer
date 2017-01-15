@@ -476,5 +476,8 @@
   },
   "biblemesh_saved" : {
     "message": "Saved."
+  },
+  "biblemesh_undo" : {
+    "message": "Undo"
   }
 }

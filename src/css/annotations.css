@@ -95,5 +95,16 @@
     display: block;
 }
 
+.highlightOpts-undo {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: gray;
+    text-decoration: underline;
+}
 
+.highlightOpts-undo:hover {
+    cursor: pointer;
+    color: black;
+}
 

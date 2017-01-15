@@ -1027,6 +1027,8 @@ BookmarkData){
                 }
             }
 
+            var noteBeforeDel = '';
+
             var setupVisually = function() {
                 highlightOptsEl
                     .find('.highlightOpts-box-' + (hasCurrentHighlight() ? currentHighlight.highlight.color : 0))
@@ -1034,9 +1036,7 @@ BookmarkData){
                     .siblings('.highlightOpts-box')
                     .removeClass('highlightOpts-sel');
                 highlightOptsEl
-                    .find('.highlightOpts-line')
-                    .removeClass('highlightOpts-faded')
-                    .slice(1)
+                    .find('.highlightOpts-line:not(.highlightOpts-highlightline)')
                     [hasCurrentHighlight() ? 'removeClass' : 'addClass']('highlightOpts-faded');
                 highlightOptsEl
                     .find('.highlightOpts-note-text')
@@ -1083,6 +1083,16 @@ BookmarkData){
                     readium.reader.plugins.highlights.removeHighlight(cfiObj.cfi);
 
                     if(currentHighlight) {
+                        if(currentHighlight.highlight.note != "") {
+                            var boxSelectedBeforeDel = highlightOptsEl.find('.highlightOpts-sel');
+                            noteBeforeDel = currentHighlight.highlight.note;
+                            highlightOptsEl.find('.highlightOpts-highlightline').append(
+                                $("<div class='highlightOpts-undo'>" + Strings.biblemesh_undo + "</div>")
+                                    .on('click', function() {
+                                        boxSelectedBeforeDel.trigger('click');
+                                    })
+                            );
+                        }
                         currentHighlight.highlight = biblemesh_userData.books[biblemesh_bookId].highlights[currentHighlight.idx] = {
                             cfi: cfiObj.cfi,
                             updated_at: biblemesh_Helpers.getUTCTimeStamp(),
@@ -1096,7 +1106,7 @@ BookmarkData){
                     var highlightData = {
                         cfi: cfiObj.cfi,
                         color: highlightChoice,
-                        note: "",
+                        note: noteBeforeDel,
                         updated_at: biblemesh_Helpers.getUTCTimeStamp()
                     };
                     
@@ -1109,6 +1119,9 @@ BookmarkData){
                             highlight: highlightData
                         }
                     }
+
+                    highlightOptsEl.find('.highlightOpts-undo').remove();
+                    highlightOptsEl.find('.highlightOpts-note-text').val(noteBeforeDel);
 
                 }
 
