@@ -438,7 +438,7 @@ biblemesh_Helpers){
         }
 
         Dialogs.updateProgress(0, Messages.PROGRESS_EXTRACTING, file.name);
-                
+
         libraryManager.handleZippedEpub({
             file: file,
             overwrite: promptForReplace,
@@ -481,6 +481,51 @@ biblemesh_Helpers){
             }
         });
     };
+
+    var biblemesh_handleFileSelect = function(evt){
+        
+        var containsBadFilename = false;
+        var files = evt.target.files;
+        var data = new FormData();
+
+        $.each(files, function(key, value) {
+            if(!(value.name || '').match(/^book_[0-9]+\.epub$/)) {
+                Dialogs.showModalMessage('Invalid File Name(s)',
+                    'All files must be named book_[id].epub where [id] is replaced by the book id.');
+                containsBadFilename = true;
+            } else {
+                data.append(key, value);
+            }
+        });
+        
+        if(containsBadFilename) {
+            $(this).val('');
+            return;
+        }
+
+        $.ajax({
+            url: location.origin + '/importbooks.json',
+            type: 'POST',
+            data: data,
+            cache: false,
+            dataType: 'json',
+            processData: false, // Don't process the files
+            contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+            success: function(response) {
+                if(typeof response.error === 'undefined') {
+                    // Success
+                    alert('yes!');
+                } else {
+                    Dialogs.showModalMessage('Import Failed', response.error);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                // Handle errors here
+                console.error('EPUB import failure.');
+            }
+        });
+
+    }
 
     var handleFileSelect = function(evt){
         $('#add-epub-dialog').modal('hide');
@@ -629,7 +674,7 @@ biblemesh_Helpers){
 
         setAppSize();
         $(document.body).on('click', '.read', readClick);
-        $('#epub-upload').on('change', handleFileSelect);
+        $('#epub-upload').on('change', biblemesh_handleFileSelect);
         $('#dir-upload').on('change', handleDirSelect);
 
         document.title = Strings.i18n_readium_library;
