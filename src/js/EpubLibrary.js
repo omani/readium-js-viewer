@@ -140,7 +140,8 @@ biblemesh_Helpers){
                                     function(){
                                         Dialogs.showModalProgress(Strings.delete_progress_title, '');
                                         Dialogs.updateProgress(100, Messages.PROGRESS_DELETING, details.title, true);
-                                        libraryManager.deleteEpubWithId(details.rootDir, success, showError)
+                                        // libraryManager.deleteEpubWithId(details.rootDir, success, showError)   // biblemesh_
+                                        biblemesh_deleteEpub(details, success, showError);
                                     });
         });
     }
@@ -482,6 +483,29 @@ biblemesh_Helpers){
         });
     };
 
+    var biblemesh_deleteEpub = function(details, success){
+        var bookId = parseInt(details.rootUrl.replace(/^.*book_([0-9]+)$/, '$1'));
+        
+        $.ajax({
+            url: location.origin + '/book/' + bookId,
+            method: 'DELETE',
+            success: function() {
+                console.log("Delete successful.");
+                libraryManager.libraryData.some(function(book, idx) {
+                    if(book.id == bookId) {
+                        libraryManager.libraryData.splice(idx, 1);
+                        return true;
+                    }
+                });
+                if(success) success();
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                Dialogs.showModalMessageEx(Strings.err_dlg_title, Strings.err_ajax);
+            }
+        });
+
+    }
+
     var biblemesh_handleFileSelect = function(evt){
 
         var containsBadFilename = false;
@@ -507,7 +531,7 @@ biblemesh_Helpers){
         }
 
         $('#closeAddEpubCross').trigger('click');
-        Dialogs.showModalProgress(Strings.i18n_add_book, Strings.biblemesh_uploading);
+        Dialogs.showModalProgress(Strings.biblemesh_import_books, Strings.biblemesh_uploading);
 
         var doImport = function() {
 
