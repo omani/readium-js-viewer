@@ -209,6 +209,12 @@ define(['hgn!readium_js_viewer_html_templates/managed-dialog.html', 'hgn!readium
                 case Messages.PROGRESS_DELETING:
                     msg = Strings.delete_progress_message + ' ' + data;
                     break;
+                case Messages.BIBLEMESH_UPLOAD:
+                    msg = Strings.biblemesh_uploading + ' ' + data;
+                    break;
+                case Messages.BIBLEMESH_PROCESSING:
+                    msg = Strings.biblemesh_processing + ' ' + data;
+                    break;
             }
             // if (!noForce && $('#managed-dialog').is(':hidden')){
             //      Dialogs.showModalProgress(lastTitle, msg);

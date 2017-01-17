@@ -26,6 +26,9 @@ define(function(){
         PROGRESS_DELETING: 202,
         PROGRESS_MIGRATING: 203,
 
+        BIBLEMESH_UPLOAD: 250,
+        BIBLEMESH_PROCESSING: 251,
+
         ERROR_STORAGE : 300,
         ERROR_EPUB : 301,
         ERROR_AJAX : 302,

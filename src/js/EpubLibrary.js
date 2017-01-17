@@ -483,47 +483,102 @@ biblemesh_Helpers){
     };
 
     var biblemesh_handleFileSelect = function(evt){
-        
+
         var containsBadFilename = false;
         var files = evt.target.files;
-        var data = new FormData();
+        var fileArray = [];
+        var resultArray = [];
 
         $.each(files, function(key, value) {
             if(!(value.name || '').match(/^book_[0-9]+\.epub$/)) {
-                Dialogs.showModalMessage('Invalid File Name(s)',
-                    'All files must be named book_[id].epub where [id] is replaced by the book id.');
-                containsBadFilename = true;
+                if(!containsBadFilename) {
+                    Dialogs.showModalMessage('Invalid File Name(s)',
+                        'All files must be named book_[id].epub where [id] is replaced by the book id.');
+                    containsBadFilename = true;
+                }
             } else {
-                data.append(key, value);
+                fileArray.push([key, value]);
             }
         });
-        
-        if(containsBadFilename) {
+
+        if(containsBadFilename || fileArray.length == 0) {
             $(this).val('');
             return;
         }
 
-        $.ajax({
-            url: location.origin + '/importbooks.json',
-            type: 'POST',
-            data: data,
-            cache: false,
-            dataType: 'json',
-            processData: false, // Don't process the files
-            contentType: false, // Set content type to false as jQuery will tell the server its a query string request
-            success: function(response) {
-                if(typeof response.error === 'undefined') {
-                    // Success
-                    alert('yes!');
-                } else {
-                    Dialogs.showModalMessage('Import Failed', response.error);
+        $('#closeAddEpubCross').trigger('click');
+        Dialogs.showModalProgress(Strings.i18n_add_book, Strings.biblemesh_uploading);
+
+        var doImport = function() {
+
+            var file = fileArray.shift();
+
+            if(file) {
+
+                var result = {
+                    filename: file[1].name,
                 }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                // Handle errors here
-                console.error('EPUB import failure.');
+                var data = new FormData();
+                data.append(file[0], file[1]);
+
+                Dialogs.updateProgress(0, Messages.BIBLEMESH_UPLOAD, file[1].name);
+
+                $.ajax({
+                    url: location.origin + '/importbooks.json',
+                    type: 'POST',
+                    data: data,
+                    cache: false,
+                    dataType: 'json',
+                    processData: false, // Don't process the files
+                    contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+                    xhr: function() {  // Custom XMLHttpRequest
+                        var myXhr = $.ajaxSettings.xhr();
+                        if(myXhr.upload){ // Check if upload property exists
+                            myXhr.upload.addEventListener('progress',function(e) {
+                                console.log(e);
+                                var uploadPercent = (e.loaded / e.total) * 100;
+                                Dialogs.updateProgress(
+                                    uploadPercent,
+                                    uploadPercent >= 100 ? Messages.BIBLEMESH_PROCESSING : Messages.BIBLEMESH_UPLOAD,
+                                    file[1].name
+                                );
+                            }, false); // For handling the progress of the upload
+                        }
+                        return myXhr;
+                    },
+                    success: function(response) {
+                        if(typeof response.error !== 'undefined') {
+                            result.error = response.error;
+                        }
+                        resultArray.push(result);
+                        doImport();
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        result.error = Strings.err_ajax;
+                        resultArray.push(result);
+                        doImport();
+                    }
+                });
+
+            } else {
+
+                //give the report
+                Dialogs.showModalMessageEx(Strings.biblemesh_import_done, resultArray.map(function(result) {
+                    if(typeof result.error !== 'undefined') {
+                        return result.filename + " — ERROR: " + result.error;
+                    } else {
+                        return result.filename + " " + Strings.biblemesh_successful;
+                    }
+                }).join("<br>"));
+                
+                delete libraryManager.libraryData;
+                libraryManager.retrieveAvailableEpubs(loadLibraryItems);
+
             }
-        });
+
+        }
+
+        doImport();
 
     }
 

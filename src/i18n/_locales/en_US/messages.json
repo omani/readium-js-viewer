@@ -479,5 +479,17 @@
   },
   "biblemesh_undo" : {
     "message": "Undo"
+  },
+  "biblemesh_import_done" : {
+    "message": "Import Complete"
+  },
+  "biblemesh_uploading" : {
+    "message": "Uploading"
+  },
+  "biblemesh_processing" : {
+    "message": "Processing"
+  },
+  "biblemesh_successful" : {
+    "message": "imported successfully."
   }
 }
