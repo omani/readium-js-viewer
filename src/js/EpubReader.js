@@ -84,6 +84,7 @@ BookmarkData){
                 updated_at: xxxx,
                 highlights: [
                     {
+                        spineIdRef: xxxx,
                         cfi: xxxx,
                         color: 1,
                         note: "lorem ipsum",
@@ -779,11 +780,12 @@ BookmarkData){
         }
     }
 
-    var biblemesh_getHighlightDataObj = function(cfi) {
+    var biblemesh_getHighlightDataObj = function(cfiObj) {
         var returnObj = false;
+        var cfiObjId = biblemesh_getHighlightId(cfiObj);
 
         biblemesh_userData.books[biblemesh_bookId].highlights.forEach(function(highlight, idx) {
-            if(highlight.cfi == cfi) {
+            if(biblemesh_getHighlightId(highlight) == cfiObjId) {
                 returnObj = {
                     highlight: highlight,
                     idx: idx
@@ -794,10 +796,20 @@ BookmarkData){
         return returnObj;
     }
 
+    var biblemesh_getHighlightId = function(highlight) {
+        return (highlight.spineIdRef || highlight.idref) + ' ' + highlight.cfi;
+    }
+
     var biblemesh_drawHighlights = function() {
         if (readium && readium.reader.plugins.highlights) {
 
             var spotInfo = biblemesh_Helpers.getCurrentSpotInfo();
+            var idRef;
+            try {
+                idRef = JSON.parse(spotInfo.ebookSpot).idref;
+            } catch(e) {
+                idRef = '';
+            }
 
             // next line needed especially for switching between books
             readium.reader.plugins.highlights.removeHighlightsByType("user-highlight");
@@ -805,19 +817,18 @@ BookmarkData){
             biblemesh_initUserDataBook();
 
             biblemesh_userData.books[biblemesh_bookId].highlights.forEach(function(highlight) {
-                var idRef;
-                try {
-                    idRef = JSON.parse(spotInfo.ebookSpot).idref;
-                } catch(e) {
-                    idRef = '';
-                }
                 // without this line, highlights are sometimes not added on the next because they are listed as still there
-                readium.reader.plugins.highlights.removeHighlight(highlight.cfi);
-                if(!highlight._delete) {
+                readium.reader.plugins.highlights.removeHighlight(biblemesh_getHighlightId(highlight));
+                if(highlight.spineIdRef == idRef && !highlight._delete) {
                     try {
-                        readium.reader.plugins.highlights.addHighlight(idRef, highlight.cfi, highlight.cfi, "user-highlight");
+                        readium.reader.plugins.highlights.addHighlight(
+                            highlight.spineIdRef,
+                            highlight.cfi,
+                            biblemesh_getHighlightId(highlight),
+                            "user-highlight"
+                        );
                     } catch(e) {
-                        // may fail because the highlight is off the current page
+                        // should never get here.
                     }
                 }
             });
@@ -851,7 +862,11 @@ BookmarkData){
 
         // biblemesh_ : IF and ELSE block new
         if(pageChangeData.spineItem == undefined) {  // i.e. if they are on the same chapter
-            readium.reader.plugins.highlights.redrawAnnotations();  // quicker than running biblemesh_drawHighlights
+            try {
+                // quicker than running biblemesh_drawHighlights
+                // needed because highlights off screen when a new spine is loaded are not drawn
+                readium.reader.plugins.highlights.redrawAnnotations();
+            } catch(e) {}
         } else {
             biblemesh_drawHighlights();
         }
@@ -1013,7 +1028,7 @@ BookmarkData){
                 }
             ) );
 
-            var currentHighlight = biblemesh_getHighlightDataObj(cfiObj.cfi);
+            var currentHighlight = biblemesh_getHighlightDataObj(cfiObj);
 
             var hasCurrentHighlight = function() {
                 return currentHighlight && !currentHighlight.highlight._delete;
@@ -1080,7 +1095,7 @@ BookmarkData){
                 var highlightChoice = parseInt($(this).attr('data-choice'));
 
                 if(highlightChoice == 0) {
-                    readium.reader.plugins.highlights.removeHighlight(cfiObj.cfi);
+                    readium.reader.plugins.highlights.removeHighlight(biblemesh_getHighlightId(cfiObj));
 
                     if(currentHighlight) {
                         if(currentHighlight.highlight.note != "") {
@@ -1094,6 +1109,7 @@ BookmarkData){
                             );
                         }
                         currentHighlight.highlight = biblemesh_userData.books[biblemesh_bookId].highlights[currentHighlight.idx] = {
+                            spineIdRef: cfiObj.idref,
                             cfi: cfiObj.cfi,
                             updated_at: biblemesh_Helpers.getUTCTimeStamp(),
                             _delete: true
@@ -1101,9 +1117,10 @@ BookmarkData){
                     }
 
                 } else {
-                    readium.reader.plugins.highlights.addHighlight(cfiObj.idref, cfiObj.cfi, cfiObj.cfi, "user-highlight");
+                    readium.reader.plugins.highlights.addHighlight(cfiObj.idref, cfiObj.cfi, biblemesh_getHighlightId(cfiObj), "user-highlight");
 
                     var highlightData = {
+                        spineIdRef: cfiObj.idref,
                         cfi: cfiObj.cfi,
                         color: highlightChoice,
                         note: noteBeforeDel,
