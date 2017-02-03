@@ -498,6 +498,9 @@
   "biblemesh_import_instructions" : {
     "message": "Choose one or more packaged EPUB files with names in the format book_12345.epub where 12345 is the book id."
   },
+  "biblemesh_import_instructions_note" : {
+    "message": "NOTE: If you delete a book and then add a new book with the same book id, it must be the exact same EPUB file to prevent the corruption of user highlight  data. If you would like to upload a new edition of a book, please use a new book id."
+  },
   "biblemesh_no_user_setup" : {
     "message": "Could not properly setup user."
   }
