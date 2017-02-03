@@ -497,5 +497,8 @@
   },
   "biblemesh_import_instructions" : {
     "message": "Choose one or more packaged EPUB files with names in the format book_12345.epub where 12345 is the book id."
+  },
+  "biblemesh_no_user_setup" : {
+    "message": "Could not properly setup user."
   }
 }

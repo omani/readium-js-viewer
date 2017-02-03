@@ -1,9 +1,9 @@
-define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 'readium_shared_js/biblemesh_helpers', 'URIjs', 'biblemesh_Settings'], function($, EpubLibrary, EpubReader, Helpers, biblemesh_Helpers, URI, Settings){
+define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 'readium_shared_js/biblemesh_helpers', 'URIjs', 'biblemesh_Settings', 'i18nStrings', './Dialogs'], function($, EpubLibrary, EpubReader, Helpers, biblemesh_Helpers, URI, Settings, Strings, Dialogs){
 
     var _initialLoad = true; // replaces pushState() with replaceState() at first load 
     var initialLoad = function(){
 
-        biblemesh_Helpers.setTimeRelativeToServer(function() {  // biblemesh_ : this wrapper is new
+        Settings.initialize(function() {  // biblemesh_ : this wrapper is new
 
             Settings.patchFromLocalStorage(function() {  // biblemesh_ : this wrapper is new
                 
@@ -38,6 +38,8 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
 
             });
 
+        }, function() {
+            Dialogs.showErrorWithDetails(Strings.err_dlg_title, Strings.biblemesh_no_user_setup);
         });
 
     };

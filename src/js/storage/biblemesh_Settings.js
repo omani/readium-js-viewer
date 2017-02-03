@@ -3,13 +3,16 @@ define([
 ],
 function(biblemesh_Helpers){
     
-    var userId = 1;  // TODO: this is just a placeholder
+    var userInfo = {};
 
     var settingsInLocalStorageOnly = ['reader', 'needsMigration', 'replaceByDefault'];
-    var userDataPathPreface = location.origin + '/users/' + userId + '/';
 
     var lastSuccessfulPatch = biblemesh_Helpers.getUTCTimeStamp();
     var currentlyPatching = false;
+
+    var getUserDataPathPreface = function() {
+        return location.origin + '/users/' + userInfo.id + '/';
+    }
 
     // localStorage may be disabled due to zero-quota issues (e.g. iPad in private browsing mode)
     var _isLocalStorageEnabled = undefined;
@@ -114,7 +117,7 @@ function(biblemesh_Helpers){
 
                         if(bookUserData.latest_location || bookUserData.highlights.length > 0) {
 
-                            var path = userDataPathPreface + 'books/' + bookId + '.json';
+                            var path = getUserDataPathPreface() + 'books/' + bookId + '.json';
 
                             currentlyPatching = true;
                             indicateSave();
@@ -188,7 +191,7 @@ function(biblemesh_Helpers){
                 }
 
             } else {
-                var path = userDataPathPreface + key + '.json';
+                var path = getUserDataPathPreface() + key + '.json';
                 $.ajax({
                     url: path,
                     success: function (result) {
@@ -225,7 +228,7 @@ function(biblemesh_Helpers){
 
                 } else {
 
-                    var path = userDataPathPreface + key + '.json';
+                    var path = getUserDataPathPreface() + key + '.json';
 
                     $.ajax({
                         url: path,
@@ -268,7 +271,29 @@ function(biblemesh_Helpers){
                 }
             }
             if(callback) callback();
+        },
+
+        initialize: function(callback, errorCallback) {
+            // 1. gets basic user info (id, username, ...)
+            // 2. gets google analytics code
+            // 3. sets the js time to align with the server
+            $.ajax({
+                url: location.origin + '/usersetup.json',
+                success: function (result) {
+                    userInfo = result.userInfo;
+                    if(result.gaCode) {
+                        biblemesh_Helpers.setupGoogleAnalytics(result.gaCode)
+                    }
+                    biblemesh_Helpers.setServerTimeOffset(result.currentServerTime);
+                    callback();
+                },
+                error: function (xhr, status, errorThrown) {
+                    console.error('Error setting up the user.');
+                    errorCallback();
+                }
+            });
         }
+        
     }
     return Settings;
 })

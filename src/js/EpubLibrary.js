@@ -217,6 +217,8 @@ biblemesh_Helpers){
     }
 
     var loadLibraryItems = function(epubs){
+        try { ga('send', 'pageview', window.location.pathname); } catch(e) {} // biblemesh_
+
         $('#app-container .library-items').remove();
         $('#app-container').append(LibraryBody({}));
         if (!epubs.length){

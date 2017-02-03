@@ -1421,6 +1421,8 @@ BookmarkData){
         biblemesh_bookId = spotInfo.bookId;
         var bookKey = 'books/' + biblemesh_bookId;
 
+        try { ga('send', 'pageview', window.location.pathname); } catch(e) {} // biblemesh_
+
         Settings.getMultiple(['reader', bookKey], function(settings){
 
             biblemesh_userData.books[biblemesh_bookId] = settings[bookKey] || null;
