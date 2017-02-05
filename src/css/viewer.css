@@ -628,3 +628,78 @@ ul.nav-tabs li:not(.active) button:hover
 #zoom-menu .active-zoom .glyphicon-ok{
   display: inline-block;
 }
+
+
+/* biblemesh_ items follow */
+
+#epub-reader-container {
+  bottom: 38px;
+}
+
+#progressBar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 25px;
+  display: -webkit-flex;
+  display: flex;
+  padding: 0 30px;
+  overflow: hidden;
+}
+
+.progressBarLine {
+  -webkit-flex: 1;
+  flex: 1;
+  position: relative;
+  top: 5px;
+  left: 0;
+  height: 2px;
+}
+
+.progressBarLineCont {
+  -webkit-flex: 1;
+  flex: 1;
+  display: -webkit-flex;
+  display: flex;
+  cursor: pointer;
+}
+
+.progressBarLineCont:first-child > .progressBarLine:first-child {
+  display: none;
+}
+
+.progressBarDotCont {
+  position: relative;
+  top: 5px;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: 1;
+}
+
+.progressBarDot {
+  position: absolute;
+  top: 0;
+  left: -1px;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  transition: transform .2s ease-in-out;
+}
+
+.progressBarLineCont:hover .progressBarDot {
+  transform: scale(4);
+}
+
+.progressBarLine,
+.progressBarDot {
+  background: #CCC;
+}  
+
+.progressBarLineDone .progressBarLine,
+.progressBarLineDone .progressBarDot,
+.progressBarLineCurrent .progressBarLine:first-child,
+.progressBarLineCurrent .progressBarDot {
+  background: #888;
+}

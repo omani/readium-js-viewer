@@ -16,6 +16,7 @@ define([
 'hgn!readium_js_viewer_html_templates/reader-body.html',
 'hgn!readium_js_viewer_html_templates/reader-body-page-btns.html',
 'hgn!readium_js_viewer_html_templates/biblemesh_highlight-opts.html',
+'hgn!readium_js_viewer_html_templates/biblemesh_progress-bar-item.html',
 'Analytics',
 'screenfull',
 './Keyboard',
@@ -46,6 +47,7 @@ ReaderNavbar,
 ReaderBody,
 ReaderBodyPageButtons,
 biblemesh_highlightOptions,
+biblemesh_progressBarItem,
 Analytics,
 screenfull,
 Keyboard,
@@ -104,7 +106,7 @@ BookmarkData){
     var el = document.documentElement;
 
     var tooltipSelector = function() {
-        return 'nav *[title], #readium-page-btns *[title]';
+        return 'nav *[title], #readium-page-btns *[title], #progressBar *[title]';
     };
    
     var ensureUrlIsRelativeToApp = function(ebookURL) {
@@ -439,6 +441,8 @@ BookmarkData){
                   });
                 });
 
+                biblemesh_setupProgressBar(dom);
+
             }
 
         } else {
@@ -478,6 +482,10 @@ BookmarkData){
             lastIframe = $iframe[0];
         });
 
+        readium.reader.on(ReadiumSDK.Events.CONTENT_DOCUMENT_LOAD_START, function (loadStartData, loadStartSpineItem)
+        {
+            biblemesh_updateProgressBar(loadStartSpineItem.idref);
+        })
         readium.reader.on(ReadiumSDK.Events.PAGINATION_CHANGED, function (pageChangeData)
         {
             Globals.logEvent("PAGINATION_CHANGED", "ON", "EpubReader.js");
@@ -680,6 +688,60 @@ BookmarkData){
       }); // end of onkeyup
     } // end of loadToc
 
+    var biblemesh_setupProgressBar = function(tocDOM){
+        var progressBarEl = $("<div id='progressBar'></div>");
+        var idRef = biblemesh_getCurrentIdRef();
+        var spineItemsLen = readium.reader.spine().items.length;
+        var labels = {};
+
+        $('a', tocDOM).each(function(idx, el) {
+            labels[$(el).attr('href')] = $(el).text().replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        });
+
+        for( var i=0; i<spineItemsLen; i++ ) {
+            var spineItem = readium.reader.spine().item(i);
+            if(spineItem) {
+                var lineContEl = $( biblemesh_progressBarItem(
+                    {
+                        idref: spineItem.idref,
+                        label: labels[spineItem.href]
+                    }
+                ) )
+                    .on('click', function(e) {
+                        var gotoIdRef = $(this).attr('data-idref');
+                        spin(true);
+                        readium.reader.openSpineItemElementId(gotoIdRef);
+                        biblemesh_updateProgressBar(gotoIdRef);
+                    });
+                
+                progressBarEl.append(lineContEl);
+            }
+        }
+
+        $('#reading-area').append(progressBarEl);
+
+        biblemesh_updateProgressBar();
+
+    } // end of biblemesh_setupProgressBar
+
+    var biblemesh_updateProgressBar = function(idRef) {
+
+        idRef = idRef || biblemesh_getCurrentIdRef();
+
+        var beforeCurrentSpot = !!idRef;
+
+        $(".progressBarLineCont").each(function(idx, el) {
+            el = $(el);
+            var isCurrentPage = el.attr('data-idref') == idRef;
+            beforeCurrentSpot = beforeCurrentSpot && !isCurrentPage;
+
+            el[isCurrentPage ? "addClass" : "removeClass"]("progressBarLineCurrent");
+            el[beforeCurrentSpot ? "addClass" : "removeClass"]("progressBarLineDone");
+
+        });
+
+    } // end of biblemesh_updateProgressBar
+
     var toggleFullScreen = function(){
 
         if (!screenfull.enabled) return;
@@ -800,16 +862,21 @@ BookmarkData){
         return (highlight.spineIdRef || highlight.idref) + ' ' + highlight.cfi;
     }
 
+    var biblemesh_getCurrentIdRef = function() {
+        var spotInfo = biblemesh_Helpers.getCurrentSpotInfo();
+        var idRef;
+        try {
+            idRef = JSON.parse(spotInfo.ebookSpot).idref;
+        } catch(e) {
+            idRef = '';
+        }
+        return idRef;
+    }
+
     var biblemesh_drawHighlights = function() {
         if (readium && readium.reader.plugins.highlights) {
 
-            var spotInfo = biblemesh_Helpers.getCurrentSpotInfo();
-            var idRef;
-            try {
-                idRef = JSON.parse(spotInfo.ebookSpot).idref;
-            } catch(e) {
-                idRef = '';
-            }
+            var idRef = biblemesh_getCurrentIdRef();;
 
             // next line needed especially for switching between books
             readium.reader.plugins.highlights.removeHighlightsByType("user-highlight");
@@ -869,7 +936,9 @@ BookmarkData){
             } catch(e) {}
         } else {
             biblemesh_drawHighlights();
+            biblemesh_updateProgressBar(pageChangeData.spineItem.idref);
         }
+
     }
 
     var biblemesh_initUserDataBook = function(){
