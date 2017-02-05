@@ -1,12 +1,13 @@
-.rd-highlight.user-highlight {
-    position: absolute;
-    opacity: 0.2;
-    background-color: yellow;
-}
-
 .rd-highlight.hover-user-highlight {
     position: absolute;
     opacity: 0.4;
+    background-color: yellow;
+}
+
+.rd-highlight.user-highlight,
+.rd-highlight.hide-hover-user-highlight {
+    position: absolute;
+    opacity: 0.2;
     background-color: yellow;
 }
 

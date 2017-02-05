@@ -877,6 +877,7 @@ BookmarkData){
         if (readium && readium.reader.plugins.highlights) {
 
             var idRef = biblemesh_getCurrentIdRef();;
+            var highlightsToDraw = [];
 
             // next line needed especially for switching between books
             readium.reader.plugins.highlights.removeHighlightsByType("user-highlight");
@@ -884,19 +885,27 @@ BookmarkData){
             biblemesh_initUserDataBook();
 
             biblemesh_userData.books[biblemesh_bookId].highlights.forEach(function(highlight) {
-                // without this line, highlights are sometimes not added on the next because they are listed as still there
+                // without this line, highlights are sometimes not added because they are listed as still there
                 readium.reader.plugins.highlights.removeHighlight(biblemesh_getHighlightId(highlight));
                 if(highlight.spineIdRef == idRef && !highlight._delete) {
-                    try {
-                        readium.reader.plugins.highlights.addHighlight(
-                            highlight.spineIdRef,
-                            highlight.cfi,
-                            biblemesh_getHighlightId(highlight),
-                            "user-highlight"
-                        );
-                    } catch(e) {
-                        // should never get here.
-                    }
+                    highlightsToDraw.push(highlight);
+                }
+            });
+
+            highlightsToDraw.sort(function(a, b) {
+                return biblemesh_contentCfiComparator(a.cfi, b.cfi);
+            });
+
+            highlightsToDraw.forEach(function(highlight) {
+                try {
+                    readium.reader.plugins.highlights.addHighlight(
+                        highlight.spineIdRef,
+                        highlight.cfi,
+                        biblemesh_getHighlightId(highlight),
+                        "user-highlight"
+                    );
+                } catch(e) {
+                    // should never get here.
                 }
             });
         }
@@ -1186,7 +1195,7 @@ BookmarkData){
                     }
 
                 } else {
-                    readium.reader.plugins.highlights.addHighlight(cfiObj.idref, cfiObj.cfi, biblemesh_getHighlightId(cfiObj), "user-highlight");
+                    // readium.reader.plugins.highlights.addHighlight(cfiObj.idref, cfiObj.cfi, biblemesh_getHighlightId(cfiObj), "user-highlight");
 
                     var highlightData = {
                         spineIdRef: cfiObj.idref,
@@ -1209,6 +1218,7 @@ BookmarkData){
                     highlightOptsEl.find('.highlightOpts-undo').remove();
                     highlightOptsEl.find('.highlightOpts-note-text').val(noteBeforeDel);
 
+                    biblemesh_drawHighlights();
                 }
 
                 Settings.patch(biblemesh_userData, biblemesh_refreshUserDataCallback);
