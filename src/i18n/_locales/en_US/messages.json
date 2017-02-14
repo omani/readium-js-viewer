@@ -199,7 +199,7 @@
     "message" : "Sorry, the current EPUB does not contain a media overlay for this content"
   },
   "i18n_add_items" : {
-    "message" : "Add items to your library here!"
+    "message" : "Upload books to the server here!"
   },
   "i18n_extracting" : {
     "message" : "extracting: "
@@ -493,13 +493,13 @@
     "message": "Processing"
   },
   "biblemesh_successful" : {
-    "message": "imported successfully."
+    "message": "imported successfully and was assigned id #BOOK_ID."
   },
   "biblemesh_import_instructions" : {
-    "message": "Choose one or more packaged EPUB files with names in the format book_12345.epub where 12345 is the book id."
+    "message": "Choose one or more packaged EPUB files."
   },
   "biblemesh_import_instructions_note" : {
-    "message": "NOTE: If you delete a book and then add a new book with the same book id, it must be the exact same EPUB file to prevent the corruption of user highlight  data. If you would like to upload a new edition of a book, please use a new book id."
+    "message": "NOTE: We will inform you of the newly assigned book id's after the import is complete."
   },
   "biblemesh_no_user_setup" : {
     "message": "Could not properly setup user."

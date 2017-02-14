@@ -510,27 +510,13 @@ biblemesh_Helpers){
 
     var biblemesh_handleFileSelect = function(evt){
 
-        var containsBadFilename = false;
         var files = evt.target.files;
         var fileArray = [];
         var resultArray = [];
 
         $.each(files, function(key, value) {
-            if(!(value.name || '').match(/^book_[0-9]+\.epub$/)) {
-                if(!containsBadFilename) {
-                    Dialogs.showModalMessage('Invalid File Name(s)',
-                        'All files must be named book_[id].epub where [id] is replaced by the book id.');
-                    containsBadFilename = true;
-                }
-            } else {
-                fileArray.push([key, value]);
-            }
+            fileArray.push([key, value]);
         });
-
-        if(containsBadFilename || fileArray.length == 0) {
-            $(this).val('');
-            return;
-        }
 
         $('#closeAddEpubCross').trigger('click');
         Dialogs.showModalProgress(Strings.biblemesh_import_books, Strings.biblemesh_uploading);
@@ -550,7 +536,7 @@ biblemesh_Helpers){
                 Dialogs.updateProgress(0, Messages.BIBLEMESH_UPLOAD, file[1].name);
 
                 $.ajax({
-                    url: location.origin + '/importbooks.json',
+                    url: location.origin + '/importbook.json',
                     type: 'POST',
                     data: data,
                     cache: false,
@@ -576,6 +562,9 @@ biblemesh_Helpers){
                         if(typeof response.error !== 'undefined') {
                             result.error = response.error;
                         }
+                        if(typeof response.bookId !== 'undefined') {
+                            result.bookId = response.bookId;
+                        }
                         resultArray.push(result);
                         doImport();
                     },
@@ -593,7 +582,7 @@ biblemesh_Helpers){
                     if(typeof result.error !== 'undefined') {
                         return result.filename + " — ERROR: " + result.error;
                     } else {
-                        return result.filename + " " + Strings.biblemesh_successful;
+                        return result.filename + " " + Strings.biblemesh_successful.replace('BOOK_ID', result.bookId);
                     }
                 }).join("<br>"));
                 
