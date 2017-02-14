@@ -5,7 +5,7 @@ function(biblemesh_Helpers){
     
     var userInfo = {};
 
-    var settingsInLocalStorageOnly = ['reader', 'needsMigration', 'replaceByDefault'];
+    var settingsInLocalStorageOnly = /^(reader|needsMigration|replaceByDefault|404:.*)$/;
 
     var lastSuccessfulPatch = biblemesh_Helpers.getUTCTimeStamp();
     var currentlyPatching = false;
@@ -57,7 +57,7 @@ function(biblemesh_Helpers){
                 localStorage[key] = val;
             }
 
-            if(settingsInLocalStorageOnly.indexOf(key) == -1) {
+            if(!key.match(settingsInLocalStorageOnly)) {
                 console.error('Put method not supported to the server.'); 
             }
 
@@ -176,7 +176,7 @@ function(biblemesh_Helpers){
             runPatch();
         },
         get : function(key, callback){
-            if(settingsInLocalStorageOnly.indexOf(key) != -1) {
+            if(key.match(settingsInLocalStorageOnly)) {
                 if (!isLocalStorageEnabled()) {
                     if (callback) callback(null);
                     return;
@@ -217,7 +217,7 @@ function(biblemesh_Helpers){
             }
             
             keys.forEach(function(key, i) {
-                if(settingsInLocalStorageOnly.indexOf(key) != -1) {
+                if(key.match(settingsInLocalStorageOnly)) {
                     if (!isLocalStorageEnabled()) {
                         retVal['_err_' + key] = true;
                     } else {
