@@ -292,6 +292,10 @@ function(biblemesh_Helpers){
                     errorCallback();
                 }
             });
+        },
+
+        getUserAttr: function(key) {
+            return userInfo[key];
         }
         
     }

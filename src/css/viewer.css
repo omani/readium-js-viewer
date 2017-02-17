@@ -703,3 +703,98 @@ ul.nav-tabs li:not(.active) button:hover
 .progressBarLineCurrent .progressBarDot {
   background: #888;
 }
+
+
+
+.navbar .btn {
+  background: none;
+}
+.navbar {
+  background: #333;
+  box-shadow: none;
+  height: 43px;
+}
+.navlogo {
+  height: 24px;
+  margin: -3px 10px 0 0;
+  vertical-align: top;
+}
+
+.navbar-left {
+  line-height: 24px;
+  padding: 10px 0 0 8px;
+  font-size: 19px;
+  color: rgba(191, 216, 230, 0.5);
+}
+
+.navbar-right
+{
+    margin-top: 2px;
+    background: none;
+}
+
+#navuser {
+  float: left;
+  margin: -3px -1px;
+  height: 43px;
+  position: relative;
+  cursor: pointer;
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
+}
+
+#navuserarrow {
+  border-left-style: solid;
+  margin-right: 15px;
+  position: absolute;
+  right: 0;
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  border: inset 5px;
+  border-color: rgba(255, 255, 255, 0.4) transparent transparent transparent;
+  border-top-style: solid;
+  margin-top: -2.5px;
+  top: 21px;
+}
+
+#navuserpulldown {
+  position: absolute;
+  top: 43px;
+  right: 0px;
+  background: #333;
+  display: none;
+}
+
+#navusername {
+  min-width: 40px;
+  color: white;
+  padding: 10px 36px 10px 13px;
+  line-height: 23px;
+  white-space: nowrap;
+  height: 43px;
+}
+
+.navuseritem {
+  line-height: 45px;
+  padding: 0 15px;
+  white-space: nowrap;
+  cursor: pointer;
+  color: white;
+}
+
+.navuseritem:hover,
+#navuser:hover > #navusername {
+  background: #272727;
+}
+
+#navuser:hover > #navuserpulldown {
+  display: block;
+}
+
+.linkbtn:hover {
+  text-decoration: none;
+}

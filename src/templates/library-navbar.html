@@ -1,5 +1,10 @@
-<div class="btn-group navbar-left">
+<!-- biblemesh_ : several changes throughout this template -->
+
+<!--<div class="btn-group navbar-left">
     <button id="aboutButt1" tabindex="1" type="button" class="btn icon-logo" data-toggle="modal" data-target="#about-dialog" title="{{strings.about}}" aria-label="{{strings.about}}"></button>
+</div>-->
+<div class="navbar-left">
+    <img class="navlogo" src="{{idp_logo_src}}" alt="">{{strings.biblemesh_reader}}
 </div>
 <div class="btn-group navbar-right">
     <button tabindex="1" type="button" class="btn icon-thumbnails" title="{{strings.thumbnail_view}}" aria-label="{{strings.thumbnail_view}}">
@@ -11,7 +16,16 @@
     <button id="addbutt" tabindex="1" type="button" class="btn icon-add-epub" title="{{strings.biblemesh_import_books}}" aria-label="{{strings.biblemesh_import_books}}" data-toggle="modal" data-target="#add-epub-dialog">
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
     </button>
-    <button id="settbutt1" tabindex="1" type="button" class="btn icon-settings" title="{{strings.settings}} [{{keyboard.ShowSettingsModal}}]" aria-label="{{strings.settings}} [{{keyboard.ShowSettingsModal}}]" accesskey="{{keyboard.accesskeys.ShowSettingsModal}}" data-toggle="modal" data-target="#settings-dialog">
+    <div id="navuser">
+        <div id="navusername">{{firstname}}</div>
+        <div id="navuserarrow"></div>
+        <div id="navuserpulldown">
+            <div id="navusersettings" class="navuseritem">{{strings.settings}}</div>
+            <a href="/logout/callback" class="linkbtn"><div id="navuserlogout" class="navuseritem">Logout</div></a>
+            <a href="/logout" class="linkbtn"><div id="navuserlogoutall" class="navuseritem">Logout all</div></a>
+        </div>
+    </div>
+    <!--<button id="settbutt1" tabindex="1" type="button" class="btn icon-settings" title="{{strings.settings}} [{{keyboard.ShowSettingsModal}}]" aria-label="{{strings.settings}} [{{keyboard.ShowSettingsModal}}]" accesskey="{{keyboard.accesskeys.ShowSettingsModal}}" data-toggle="modal" data-target="#settings-dialog">
         <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-    </button>
+    </button>-->
 </div>

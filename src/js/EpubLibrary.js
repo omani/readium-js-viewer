@@ -715,7 +715,13 @@ biblemesh_Helpers){
         $('.add-book').on('click', handleUrlSelect);
         $('nav').empty();
         $('nav').attr("aria-label", Strings.i18n_toolbar);
-        $('nav').append(LibraryNavbar({strings: Strings, dialogs: Dialogs, keyboard: Keyboard}));
+        $('nav').append(LibraryNavbar({
+            strings: Strings,
+            dialogs: Dialogs,
+            keyboard: Keyboard,
+            idp_logo_src: Settings.getUserAttr('idpLogoSrc'),  // biblemesh_
+            firstname: Settings.getUserAttr('firstname')  // biblemesh_
+        }));
         $('.icon-list-view').on('click', function(){
             $(document.body).addClass('list-view');
             setTimeout(function(){ $('.icon-thumbnails')[0].focus(); }, 50);
@@ -730,6 +736,10 @@ biblemesh_Helpers){
             libraryManager.retrieveAvailableEpubs(loadLibraryItems);
         }, showError);
 
+        // biblemesh_ : following event
+        $('#navusersettings').on('click', function(){
+            $('#settings-dialog').modal("show");
+        });
         Keyboard.on(Keyboard.ShowSettingsModal, 'library', function(){$('#settings-dialog').modal("show");});
 
         $(window).trigger('libraryUIReady');

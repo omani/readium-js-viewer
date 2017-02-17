@@ -503,5 +503,8 @@
   },
   "biblemesh_no_user_setup" : {
     "message": "Could not properly setup user."
+  },
+  "biblemesh_reader" : {
+    "message": "Reader"
   }
 }
