@@ -44,13 +44,14 @@ define(['module','jquery', 'bootstrap', 'readium_js/Readium', './Spinner', 'bibl
         );
 
 
-        Keyboard.on(Keyboard.BackgroundAudioPlayPause, 'reader', function()
-        {
-            var play = !$audioTrackDiv.hasClass('isPlaying');
+        // biblemesh_ : following event commented out
+        // Keyboard.on(Keyboard.BackgroundAudioPlayPause, 'reader', function()
+        // {
+        //     var play = !$audioTrackDiv.hasClass('isPlaying');
 
-            readium.reader.backgroundAudioTrackManager.setPlayState(play);
-            readium.reader.backgroundAudioTrackManager.playPause(play);
-        });
+        //     readium.reader.backgroundAudioTrackManager.setPlayState(play);
+        //     readium.reader.backgroundAudioTrackManager.playPause(play);
+        // });
 
         $playAudioTrackBtn.on("click", function ()
         {

@@ -458,7 +458,7 @@ define(['i18nStrings', 'keymaster', 'biblemesh_Settings'], function(Strings, key
         MediaOverlaysEscape: 'r', //accesskey'ed
 
         //MediaOverlaysPlayPauseAlt: 'p', // ALT BELOW
-        MediaOverlaysPlayPause: 'm', //accesskey'ed
+        MediaOverlaysPlayPause: 'space', //accesskey'ed  // biblemesh_
 
         MediaOverlaysRateIncrease: 'l', //accesskey'ed
         MediaOverlaysRateDecrease: 'j', //accesskey'ed

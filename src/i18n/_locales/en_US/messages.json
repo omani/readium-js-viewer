@@ -506,5 +506,14 @@
   },
   "biblemesh_reader" : {
     "message": "Reader"
+  },
+  "biblemesh_logout_reader" : {
+    "message": "Log out of Reader only"
+  },
+  "biblemesh_logout_of" : {
+    "message": "Log out of "
+  },
+  "biblemesh_no_books" : {
+    "message": "No books available."
   }
 }

@@ -720,8 +720,12 @@ biblemesh_Helpers){
             dialogs: Dialogs,
             keyboard: Keyboard,
             idp_logo_src: Settings.getUserAttr('idpLogoSrc'),  // biblemesh_
+            logout_of_idp: Strings.biblemesh_logout_of + Settings.getUserAttr('idpName'),  // biblemesh_
             firstname: Settings.getUserAttr('firstname')  // biblemesh_
         }));
+        if(!Settings.getUserAttr('isAdmin')) {  // biblemesh_
+            $('#addbutt').remove();
+        }
         $('.icon-list-view').on('click', function(){
             $(document.body).addClass('list-view');
             setTimeout(function(){ $('.icon-thumbnails')[0].focus(); }, 50);
@@ -740,7 +744,9 @@ biblemesh_Helpers){
         $('#navusersettings').on('click', function(){
             $('#settings-dialog').modal("show");
         });
-        Keyboard.on(Keyboard.ShowSettingsModal, 'library', function(){$('#settings-dialog').modal("show");});
+
+        // biblemesh_ : following event commented out
+        // Keyboard.on(Keyboard.ShowSettingsModal, 'library', function(){$('#settings-dialog').modal("show");});
 
         $(window).trigger('libraryUIReady');
         $(window).on('resize', setItemHeight);

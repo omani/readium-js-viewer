@@ -279,32 +279,35 @@ define(['./ModuleConfig', 'hgn!readium_js_viewer_html_templates/settings-dialog.
             });
         };
 
-        Keyboard.on(Keyboard.NightTheme, 'settings', function(){
+        // biblemesh_ : following event commented out
+        // Keyboard.on(Keyboard.NightTheme, 'settings', function(){
 
-                Settings.get('reader', function(json)
-                {
-                    if (!json)
-                    {
-                        json = {};
-                    }
+        //         Settings.get('reader', function(json)
+        //         {
+        //             if (!json)
+        //             {
+        //                 json = {};
+        //             }
 
-                    var isNight = json.theme === "night-theme";
-                    json.theme = isNight ? "author-theme" : "night-theme";
+        //             var isNight = json.theme === "night-theme";
+        //             json.theme = isNight ? "author-theme" : "night-theme";
 
-                    Settings.put('reader', json);
+        //             Settings.put('reader', json);
 
-                    if (reader) updateReader(reader, json);
-                });
-        });
+        //             if (reader) updateReader(reader, json);
+        //         });
+        // });
 
-        Keyboard.on(Keyboard.SettingsModalSave, 'settings', function() {
-            save();
-            $('#settings-dialog').modal('hide');
-        });
+        // biblemesh_ : following event commented out
+        // Keyboard.on(Keyboard.SettingsModalSave, 'settings', function() {
+        //     save();
+        //     $('#settings-dialog').modal('hide');
+        // });
 
-        Keyboard.on(Keyboard.SettingsModalClose, 'settings', function() {
-            $('#settings-dialog').modal('hide');
-        });
+        // biblemesh_ : following event commented out
+        // Keyboard.on(Keyboard.SettingsModalClose, 'settings', function() {
+        //     $('#settings-dialog').modal('hide');
+        // });
 
         $('#settings-dialog .btn-primary').on('click', save);
     }

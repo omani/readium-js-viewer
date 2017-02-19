@@ -82,3 +82,18 @@ iframe {
 .fixed-page-frame, .fixed-page-frame-left, .fixed-page-frame-right, .fixed-page-frame-center {
     position: absolute !important;
 }
+
+/* biblemesh_ items follow */
+
+body, .tooltip {
+    font-family: 'Open Sans', sans-serif;
+}
+
+a {
+  color: #1C60AB;
+}
+
+a:hover {
+  color: #6399D5;
+  text-decoration: none;
+}
