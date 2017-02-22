@@ -707,11 +707,14 @@ ul.nav-tabs li:not(.active) button:hover
 .navbar .btn {
   background: none;
 }
+
 .navbar {
   background: #333;
   box-shadow: none;
-  min-height: 43px;
+  min-height: 44px;
+  border: none;
 }
+
 .navlogo {
   height: 24px;
   margin: -3px 10px 0 0;
@@ -723,7 +726,7 @@ ul.nav-tabs li:not(.active) button:hover
   padding: 10px 0 0 8px;
   font-size: 19px;
   color: rgba(191, 216, 230, 0.5);
-  height: 41px;
+  height: 44px;
   white-space: nowrap;
   float: left;
 }
@@ -738,7 +741,7 @@ ul.nav-tabs li:not(.active) button:hover
 
 #navuser {
   display: inline-block;
-  height: 41px;
+  height: 44px;
   position: relative;
   cursor: pointer;
   -webkit-user-select:none;
@@ -769,8 +772,8 @@ ul.nav-tabs li:not(.active) button:hover
 
 #navuserpulldown {
   position: absolute;
-  top: 41px;
-  right: -1px;
+  top: 44px;
+  right: 0;
   background: #333;
   display: none;
 }
@@ -781,11 +784,11 @@ ul.nav-tabs li:not(.active) button:hover
   padding: 10px 36px 10px 13px;
   line-height: 21px;
   white-space: nowrap;
-  height: 41px;
+  height: 44px;
 }
 
 .navuseritem {
-  line-height: 45px;
+  line-height: 44px;
   padding: 0 15px;
   white-space: nowrap;
   cursor: pointer;
@@ -802,7 +805,7 @@ ul.nav-tabs li:not(.active) button:hover
 }
 
 .navbar .btn {
-	height: 41px;
+	height: 44px;
   float: none;
 }
 
@@ -810,7 +813,7 @@ ul.nav-tabs li:not(.active) button:hover
   padding: 9px 12px;
 	float: none;
 	display: inline-block;
-	height: 41px;
+	height: 44px;
 }
 
 .zoom-wrapper input[disabled] {
@@ -826,7 +829,7 @@ ul.nav-tabs li:not(.active) button:hover
 }
 
 #reading-area {
-  top: 45px;
+  top: 44px;
 }
 
 .btn-info {
@@ -853,10 +856,6 @@ body.keyboard #app-navbar button:focus {
     box-shadow: none !important;
     outline: none !important;
 }*/
-
-.book-title-header {
-  margin-top: 19px;
-}
 
 #readium-toc-body {
 	padding: 7px 0 20px;

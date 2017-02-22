@@ -121,7 +121,8 @@ biblemesh_Helpers){
     var showDetailsDialog = function(details){
         var bodyStr = DetailsBody({
             data: details,
-            strings: Strings
+            strings: Strings,
+            isadmin: Settings.getUserAttr('isAdmin') // biblemesh_
         });
 
         $('.details-dialog .modal-body').html(bodyStr);

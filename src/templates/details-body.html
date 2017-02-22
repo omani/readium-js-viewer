@@ -19,7 +19,9 @@
         {{/data.coverHref}}
         <div class="buttons">
             <button tabindex="1000" class="btn btn-default read" data-dismiss="modal" data-book="{{data.rootUrl}}" type="button">{{strings.i18n_read}}</button>
+            {{#isadmin}}  <!-- biblemesh_ -->
             <button tabindex="1000" class="btn btn-danger delete" data-dismiss="modal" type="button">{{strings.i18n_delete}}</button>
+            {{/isadmin}}  <!-- biblemesh_ -->
         </div>
     </div>
     <div class='modal-book-info'>
