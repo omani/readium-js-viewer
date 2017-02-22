@@ -575,3 +575,15 @@ box-shadow: 0 0 0 1px #6fb5f1;
         width: 100%;
     }
 }
+
+/* biblemesh_ items follow */
+
+#audioplayer {
+    margin: 0 6px;
+}
+
+@media (max-width: 1000px) {
+    #audioResponsive {
+        display: none;
+    }
+}

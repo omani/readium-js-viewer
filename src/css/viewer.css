@@ -704,15 +704,13 @@ ul.nav-tabs li:not(.active) button:hover
   background: #888;
 }
 
-
-
 .navbar .btn {
   background: none;
 }
 .navbar {
   background: #333;
   box-shadow: none;
-  height: 43px;
+  min-height: 43px;
 }
 .navlogo {
   height: 24px;
@@ -725,24 +723,32 @@ ul.nav-tabs li:not(.active) button:hover
   padding: 10px 0 0 8px;
   font-size: 19px;
   color: rgba(191, 216, 230, 0.5);
+  height: 41px;
+  white-space: nowrap;
+  float: left;
 }
 
 .navbar-right
 {
-    margin-top: 2px;
     background: none;
+    height: auto;
+    float: right;
+    text-align: right;
 }
 
 #navuser {
-  float: left;
-  margin: -3px -1px;
-  height: 43px;
+  display: inline-block;
+  height: 41px;
   position: relative;
   cursor: pointer;
   -webkit-user-select:none;
   -moz-user-select:none;
   -ms-user-select:none;
   user-select:none;
+}
+
+.navbar-right > * {
+	vertical-align: top;
 }
 
 #navuserarrow {
@@ -763,8 +769,8 @@ ul.nav-tabs li:not(.active) button:hover
 
 #navuserpulldown {
   position: absolute;
-  top: 43px;
-  right: 0px;
+  top: 41px;
+  right: -1px;
   background: #333;
   display: none;
 }
@@ -773,9 +779,9 @@ ul.nav-tabs li:not(.active) button:hover
   min-width: 40px;
   color: white;
   padding: 10px 36px 10px 13px;
-  line-height: 23px;
+  line-height: 21px;
   white-space: nowrap;
-  height: 43px;
+  height: 41px;
 }
 
 .navuseritem {
@@ -793,6 +799,22 @@ ul.nav-tabs li:not(.active) button:hover
 
 #navuser:hover > #navuserpulldown {
   display: block;
+}
+
+.navbar .btn {
+	height: 41px;
+  float: none;
+}
+
+.zoom-wrapper {
+  padding: 9px 12px;
+	float: none;
+	display: inline-block;
+	height: 41px;
+}
+
+.zoom-wrapper input[disabled] {
+  background: transparent;
 }
 
 .linkbtn:hover {
@@ -843,4 +865,3 @@ body.keyboard #app-navbar button:focus {
 #readium-toc-body li {
 	padding: 2px 0;
 }
-

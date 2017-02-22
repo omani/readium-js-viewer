@@ -278,3 +278,7 @@ body.list-view .details{
 .title, .author, .modal-book-info {
     font-family: 'Montserrat', sans-serif;
 }
+
+.list-view .icon-thumbnails {
+    display: inline-block;
+}

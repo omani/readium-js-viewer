@@ -471,6 +471,9 @@
   "biblemesh_share" : {
     "message": "Share"
   },
+  "biblemesh_add_note" : {
+    "message": "Add note"
+  },
   "biblemesh_saving" : {
     "message": "Saving..."
   },

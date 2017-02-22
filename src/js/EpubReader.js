@@ -1087,7 +1087,7 @@ BookmarkData){
         history['replaceState'](null, null, url);
     }
 
-    var biblemesh_showHighlightOptions = function(){
+    var biblemesh_showHighlightOptions = function(forceShowNote) {
         
         var iframe = $("#epub-reader-frame iframe")[0];
         var win = iframe.contentWindow || iframe;
@@ -1119,7 +1119,40 @@ BookmarkData){
                     currentHighlight.highlight.note = $(this).val();
                     currentHighlight.highlight.updated_at = biblemesh_Helpers.getUTCTimeStamp();
                     Settings.patch(biblemesh_userData, biblemesh_refreshUserDataCallback);
+                    biblemesh_setupShareLink();
                 }
+            }
+
+            var encodeURIComp = function(comp) {
+                return encodeURIComponent(comp).replace(/%20/g, "+");
+            }
+
+            function biblemesh_setupShareLink() {
+                var abridgedHighlight = selStr;
+                var abridgedNote = hasCurrentHighlight() ? currentHighlight.highlight.note : '';
+                while(encodeURIComp(abridgedHighlight+abridgedNote).length > 1900) {
+                    if(abridgedHighlight.length > abridgedNote.length) {
+                        abridgedHighlight = abridgedHighlight.substring(0, abridgedHighlight.length-50) + '...';
+                    } else {
+                        abridgedNote = abridgedNote.substring(0, abridgedNote.length-50) + '...';
+                    }
+                }
+                highlightOptsEl.find('.highlightOpts-share').attr('href',
+                    '/book/' + biblemesh_bookId
+                        + '?goto=' + encodeURIComp(JSON.stringify({
+                            idref: cfiObj.idref,
+                            elementCfi: cfiObj.cfi
+                        }))
+                        + '&highlight=' + encodeURIComp(abridgedHighlight)
+                        + (abridgedNote ? '&note=' + encodeURIComp(abridgedNote) : '')
+                        + (abridgedNote
+                            ? '&sharer=' + encodeURIComp(
+                                (Settings.getUserAttr('firstname') + ' ' + Settings.getUserAttr('lastname')).trim()
+                            )
+                            : ''
+                        )
+                        + '&editing=1'
+                );
             }
 
             var noteBeforeDel = '';
@@ -1136,6 +1169,9 @@ BookmarkData){
                 highlightOptsEl
                     .find('.highlightOpts-note-text')
                     .val(hasCurrentHighlight() ? currentHighlight.highlight.note : '');
+                highlightOptsEl
+                    .find('.highlightOpts-addnote')
+                    [hasCurrentHighlight() ? 'removeClass' : 'addClass']('disabled');
             }
 
             setupVisually();
@@ -1153,10 +1189,11 @@ BookmarkData){
             var selectionVeryBottom = cRect.top+cRect.height;
             var selectionVeryLeft = cRect.left;
             var selectionVeryRight = cRect.left+cRect.width;
+            var hasNote = forceShowNote || (hasCurrentHighlight() && currentHighlight.highlight.note);
 
             var style = {
-                width: Math.min( 400 , docWd - SHADOW_WIDTH*2 ),
-                height: Math.min( 200 , docHt - SHADOW_WIDTH*2 )
+                width: hasNote ? Math.min( 400 , docWd - SHADOW_WIDTH*2 ) : 250,
+                height: hasNote ? Math.min( 216 , docHt - SHADOW_WIDTH*2 ) : 42
             }
 
             var midLeft = docLeft * -1 + parseInt((selectionVeryLeft + selectionVeryRight) / 2);
@@ -1166,6 +1203,10 @@ BookmarkData){
             style.top = Math.max( SHADOW_WIDTH , Math.min( docHt - style.height - SHADOW_WIDTH*2 , moreRoomAtTop ? selectionVeryTop - style.height : selectionVeryBottom ) );;
 
             highlightOptsEl.css(style);
+
+            if(!hasNote) {
+                highlightOptsEl.addClass('nonote');
+            }
 
 // a click on a highlight that includes a partial word does not then indicate a highlight is selected
 
@@ -1181,7 +1222,7 @@ BookmarkData){
                         if(currentHighlight.highlight.note != "") {
                             var boxSelectedBeforeDel = highlightOptsEl.find('.highlightOpts-sel');
                             noteBeforeDel = currentHighlight.highlight.note;
-                            highlightOptsEl.find('.highlightOpts-highlightline').append(
+                            highlightOptsEl.find('.highlightOpts-share').after(
                                 $("<div class='highlightOpts-undo'>" + Strings.biblemesh_undo + "</div>")
                                     .on('click', function() {
                                         boxSelectedBeforeDel.trigger('click');
@@ -1228,6 +1269,19 @@ BookmarkData){
                 setupVisually();
             });
 
+            highlightOptsEl.find('.highlightOpts-addnote')
+                .on('click', function(e) {
+                    if($(this).hasClass('disabled')) return;
+
+                    var highlightBookmarkData = new BookmarkData(currentHighlight.highlight.spineIdRef, currentHighlight.highlight.cfi);
+                    var highlightRange = readium.reader.getDomRangeFromRangeCfi(highlightBookmarkData);
+
+                    sel.removeAllRanges();
+                    sel.addRange(highlightRange);
+
+                    biblemesh_showHighlightOptions(true);
+                });
+
             highlightOptsEl.find('.highlightOpts-note-text')
                 .on('mousedown', function(e) {
                     if(!hasCurrentHighlight()) {
@@ -1245,6 +1299,7 @@ BookmarkData){
             docEl.append(highlightOptsEl);
 
             readium.reader.plugins.highlights.addSelectionHighlight("highlightOpts-sel-highlight", "sel-highlight", undefined, true);
+            biblemesh_setupShareLink();
 
         }
     }
