@@ -767,7 +767,7 @@ ul.nav-tabs li:not(.active) button:hover
   border-color: rgba(255, 255, 255, 0.4) transparent transparent transparent;
   border-top-style: solid;
   margin-top: -2.5px;
-  top: 21px;
+  top: 22px;
 }
 
 #navuserpulldown {
@@ -782,7 +782,7 @@ ul.nav-tabs li:not(.active) button:hover
   min-width: 40px;
   color: white;
   padding: 10px 36px 10px 13px;
-  line-height: 21px;
+  line-height: 24px;
   white-space: nowrap;
   height: 44px;
 }
