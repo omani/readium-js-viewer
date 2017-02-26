@@ -100,6 +100,8 @@ BookmarkData){
     */
 
     var biblemesh_userDataRefreshInterval = 0;
+
+    var onload = true;
     
     // TODO: is this variable actually used anywhere here??
     // (bad naming convention, hard to find usages of "el")
@@ -490,6 +492,9 @@ BookmarkData){
         {
             Globals.logEvent("PAGINATION_CHANGED", "ON", "EpubReader.js");
             
+            var isOnload = onload;  //first call to this function is always during onload
+            onload = false;
+
             if (_debugBookmarkData_goto) {
                 
                 debugBookmarkData(_debugBookmarkData_goto);
@@ -497,7 +502,7 @@ BookmarkData){
             }
             
             biblemesh_updateURL();
-            biblemesh_savePlace();
+            if(!isOnload) biblemesh_savePlace();
             updateUI(pageChangeData);
 
             spin(false);
