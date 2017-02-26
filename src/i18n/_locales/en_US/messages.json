@@ -518,5 +518,11 @@
   },
   "biblemesh_no_books" : {
     "message": "No books available."
+  },
+  "i18n_readium_library" : {
+    "message" : "Library"
+  },
+  "i18n_readium_options" : {
+    "message" : "Options:"
   }
 }

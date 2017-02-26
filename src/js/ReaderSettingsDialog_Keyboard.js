@@ -333,7 +333,7 @@ define(['hgn!readium_js_viewer_html_templates/settings-keyboard-item.html', 'i18
             if (atLeastOneInvalidOrDuplicate) {
               body += "<p>" + Strings.i18n_keyboard_onerror_reset + "</p>";
             }
-            Dialogs.showModalMessageEx("Readium - " + Strings.i18n_keyboard_shortcuts, body);
+            Dialogs.showModalMessageEx("Reader - " + Strings.i18n_keyboard_shortcuts, body);  //biblemesh_
         }
 
         return keys;

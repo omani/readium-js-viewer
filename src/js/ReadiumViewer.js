@@ -136,7 +136,7 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
         var func = _initialLoad ? replaceState : pushState;
         func(
             {epub: epub, epubs: epubs},
-            "Readium Viewer",
+            "Reader",  // biblemesh_
             urlState
         );
     
@@ -165,7 +165,7 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
         var func = _initialLoad ? replaceState : pushState;
         func(
             {epubs: libraryURL},
-            "Readium Library",
+            Settings.getUserAttr('idpName') + ' ' + Strings.view_library,  // biblemesh_
             urlState
         );
         

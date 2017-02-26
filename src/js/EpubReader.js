@@ -174,6 +174,8 @@ BookmarkData){
         } else {
             $('<h2 class="book-title-header"></h2>').insertAfter('.navbar').text(title);
         }
+
+        document.title = title;  // biblemesh_
     };
 
     var _debugBookmarkData_goto = undefined;
@@ -1531,7 +1533,7 @@ BookmarkData){
             firstname: Settings.getUserAttr('firstname')  // biblemesh_
         }));
         installReaderEventHandlers();
-        document.title = "Readium";
+        document.title = "Reader";  // biblemesh_
         $('#zoom-fit-width a').on('click', setFitWidth);
         $('#zoom-fit-screen a').on('click', setFitScreen);
         $('#zoom-custom a').on('click', enableCustom);
