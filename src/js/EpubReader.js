@@ -101,7 +101,8 @@ BookmarkData){
 
     var biblemesh_userDataRefreshInterval = 0;
 
-    var onload = true;
+    var biblemesh_onload = true;
+    var biblemesh_doPushState = false;
     
     // TODO: is this variable actually used anywhere here??
     // (bad naming convention, hard to find usages of "el")
@@ -492,8 +493,8 @@ BookmarkData){
         {
             Globals.logEvent("PAGINATION_CHANGED", "ON", "EpubReader.js");
             
-            var isOnload = onload;  //first call to this function is always during onload
-            onload = false;
+            var biblemesh_isOnload = biblemesh_onload;  //first call to this function is always during onload
+            biblemesh_onload = false;
 
             if (_debugBookmarkData_goto) {
                 
@@ -502,7 +503,7 @@ BookmarkData){
             }
             
             biblemesh_updateURL();
-            if(!isOnload) biblemesh_savePlace();
+            if(!biblemesh_isOnload) biblemesh_savePlace();
             updateUI(pageChangeData);
 
             spin(false);
@@ -599,6 +600,7 @@ BookmarkData){
     
                 _tocLinkActivated = true;
     
+                biblemesh_doPushState = true;
                 readium.reader.openContentUrl(href, tocUrl, undefined);
     
                 if (embedded) {
@@ -717,6 +719,7 @@ BookmarkData){
                     .on('click', function(e) {
                         var gotoIdRef = $(this).attr('data-idref');
                         spin(true);
+                        biblemesh_doPushState = true;
                         readium.reader.openSpineItemElementId(gotoIdRef);
                         biblemesh_updateProgressBar(gotoIdRef);
                     });
@@ -1089,7 +1092,8 @@ BookmarkData){
 
         var url = biblemesh_getBookmarkURL()
         
-        history['replaceState'](null, null, url);
+        history[biblemesh_doPushState ? 'pushState' : 'replaceState']({epub: "/epub_content/book_" + biblemesh_bookId}, null, url);
+        biblemesh_doPushState = false;
     }
 
     var biblemesh_showHighlightOptions = function(forceShowNote) {
