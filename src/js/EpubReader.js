@@ -925,6 +925,7 @@ BookmarkData){
     
     var biblemesh_delHighlightOpts = function() {
         var iframe = $("#epub-reader-frame iframe")[0];
+        if(!iframe) return;
         var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
         var docEl = $( doc.documentElement );
 
@@ -1453,6 +1454,7 @@ BookmarkData){
             var appHeight = $(document.body).height() - $('#app-container')[0].offsetTop;
             $('#app-container').height(appHeight);
             $('#readium-toc-body').height(appHeight);
+            biblemesh_delHighlightOpts();
         };
 
         // biblemesh_ : following event commented out
