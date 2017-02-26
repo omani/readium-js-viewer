@@ -126,25 +126,29 @@ biblemesh_Helpers){
         });
 
         $('.details-dialog .modal-body').html(bodyStr);
-        
+
         $('.details-dialog .delete').on('click', function(){
-            $('.details-dialog').modal('hide');
-            var success = function(){
-                libraryManager.retrieveAvailableEpubs(loadLibraryItems);
-                Dialogs.closeModal();
-            }
-
-            var promptMsg = Strings.i18n_are_you_sure + ' \'' + details.title + '\'';
-
-            Dialogs.showModalPrompt(Strings.delete_dlg_title, promptMsg,
-                                    Strings.i18n_delete, Strings.i18n_cancel,
-                                    function(){
-                                        Dialogs.showModalProgress(Strings.delete_progress_title, '');
-                                        Dialogs.updateProgress(100, Messages.PROGRESS_DELETING, details.title, true);
-                                        // libraryManager.deleteEpubWithId(details.rootDir, success, showError)   // biblemesh_
-                                        biblemesh_deleteEpub(details, success, showError);
-                                    });
+            biblemesh_confirmDelete(details);
         });
+    }
+
+    var biblemesh_confirmDelete = function(details) {
+        $('.details-dialog').modal('hide');
+        var success = function(){
+            libraryManager.retrieveAvailableEpubs(loadLibraryItems);
+            Dialogs.closeModal();
+        }
+
+        var promptMsg = Strings.i18n_are_you_sure + ' \'' + details.title + '\'';
+
+        Dialogs.showModalPrompt(Strings.delete_dlg_title, promptMsg,
+                                Strings.i18n_delete, Strings.i18n_cancel,
+                                function(){
+                                    Dialogs.showModalProgress(Strings.delete_progress_title, '');
+                                    Dialogs.updateProgress(100, Messages.PROGRESS_DELETING, details.title, true);
+                                    // libraryManager.deleteEpubWithId(details.rootDir, success, showError)   // biblemesh_
+                                    biblemesh_deleteEpub(details, success, showError);
+                                });
     }
 
     var showError = function(errorCode, data){
@@ -157,6 +161,7 @@ biblemesh_Helpers){
             bookRoot = $this.attr('data-root'),
             rootDir = $this.attr('data-root-dir'),
             noCoverBg = $this.attr('data-no-cover');
+            title = $this.closest('.title').attr('title');  // biblemesh_
 
         $('.details-dialog').remove();
 
@@ -184,7 +189,23 @@ biblemesh_Helpers){
                 console.warn("no package path (OPF within zipped EPUB archive?): " + packageUrl);
             }
             
-            libraryManager.retrieveFullEpubDetails(packageUrl, bookRoot, rootDir, noCoverBg, showDetailsDialog, showError);
+            libraryManager.retrieveFullEpubDetails(packageUrl, bookRoot, rootDir, noCoverBg, showDetailsDialog, function(errorCode, data) {
+                // biblemesh_
+                $('#details-dialog').remove();
+                $('.modal-backdrop').remove();
+                Dialogs.showModalPrompt(
+                    Strings.err_unknown,
+                    Strings.biblemesh_corrupt_epub,
+                    Strings.i18n_delete,
+                    Strings.ok,
+                    function() {
+                        biblemesh_confirmDelete({
+                            title: title,
+                            rootUrl: bookRoot
+                        });
+                    }
+                );
+            });
         };
         
         console.log("OPF package URL: " + url);

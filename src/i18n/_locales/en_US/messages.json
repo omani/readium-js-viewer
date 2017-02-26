@@ -524,5 +524,8 @@
   },
   "i18n_readium_options" : {
     "message" : "Options:"
+  },
+  "biblemesh_corrupt_epub" : {
+    "message" : "This EPUB may be corrupt."
   }
 }
