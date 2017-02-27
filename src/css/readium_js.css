@@ -90,10 +90,19 @@ body, .tooltip {
 }
 
 a {
-  color: #1C60AB;
+    color: #1C60AB;
 }
 
 a:hover {
-  color: #6399D5;
-  text-decoration: none;
+    color: #6399D5;
+    text-decoration: none;
+}
+
+.shareIframe {
+    width: 100%;
+    margin-bottom: -5px;
+}
+
+.modal-body.withShareIFrame {
+    padding: 0;
 }
