@@ -1307,6 +1307,21 @@ BookmarkData){
                 .on('touchend', saveHighlight)
                 .on('keyup', saveHighlight);
 
+            highlightOptsEl.find('.highlightOpts-share')
+                .on('click', function(e) {
+                    e.preventDefault();
+
+                    var bodyHt = $('body').height();
+
+                    Dialogs.showModalMessage(Strings.biblemesh_share, '');
+                    $('.modal-body').addClass('withShareIFrame').html('').append(
+                        $('<iframe class="shareIframe"></iframe>')
+                            .attr('src', $(this).attr('href'))
+                            .css('height', Math.min(500, bodyHt - 100) )
+                    );
+                    $('.modal-footer').remove();
+
+                });
 
             docEl.append(highlightOptsEl);
 
@@ -1598,7 +1613,7 @@ BookmarkData){
 
             var readerOptions =  {
                 el: "#epub-reader-frame",
-                annotationCSSUrl: moduleConfig.annotationCSSUrl,
+                annotationCSSUrl: moduleConfig.annotationCSSUrl + '?bust=VERSION_BUST_STRING',  // biblemesh_
                 mathJaxUrl : moduleConfig.mathJaxUrl,
             };
 
