@@ -138,6 +138,10 @@ function(biblemesh_Helpers){
                                     }
                                 },
                                 error: function (xhr, status, errorThrown) {
+                                    if(xhr.status == 403) {
+                                        location.reload();
+                                        return;
+                                    }
                                     currentlyPatching = false;
                                     indicateSave();
                                     if(xhr.status == 412) {
@@ -198,6 +202,10 @@ function(biblemesh_Helpers){
                         callback(result);
                     },
                     error: function (xhr, status, errorThrown) {
+                        if(xhr.status == 403) {
+                            location.reload();
+                            return;
+                        }
                         console.error('Error when AJAX fetching ' + path);
                         console.error(status);
                         console.error(errorThrown);
@@ -237,6 +245,10 @@ function(biblemesh_Helpers){
                             callbackWhenComplete();
                         },
                         error: function (xhr, status, errorThrown) {
+                            if(xhr.status == 403) {
+                                location.reload();
+                                return;
+                            }
                             console.error('Error when AJAX fetching ' + path);
                             console.error(status);
                             console.error(errorThrown);
@@ -288,6 +300,10 @@ function(biblemesh_Helpers){
                     callback();
                 },
                 error: function (xhr, status, errorThrown) {
+                    if(xhr.status == 403) {
+                        location.reload();
+                        return;
+                    }
                     console.error('Error setting up the user.');
                     errorCallback();
                 }

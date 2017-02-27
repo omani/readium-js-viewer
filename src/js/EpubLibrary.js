@@ -524,6 +524,10 @@ biblemesh_Helpers){
                 if(success) success();
             },
             error: function(jqXHR, textStatus, errorThrown) {
+                if(jqXHR.status == 403) {
+                    location.reload();
+                    return;
+                }
                 Dialogs.showModalMessageEx(Strings.err_dlg_title, Strings.err_ajax);
             }
         });
@@ -591,6 +595,10 @@ biblemesh_Helpers){
                         doImport();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
+                        if(jqXHR.status == 403) {
+                            location.reload();
+                            return;
+                        }
                         result.error = Strings.err_ajax;
                         resultArray.push(result);
                         doImport();
