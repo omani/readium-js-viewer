@@ -19,6 +19,13 @@ define(['./ModuleConfig', 'hgn!readium_js_viewer_html_templates/settings-dialog.
             backgroundColor: isAuthorTheme ? "" : previewStyle.backgroundColor,
             color: isAuthorTheme ? "" : previewStyle.color
         }}];
+        bookStyles.push({selector: '*:not(a):not(body)', declarations: { // biblemesh_
+            backgroundColor: (theme === "default-theme") ? 'white' : '',
+            color: (theme === "default-theme") ? 'black' : ''
+        }});
+        bookStyles.push({selector: 'a', declarations: { // biblemesh_
+            color: (theme === "night-theme") ? 'rgb(118, 189, 228)' : ''
+        }});
         return bookStyles;
     }
     var setPreviewTheme = function($previewText, newTheme){
