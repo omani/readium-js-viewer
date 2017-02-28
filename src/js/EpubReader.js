@@ -70,6 +70,7 @@ BookmarkData){
     var ebookURL = undefined;
     var ebookURL_filepath = undefined;
     var biblemesh_bookId = undefined;
+    var biblemesh_lastUrl = undefined;
     
     // initialised in loadEbook() >> readium.openPackageDocument()
     var currentPackageDocument = undefined;
@@ -102,7 +103,8 @@ BookmarkData){
     var biblemesh_userDataRefreshInterval = 0;
 
     var biblemesh_onload = true;
-    var biblemesh_doPushState = false;
+    var biblemesh_doReplaceState = false;
+    var biblemesh_didNotUpdateUrlOnStartLoad = false;
     
     // TODO: is this variable actually used anywhere here??
     // (bad naming convention, hard to find usages of "el")
@@ -229,6 +231,7 @@ BookmarkData){
     // This function will retrieve a package document and load an EPUB
     var loadEbook = function (readerSettings, openPageRequest) {
 
+        biblemesh_doReplaceState = true;
         biblemesh_askedAboutLocationUpdate = false;
 
         readium.openPackageDocument(
@@ -324,6 +327,8 @@ BookmarkData){
     var tocShowHideToggle = function(){
 
         unhideUI();
+
+        biblemesh_doReplaceState = true;
 
         var $appContainer = $('#app-container'),
             hide = $appContainer.hasClass('toc-visible');
@@ -461,16 +466,22 @@ BookmarkData){
         var lastIframe = undefined,
             wasFixed;
 
+        readium.reader.on(ReadiumSDK.Events.SETTINGS_APPLIED, function() {
+            biblemesh_doReplaceState = true;
+        });
+
         readium.reader.on(ReadiumSDK.Events.FXL_VIEW_RESIZED, function() {
             Globals.logEvent("FXL_VIEW_RESIZED", "ON", "EpubReader.js");
             setScaleDisplay();
         });
-        
+
         readium.reader.on(ReadiumSDK.Events.CONTENT_DOCUMENT_LOADED, function ($iframe, spineItem)
         {
             Globals.logEvent("CONTENT_DOCUMENT_LOADED", "ON", "EpubReader.js [ " + spineItem.href + " ]");
             
             var isFixed = readium.reader.isCurrentViewFixedLayout();
+
+            biblemesh_doReplaceState = biblemesh_doReplaceState || !biblemesh_didNotUpdateUrlOnStartLoad;
 
             // TODO: fix the pan-zoom feature!
             if (isFixed){
@@ -489,6 +500,7 @@ BookmarkData){
 
         readium.reader.on(ReadiumSDK.Events.CONTENT_DOCUMENT_LOAD_START, function (loadStartData, loadStartSpineItem)
         {
+            biblemesh_didNotUpdateUrlOnStartLoad = true;
             biblemesh_updateProgressBar(loadStartSpineItem.idref);
         })
         readium.reader.on(ReadiumSDK.Events.PAGINATION_CHANGED, function (pageChangeData)
@@ -602,7 +614,6 @@ BookmarkData){
     
                 _tocLinkActivated = true;
     
-                biblemesh_doPushState = true;
                 readium.reader.openContentUrl(href, tocUrl, undefined);
     
                 if (embedded) {
@@ -721,7 +732,6 @@ BookmarkData){
                     .on('click', function(e) {
                         var gotoIdRef = $(this).attr('data-idref');
                         spin(true);
-                        biblemesh_doPushState = true;
                         readium.reader.openSpineItemElementId(gotoIdRef);
                         biblemesh_updateProgressBar(gotoIdRef);
                     });
@@ -1093,10 +1103,12 @@ BookmarkData){
 
     var biblemesh_updateURL = function(){
 
-        var url = biblemesh_getBookmarkURL()
+        var url = biblemesh_getBookmarkURL();
         
-        history[biblemesh_doPushState ? 'pushState' : 'replaceState']({epub: "/epub_content/book_" + biblemesh_bookId}, null, url);
-        biblemesh_doPushState = false;
+        history[biblemesh_doReplaceState || biblemesh_lastUrl==url ? 'replaceState' : 'pushState']({epub: "/epub_content/book_" + biblemesh_bookId}, null, url);
+        biblemesh_doReplaceState = false;
+        biblemesh_didNotUpdateUrlOnStartLoad = false;
+        biblemesh_lastUrl = url;
     }
 
     var biblemesh_showHighlightOptions = function(forceShowNote) {
@@ -1333,12 +1345,14 @@ BookmarkData){
 
     var nextPage = function () {
 
+        biblemesh_doReplaceState = true;  // biblemesh_
         readium.reader.openPageRight();
         return false;
     };
 
     var prevPage = function () {
 
+        biblemesh_doReplaceState = true;  // biblemesh_
         readium.reader.openPageLeft();
         return false;
     };
@@ -1467,6 +1481,7 @@ BookmarkData){
 
         var setTocSize = function(){
             var appHeight = $(document.body).height() - $('#app-container')[0].offsetTop;
+            biblemesh_doReplaceState = true;
             $('#app-container').height(appHeight);
             $('#readium-toc-body').height(appHeight);
             biblemesh_delHighlightOpts();
