@@ -864,3 +864,18 @@ body.keyboard #app-navbar button:focus {
 #readium-toc-body li {
 	padding: 2px 0;
 }
+
+
+/* biblemesh_ items follow */
+
+html[data-theme=night-theme] .book-title-header,
+html[data-theme=night-theme] body,
+html[data-theme=night-theme] #readium-toc-body
+{
+    background-color: rgb(20, 20, 20);
+    color: white;
+}
+
+html[data-theme=night-theme] .book-title-header {
+    color: rgba(255,255,255,.5);
+}
