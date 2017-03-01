@@ -832,26 +832,34 @@ ul.nav-tabs li:not(.active) button:hover
   top: 44px;
 }
 
-.btn-info {
-	background: #4da7dc;
-	border-color: transparent;
-	-webkit-transition: all .2s ease-in-out;
-	-moz-transition: all .2s ease-in-out;
-	-ms-transition: all .2s ease-in-out;
-	-o-transition: all .2s ease-in-out;
-	transition: all .2s ease-in-out;
-	/*font-weight: 700;
-	letter-spacing: 1px;
-	text-transform: uppercase;
-	font-size: 0.85em;
-	padding: 13px 15px;*/
+.btn-info, .btn-info:active,
+.btn-primary, .btn-primary:active,
+.btn-danger, .btn-danger:active {
+    background: #1c60ab;
+    border-color: transparent;
+    -webkit-transition: all .2s ease-in-out;
+    -moz-transition: all .2s ease-in-out;
+    -ms-transition: all .2s ease-in-out;
+    -o-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
 }
 
-/*.btn-info:hover {
-	background: #4392c1;
+.btn-danger, .btn-danger:active {
+    background: #c9302c;
 }
 
-body.keyboard button:focus,
+.btn-info:hover,
+.btn-primary:hover {
+    background: #6399D5;
+    border-color: transparent;
+}
+
+.btn-danger:hover {
+    background: #d9534f;
+    border-color: transparent;
+}
+
+/*body.keyboard button:focus,
 body.keyboard #app-navbar button:focus {
     box-shadow: none !important;
     outline: none !important;
@@ -865,9 +873,6 @@ body.keyboard #app-navbar button:focus {
 	padding: 2px 0;
 }
 
-
-/* biblemesh_ items follow */
-
 html[data-theme=night-theme] .book-title-header,
 html[data-theme=night-theme] body,
 html[data-theme=night-theme] #readium-toc-body
@@ -879,3 +884,17 @@ html[data-theme=night-theme] #readium-toc-body
 html[data-theme=night-theme] .book-title-header {
     color: rgba(255,255,255,.5);
 }
+
+button.close {
+  padding: 0 5px;
+}
+
+#readium-toc-body button.close{
+  margin-right: 12px;
+  opacity: .6;
+}
+
+#readium-toc-body button.close:hover {
+  opacity: 1;
+}
+
