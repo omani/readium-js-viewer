@@ -16,9 +16,9 @@ See the following submodule repositories:
 * User data (current location + annotations) are patched to the server instead of simply being saved in localstorage
 * UI and other minor changes
 
-Note: Only Readium's cloud reader has been used in this project. (I.e. The chrome app and cloud reader lite have not been touched or maintained with the updates.)
+Note: Readium's cloud reader has been the sole focus of this project. (I.e. The chrome app and cloud reader lite have not been maintained or tested.)
 
-See ( https://github.com/readium/readium-js ) for more extensive information relating to this project.
+See ( https://github.com/readium/readium-js ) for more extensive information relating to the original project.
 
 
 ## Prerequisites
@@ -57,7 +57,7 @@ Note that the above command executes the following:
 
 ### Forking
 
-Assuming a fork of `https://github.com/AndyHubert/readium-js-viewer` is made under `USER` at `https://github.com/USER/readium-js-viewer`, the `.gitmodules` file ( https://github.com/readium/readium-js-viewer/blob/develop/.gitmodules ) will still point to the original submodule URL (at `readium`, instead of `USER`). Thankfully, one can simply modify the `.gitmodules` file by replacing `https://github.com/AndyHubert/` with `https://github.com/USER/`, and do this for every submodule (`readium-js-viewer` > `readium-js` > `readium-shared-js` > `readium-cfi-js`). Then the Git command `git submodule sync` can be invoked, for each submodule.
+Assuming a fork of `https://github.com/AndyHubert/readium-js-viewer` is made under `USER` at `https://github.com/USER/readium-js-viewer`, the `.gitmodules` file ( https://github.com/AndyHubert/readium-js-viewer/blob/develop/.gitmodules ) will still point to the original submodule URL (at `readium`, instead of `USER`). Thankfully, one can simply modify the `.gitmodules` file by replacing `https://github.com/AndyHubert/` with `https://github.com/USER/`, and do this for every submodule (`readium-js-viewer` > `readium-js` > `readium-shared-js` > `readium-cfi-js`). Then the Git command `git submodule sync` can be invoked, for each submodule.
 
 
 ## Distribution
