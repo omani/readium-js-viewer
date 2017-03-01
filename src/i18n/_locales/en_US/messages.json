@@ -471,6 +471,12 @@
   "biblemesh_share" : {
     "message": "Share"
   },
+  "biblemesh_copy" : {
+    "message": "Copy"
+  },
+  "biblemesh_copied" : {
+    "message": "Highlight copied"
+  },
   "biblemesh_add_note" : {
     "message": "Add note"
   },

@@ -53,6 +53,7 @@
 .highlightOpts-line {
     margin-bottom: 10px;
     position: relative;
+    z-index: 1;
 }
 
 .highlightOpts-line.highlightOpts-faded {
@@ -110,7 +111,7 @@
     display: block;
 }
 
-.highlightOpts-undo, .highlightOpts-share, #highlightOpts.nonote .highlightOpts-addnote {
+.highlightOpts-undo, .highlightOpts-share, .highlightOpts-copy, #highlightOpts.nonote .highlightOpts-addnote {
     float: right;
     color: #1c60ab;
     text-decoration: none;
@@ -119,7 +120,7 @@
     cursor: default;    
 }
 
-.highlightOpts-undo:hover, .highlightOpts-share:hover, #highlightOpts.nonote .highlightOpts-addnote:hover:not(.disabled) {
+.highlightOpts-undo:hover, .highlightOpts-share:hover, .highlightOpts-copy:hover, #highlightOpts.nonote .highlightOpts-addnote:hover:not(.disabled) {
     cursor: pointer;
     color: #6399D5;
 }
@@ -131,3 +132,36 @@
 .disabled {
     opacity: .3;
 }
+
+.highlightOpts-msg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    text-align: center;
+    vertical-align: middle;
+    display: table;
+    opacity: 0;
+    -webkit-transition: opacity .4s ease-in-out;
+    -moz-transition: opacity .4s ease-in-out;
+    -ms-transition: opacity .4s ease-in-out;
+    -o-transition: opacity .4s ease-in-out;
+    transition: opacity .4s ease-in-out;
+}
+
+.highlightOpts-msg2 {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.highlightOpts-msg.show {
+    opacity: 1;
+}
+
+.highlightOpts-msg.top {
+    z-index: 2;
+}
+
+

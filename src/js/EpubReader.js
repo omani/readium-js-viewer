@@ -943,6 +943,8 @@ BookmarkData){
 
         readium.reader.plugins.highlights.removeHighlight("highlightOpts-sel-highlight");
         docEl.children("#highlightOpts").remove();
+
+        Keyboard.scope('reader');
     }
 
     //TODO: also update "previous/next page" commands status (disabled/enabled), not just button visibility.
@@ -1232,8 +1234,6 @@ BookmarkData){
                 highlightOptsEl.addClass('nonote');
             }
 
-// a click on a highlight that includes a partial word does not then indicate a highlight is selected
-
             highlightOptsEl.find('.highlightOpts-box').on('click', function() {
                 if($(this).hasClass('highlightOpts-sel')) return;
 
@@ -1246,7 +1246,7 @@ BookmarkData){
                         if(currentHighlight.highlight.note != "") {
                             var boxSelectedBeforeDel = highlightOptsEl.find('.highlightOpts-sel');
                             noteBeforeDel = currentHighlight.highlight.note;
-                            highlightOptsEl.find('.highlightOpts-share').after(
+                            highlightOptsEl.find('.highlightOpts-copy').after(
                                 $("<div class='highlightOpts-undo'>" + Strings.biblemesh_undo + "</div>")
                                     .on('click', function() {
                                         boxSelectedBeforeDel.trigger('click');
@@ -1295,6 +1295,8 @@ BookmarkData){
 
             highlightOptsEl.find('.highlightOpts-addnote')
                 .on('click', function(e) {
+                    e.preventDefault();
+                    
                     if($(this).hasClass('disabled')) return;
 
                     var highlightBookmarkData = new BookmarkData(currentHighlight.highlight.spineIdRef, currentHighlight.highlight.cfi);
@@ -1334,6 +1336,34 @@ BookmarkData){
                     $('.modal-footer').remove();
 
                 });
+
+            highlightOptsEl.find('.highlightOpts-copy')
+                .on('click', function(e) {
+                    if(e) e.preventDefault();
+
+                    var copyEl = $('<input class="copyel" />');
+                    copyEl.val(selStr);
+                    $('body').append(copyEl);
+                    copyEl.select()
+                    copyEl.focus();
+                    
+                    document.execCommand('copy');
+
+                    copyEl.remove();
+                    
+                    highlightOptsEl.find('.highlightOpts-msg2').html(Strings.biblemesh_copied);
+                    highlightOptsEl.find('.highlightOpts-msg').addClass('show').addClass('top');
+                    setTimeout(function() {
+                        highlightOptsEl.find('.highlightOpts-msg').removeClass('show');
+                        highlightOptsEl.find('.highlightOpts-msg2').html('')
+                        setTimeout(function() {
+                            highlightOptsEl.find('.highlightOpts-msg').removeClass('top');
+                        }, 600);
+                    }, 1000);
+
+                });
+
+            Keyboard.scope('highlights');
 
             docEl.append(highlightOptsEl);
 
@@ -1503,6 +1533,19 @@ BookmarkData){
             var docEl = $( doc.documentElement );
 
             docEl.find('.highlightOpts-note-text').trigger('blur');
+        });
+
+        // biblemesh_ 
+        Keyboard.on('control+c, command+c', 'highlights', function(){
+            var iframe = $("#epub-reader-frame iframe")[0];
+            if(!iframe) return;
+            var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
+            var docEl = $( doc.documentElement );
+            var win = iframe.contentWindow || iframe;
+            var sel = win.getSelection();
+            if(sel.toString() == '') {
+                docEl.find('.highlightOpts-copy').click();
+            }
         });
 
             // captures all clicks on the document on the capture phase. Not sure if it's possible with jquery
@@ -1988,6 +2031,7 @@ BookmarkData){
 
         Keyboard.off('reader');
         Keyboard.off('settings');
+        Keyboard.off('highlights');
 
         $('#settings-dialog').off('hidden.bs.modal');
         $('#settings-dialog').off('shown.bs.modal');
