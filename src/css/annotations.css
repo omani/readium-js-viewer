@@ -120,9 +120,10 @@
     cursor: default;    
 }
 
-.highlightOpts-undo:hover, .highlightOpts-share:hover, .highlightOpts-copy:hover, #highlightOpts.nonote .highlightOpts-addnote:hover:not(.disabled) {
+.highlightOpts-undo:hover, .highlightOpts-share:hover, .highlightOpts-copy:hover, #highlightOpts.nonote .highlightOpts-addnote:hover {
     cursor: pointer;
     color: #6399D5;
+    opacity: 1;
 }
 
 .highlightOpts-share {

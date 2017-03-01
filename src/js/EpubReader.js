@@ -1297,7 +1297,9 @@ BookmarkData){
                 .on('click', function(e) {
                     e.preventDefault();
                     
-                    if($(this).hasClass('disabled')) return;
+                    if($(this).hasClass('disabled')) {
+                        highlightOptsEl.find('.highlightOpts-box-1').click();
+                    }
 
                     var highlightBookmarkData = new BookmarkData(currentHighlight.highlight.spineIdRef, currentHighlight.highlight.cfi);
                     var highlightRange = readium.reader.getDomRangeFromRangeCfi(highlightBookmarkData);
@@ -1306,6 +1308,8 @@ BookmarkData){
                     sel.addRange(highlightRange);
 
                     biblemesh_showHighlightOptions(true);
+
+                    docEl.find('.highlightOpts-note-text').focus();
                 });
 
             highlightOptsEl.find('.highlightOpts-note-text')
