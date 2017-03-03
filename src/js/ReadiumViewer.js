@@ -36,6 +36,18 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
                     $(document.body).addClass("keyboard");
                 });
 
+                $(document).on('keydown', function(e)
+                {
+                    if (e.keyCode === 9 || e.which === 9) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if(document.activeElement) {
+                            document.activeElement.blur();
+                        }
+                        return;
+                    }
+                });
+
             });
 
         }, function() {

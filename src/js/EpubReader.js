@@ -346,12 +346,12 @@ BookmarkData){
               existsFocusable[0].setAttribute("tabindex", "-1");
             }
             /* end of clear focusable tab item */
-            setTimeout(function(){ $('#tocButt')[0].focus(); }, 100);
+            // setTimeout(function(){ $('#tocButt')[0].focus(); }, 100);  biblemesh_ commented
         }
         else{
             $appContainer.addClass('toc-visible');
 
-            setTimeout(function(){ $('#readium-toc-body button.close')[0].focus(); }, 100);
+            // setTimeout(function(){ $('#readium-toc-body button.close')[0].focus(); }, 100);  biblemesh_ commented
         }
 
         if(embedded){
@@ -1443,9 +1443,9 @@ BookmarkData){
         // Keyboard.on(Keyboard.ToolbarHide, 'reader', hideTB);
 
         var showTB = function(){
-            $("#aboutButt1")[0].focus();
+            // $("#aboutButt1")[0].focus();  biblemesh_ commented
             unhideUI();
-            setTimeout(function(){ $("#aboutButt1")[0].focus(); }, 50);
+            // setTimeout(function(){ $("#aboutButt1")[0].focus(); }, 50);  biblemesh_ commented
         };
         $("#buttShowToolBar").on("click", showTB);
         // biblemesh_ : following event commented out
@@ -1492,7 +1492,7 @@ BookmarkData){
 
         $('.zoom-wrapper input').on('click', function(){
             if (!this.disabled){
-                this.focus();
+                // this.focus();  biblemesh_ commented
                 return false;
             }
         });
@@ -1576,7 +1576,7 @@ BookmarkData){
     }
 
     var enableCustom = function(e){
-        $('.zoom-wrapper input').prop('disabled', false).focus();
+        // $('.zoom-wrapper input').prop('disabled', false).focus();  biblemesh_ commented
         $('.active-zoom').removeClass('active-zoom');
         $('#zoom-custom').addClass('active-zoom');
          $('.zoom-wrapper>a').dropdown('toggle');
@@ -1793,15 +1793,25 @@ BookmarkData){
             gesturesHandler = new GesturesHandler(readium.reader, readerOptions.el);
             gesturesHandler.initialize();
 
-            $(window).on('keyup', function(e)
-            {
-                if (e.keyCode === 9 || e.which === 9)
-                {
-                    unhideUI();
-                }
-            });
+            // biblemesh_ : comment out the following
+            // $(window).on('keyup', function(e)
+            // {
+            //     if (e.keyCode === 9 || e.which === 9)
+            //     {
+            //         unhideUI();
+            //     }
+            // });
 
             readium.reader.addIFrameEventListener('keydown', function(e) {
+                if (e.keyCode === 9 || e.which === 9) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if(document.activeElement) {
+                        document.activeElement.blur();
+                    }
+                    return;
+                }
+                
                 Keyboard.dispatch(document.documentElement, e.originalEvent);
             });
 
@@ -1859,7 +1869,7 @@ BookmarkData){
                 Keyboard.scope('reader');
 
                 unhideUI()
-                setTimeout(function(){ $("#settbutt1").focus(); }, 50);
+                // setTimeout(function(){ $("#settbutt1").focus(); }, 50);  biblemesh_ commented
 
                 $("#buttSave").removeAttr("accesskey");
                 $("#buttClose").removeAttr("accesskey");
@@ -1877,7 +1887,7 @@ BookmarkData){
                 Keyboard.scope('reader');
 
                 unhideUI();
-                setTimeout(function(){ $("#aboutButt1").focus(); }, 50);
+                // setTimeout(function(){ $("#aboutButt1").focus(); }, 50);  biblemesh_ commented
             });
             $('#about-dialog').on('shown.bs.modal', function(){
                 Keyboard.scope('about');

@@ -123,7 +123,7 @@ define(['./ModuleConfig', 'hgn!readium_js_viewer_html_templates/settings-dialog.
             $('#tab-butt-main').trigger("click");
             KeyboardSettings.initKeyboardList();
 
-            setTimeout(function(){ $('#closeSettingsCross')[0].focus(); }, 1000); //tab-butt-main
+            // setTimeout(function(){ $('#closeSettingsCross')[0].focus(); }, 1000); //tab-butt-main  biblemesh_ commented
 
             Settings.get('reader', function(readerSettings){
                 readerSettings = readerSettings || defaultSettings;

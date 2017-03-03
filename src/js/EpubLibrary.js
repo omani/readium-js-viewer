@@ -173,11 +173,11 @@ biblemesh_Helpers){
         $('#details-dialog').on('hidden.bs.modal', function () {
             Keyboard.scope('library');
 
-            setTimeout(function(){ $this.focus(); }, 50);
+            // setTimeout(function(){ $this.focus(); }, 50);  biblemesh_ commented
         });
         $('#details-dialog').on('shown.bs.modal', function(){
             Keyboard.scope('details');
-            setTimeout(function(){ $('#closeEpubDetailsCross')[0].focus(); }, 1000);
+            // setTimeout(function(){ $('#closeEpubDetailsCross')[0].focus(); }, 1000);  biblemesh_ commented
         });
 
 
@@ -715,7 +715,7 @@ biblemesh_Helpers){
         $('#about-dialog').on('hidden.bs.modal', function () {
             Keyboard.scope('library');
 
-            setTimeout(function(){ $("#aboutButt1").focus(); }, 50);
+            // setTimeout(function(){ $("#aboutButt1").focus(); }, 50);  biblemesh_ commented
         });
         $('#about-dialog').on('shown.bs.modal', function(){
             Keyboard.scope('about');
@@ -724,14 +724,14 @@ biblemesh_Helpers){
         $('#add-epub-dialog').on('hidden.bs.modal', function () {
             Keyboard.scope('library');
 
-            setTimeout(function(){ $("#addbutt").focus(); }, 50);
+            // setTimeout(function(){ $("#addbutt").focus(); }, 50);  biblemesh_ commented
         });
         $('#add-epub-dialog').on('shown.bs.modal', function(){
             Keyboard.scope('add');
 
             $('#add-epub-dialog input').val('');
 
-            setTimeout(function(){ $('#closeAddEpubCross')[0].focus(); }, 1000);
+            // setTimeout(function(){ $('#closeAddEpubCross')[0].focus(); }, 1000);  biblemesh_ commented
         });
         $('#url-upload').on('keyup', function(){
             var val = $(this).val();
@@ -758,11 +758,11 @@ biblemesh_Helpers){
         }
         $('.icon-list-view').on('click', function(){
             $(document.body).addClass('list-view');
-            setTimeout(function(){ $('.icon-thumbnails')[0].focus(); }, 50);
+            // setTimeout(function(){ $('.icon-thumbnails')[0].focus(); }, 50);  biblemesh_ commented
         });
         $('.icon-thumbnails').on('click', function(){
             $(document.body).removeClass('list-view');
-            setTimeout(function(){ $('.icon-list-view')[0].focus(); }, 50);
+            // setTimeout(function(){ $('.icon-list-view')[0].focus(); }, 50);  biblemesh_ commented
         });
         findHeightRule();
         setItemHeight();
@@ -799,7 +799,7 @@ biblemesh_Helpers){
 
             Keyboard.scope('library');
 
-            setTimeout(function(){ $("#settbutt1").focus(); }, 50);
+            // setTimeout(function(){ $("#settbutt1").focus(); }, 50);  biblemesh_ commented
 
             $("#buttSave").removeAttr("accesskey");
             $("#buttClose").removeAttr("accesskey");
