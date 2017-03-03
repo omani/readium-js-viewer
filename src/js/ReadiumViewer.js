@@ -3,6 +3,8 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
     var _initialLoad = true; // replaces pushState() with replaceState() at first load 
     var initialLoad = function(){
 
+        if(typeof Raven != 'undefined') Raven.config('https://0569beced42c4b068367c8d47cfddf36@sentry.io/144504').install()
+
         Settings.initialize(function() {  // biblemesh_ : this wrapper is new
 
             Settings.patchFromLocalStorage(function() {  // biblemesh_ : this wrapper is new
