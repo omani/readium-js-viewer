@@ -524,11 +524,9 @@ biblemesh_Helpers){
                 if(success) success();
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                if(jqXHR.status == 403) {
-                    location.reload();
-                    return;
-                }
-                Dialogs.showModalMessageEx(Strings.err_dlg_title, Strings.err_ajax);
+                var response = jqXHR.responseJSON;
+                var errorMsg = Strings[response.errorType] || response.error || response.errorType || Strings.err_ajax;
+                Dialogs.showModalMessageEx(Strings.err_dlg_title, errorMsg);
             }
         });
 
@@ -585,9 +583,6 @@ biblemesh_Helpers){
                         return myXhr;
                     },
                     success: function(response) {
-                        if(typeof response.error !== 'undefined') {
-                            result.error = response.error;
-                        }
                         if(typeof response.bookId !== 'undefined') {
                             result.bookId = response.bookId;
                         }
@@ -595,11 +590,8 @@ biblemesh_Helpers){
                         doImport();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        if(jqXHR.status == 403) {
-                            location.reload();
-                            return;
-                        }
-                        result.error = Strings.err_ajax;
+                        var response = jqXHR.responseJSON;
+                        result.error = Strings[response.errorType] || response.error || response.errorType || Strings.err_ajax;
                         resultArray.push(result);
                         doImport();
                     }

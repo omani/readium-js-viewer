@@ -533,5 +533,14 @@
   },
   "biblemesh_corrupt_epub" : {
     "message" : "This EPUB may be corrupt."
+  },
+  "biblemesh_unable_to_process" : {
+    "message" : "Unable to process this file."
+  },
+  "biblemesh_no_permission" : {
+    "message" : "You do not have proper permissions to do this action."
+  },
+  "biblemesh_invalid_filename" : {
+    "message" : "Invalid file name."
   }
 }
