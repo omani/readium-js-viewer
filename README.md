@@ -25,6 +25,7 @@ See ( https://github.com/readium/readium-js ) for more extensive information rel
 
 * A decent terminal. On Windows, GitShell works great ( http://git-scm.com ), GitBash works too ( https://msysgit.github.io ), and Cygwin adds useful commands ( https://www.cygwin.com ).
 * NodeJS ( https://nodejs.org ) **v4** (but not v5, because the installer ships with NPM v3 which seems to [have bugs](https://github.com/readium/readium-js-viewer/issues/453) related to the new flat module dependencies)
+* A MySQL database with [this structure](https://github.com/AndyHubert/readium-js-viewer/ReadiumData.sql).
 
 
 ## Development
