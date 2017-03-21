@@ -114,3 +114,31 @@ a:hover {
     width: 10px;
     height: 10px;
 }
+
+.glyphicon-resize-small {
+    display: none !important;
+}
+:-webkit-full-screen .glyphicon-resize-small {
+	display: inline-block !important;
+}
+:-moz-full-screen .glyphicon-resize-small {
+	display: inline-block !important;
+}
+:-ms-full-screen .glyphicon-resize-small {
+	display: inline-block !important;
+}
+:fullscreen .glyphicon-resize-small {
+	display: inline-block !important;
+}
+:-webkit-full-screen .glyphicon-resize-full {
+    display: none !important;
+}
+:-moz-full-screen .glyphicon-resize-full {
+    display: none !important;
+}
+:-ms-full-screen .glyphicon-resize-full {
+    display: none !important;
+}
+:fullscreen .glyphicon-resize-full {
+    display: none !important;
+}

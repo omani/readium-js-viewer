@@ -485,6 +485,7 @@ input[type="text"]
     -webkit-appearance: none !important;
 }
 
+/* biblemesh_ commented
 body.keyboard button:focus,
 body.keyboard input[type="radio"]:focus + label,
 body.keyboard input[type="range"]:focus
@@ -512,6 +513,7 @@ body.keyboard #app-navbar input[type="text"]:focus
     box-shadow: 0px 0px 5px #6fb5f1 !important;
     outline: #6fb5f1 dotted 1px !important;
 }
+*/
 
 input[type="range"]
 {
@@ -815,9 +817,16 @@ ul.nav-tabs li:not(.active) button:hover
 	display: inline-block;
 	height: 44px;
 }
+.zoom-wrapper input {
+  color: black;
+}
 
 .zoom-wrapper input[disabled] {
   background: transparent;
+}
+
+.zoom-wrapper > a:focus {
+	outline: none !important;
 }
 
 .linkbtn:hover {

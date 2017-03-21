@@ -781,6 +781,7 @@ BookmarkData){
             }
         };
     }
+    /* biblemesh_ : this wasn't working. I now do it in the css
     var oldOnChange = screenfull.onchange;
     screenfull.onchange = function(e){
         var titleText;
@@ -803,6 +804,7 @@ BookmarkData){
         }
         oldOnChange.call(this, e);
     }
+    */
     var unhideUI = function(){
         hideLoop();
     }
@@ -1247,7 +1249,7 @@ BookmarkData){
                             var boxSelectedBeforeDel = highlightOptsEl.find('.highlightOpts-sel');
                             noteBeforeDel = currentHighlight.highlight.note;
                             highlightOptsEl.find('.highlightOpts-copy').after(
-                                $("<div class='highlightOpts-undo'>" + Strings.biblemesh_undo + "</div>")
+                                $("<div class='highlightOpts-undo'></div>")
                                     .on('click', function() {
                                         boxSelectedBeforeDel.trigger('click');
                                     })
@@ -1492,7 +1494,7 @@ BookmarkData){
 
         $('.zoom-wrapper input').on('click', function(){
             if (!this.disabled){
-                // this.focus();  biblemesh_ commented
+                this.focus();
                 return false;
             }
         });
@@ -1576,7 +1578,8 @@ BookmarkData){
     }
 
     var enableCustom = function(e){
-        // $('.zoom-wrapper input').prop('disabled', false).focus();  biblemesh_ commented
+        $('.zoom-wrapper input').prop('disabled', false)
+        setTimeout(function() { $('.zoom-wrapper input').select().focus(); }, 50);  // biblemesh_
         $('.active-zoom').removeClass('active-zoom');
         $('#zoom-custom').addClass('active-zoom');
          $('.zoom-wrapper>a').dropdown('toggle');
