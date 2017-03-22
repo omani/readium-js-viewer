@@ -7,9 +7,10 @@ define(['./ModuleConfig', 'hgn!readium_js_viewer_html_templates/biblemesh_settin
         fontSize: 100,
         syntheticSpread: "auto",
         scroll: "auto",
-        columnGap: 60,
-        columnMaxWidth: 550,
-        columnMinWidth: 400
+        theme: "author-theme",
+        columnGap: 45,
+        columnMaxWidth: 600,
+        columnMinWidth: 300
     }
 
     var biblemesh_ReaderSettings = {};
@@ -92,8 +93,14 @@ define(['./ModuleConfig', 'hgn!readium_js_viewer_html_templates/biblemesh_settin
             // setTimeout(function(){ $('#closeSettingsCross')[0].focus(); }, 1000); //tab-butt-main  biblemesh_ commented
 
             Settings.get('reader', function(readerSettings){
-                biblemesh_ReaderSettings = readerSettings || defaultSettings;
-                
+                biblemesh_ReaderSettings = readerSettings || {};
+
+                for(stgIdx in defaultSettings) {
+                    if(!biblemesh_ReaderSettings[stgIdx]) {
+                        biblemesh_ReaderSettings[stgIdx] = defaultSettings[stgIdx];
+                    }
+                }
+
                 if (biblemesh_ReaderSettings.syntheticSpread == "auto"){
                     $('#two-up-option input').prop('checked', true);
                 }
