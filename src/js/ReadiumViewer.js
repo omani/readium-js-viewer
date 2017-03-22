@@ -74,6 +74,8 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
             console.debug("BROWSER HISTORY POP STATE:");
             console.log(state);
             
+            $('html').attr('data-theme','');
+
             if (state && state.epub) {
                 readerView(state);
             }
