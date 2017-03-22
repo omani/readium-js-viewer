@@ -1404,11 +1404,11 @@ BookmarkData){
 
                     copyEl.remove();
                     
-                    highlightOptsEl.find('.highlightOpts-msg2').html(Strings.biblemesh_copied);
+                    highlightOptsEl.find('.highlightOpts-msg3').html(Strings.biblemesh_copied);
                     highlightOptsEl.find('.highlightOpts-msg').addClass('show').addClass('top');
                     setTimeout(function() {
                         highlightOptsEl.find('.highlightOpts-msg').removeClass('show');
-                        highlightOptsEl.find('.highlightOpts-msg2').html('')
+                        highlightOptsEl.find('.highlightOpts-msg3').html('')
                         setTimeout(function() {
                             highlightOptsEl.find('.highlightOpts-msg').removeClass('top');
                         }, 600);

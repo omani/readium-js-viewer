@@ -159,10 +159,6 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: white;
-    text-align: center;
-    vertical-align: middle;
-    display: table;
     opacity: 0;
     -webkit-transition: opacity .4s ease-in-out;
     -moz-transition: opacity .4s ease-in-out;
@@ -172,6 +168,18 @@
 }
 
 .highlightOpts-msg2 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    text-align: center;
+    vertical-align: middle;
+    display: table;
+}
+
+.highlightOpts-msg3 {
     display: table-cell;
     vertical-align: middle;
 }
