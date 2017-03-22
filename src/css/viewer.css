@@ -715,6 +715,10 @@ ul.nav-tabs li:not(.active) button:hover
   box-shadow: none;
   min-height: 44px;
   border: none;
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
 }
 
 .navlogo {

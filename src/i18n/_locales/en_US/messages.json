@@ -542,5 +542,26 @@
   },
   "biblemesh_invalid_filename" : {
     "message" : "Invalid file name."
+  },
+  "biblemesh_low_light" : {
+    "message" : "Low Light"
+  },
+  "biblemesh_high_contrast" : {
+    "message" : "High Contrast"
+  },
+  "biblemesh_text_size" : {
+    "message" : "Text size"
+  },
+  "biblemesh_theme" : {
+    "message" : "Theme"
+  },
+  "biblemesh_columns" : {
+    "message" : "Columns"
+  },
+  "biblemesh_author_theme" : {
+    "message" : "Author styles"
+  },
+  "biblemesh_width_permitting" : {
+    "message" : "Width permitting"
   }
 }

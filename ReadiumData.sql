@@ -7,7 +7,7 @@
 #
 # Host: localhost (MySQL 5.7.17)
 # Database: ReadiumData
-# Generation Time: 2017-03-21 09:30:56 +0000
+# Generation Time: 2017-03-22 10:42:31 +0000
 # ************************************************************
 
 
@@ -63,6 +63,7 @@ CREATE TABLE `idp` (
   `code` varchar(10) COLLATE utf8_bin NOT NULL DEFAULT '',
   `name` text COLLATE utf8_bin NOT NULL,
   `logoSrc` text COLLATE utf8_bin NOT NULL,
+  `smallLogoSrc` text COLLATE utf8_bin NOT NULL,
   `entryPoint` text COLLATE utf8_bin NOT NULL,
   `logoutUrl` text COLLATE utf8_bin NOT NULL,
   `nameQualifier` varchar(100) COLLATE utf8_bin NOT NULL DEFAULT '',

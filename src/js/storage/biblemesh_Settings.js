@@ -2,8 +2,9 @@ define([
 'readium_shared_js/biblemesh_helpers'
 ],
 function(biblemesh_Helpers){
-    
+
     var userInfo = {};
+    var cachedGets = {};  // prevents need to go back to server for highlight data when they hit the back button
 
     var settingsInLocalStorageOnly = /^(reader|needsMigration|replaceByDefault|404:.*)$/;
 
@@ -80,6 +81,9 @@ function(biblemesh_Helpers){
                 // filter down the userData object to only new items
                 for(var bookId in userData.books) {
                     var bookUserData = userData.books[bookId];
+                    if(!bookUserData) {
+                        continue;
+                    }
 
                     newUserData.books[bookId] = { highlights: [] };
 
@@ -238,11 +242,18 @@ function(biblemesh_Helpers){
 
                     var path = getUserDataPathPreface() + key + '.json';
 
+                    if(cachedGets[path]) {
+                        retVal[key] = cachedGets[path];
+                        callbackWhenComplete();
+                        return;
+                    }
+
                     $.ajax({
                         url: path,
                         success: function (result) {
                             retVal[key] = result;
                             callbackWhenComplete();
+                            cachedGets[path] = result;
                         },
                         error: function (xhr, status, errorThrown) {
                             if(xhr.status == 403) {
@@ -258,6 +269,9 @@ function(biblemesh_Helpers){
                     });
                 }
             });
+        },
+        clearCache: function() {
+            cachedGets = {};
         },
         refreshUserData: function(bookId, userData, callback) {
             var bookKey = 'books/' + bookId;

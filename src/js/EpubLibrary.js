@@ -742,6 +742,7 @@ biblemesh_Helpers){
             dialogs: Dialogs,
             keyboard: Keyboard,
             idp_logo_src: Settings.getUserAttr('idpLogoSrc'),  // biblemesh_
+            idp_small_logo_src: Settings.getUserAttr('idpSmallLogoSrc'),  // biblemesh_
             logout_of_idp: Strings.biblemesh_logout_of + Settings.getUserAttr('idpName'),  // biblemesh_
             firstname: Settings.getUserAttr('firstname')  // biblemesh_
         }));

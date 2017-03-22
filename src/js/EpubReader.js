@@ -506,7 +506,7 @@ BookmarkData){
         readium.reader.on(ReadiumSDK.Events.PAGINATION_CHANGED, function (pageChangeData)
         {
             Globals.logEvent("PAGINATION_CHANGED", "ON", "EpubReader.js");
-            
+
             var biblemesh_isOnload = biblemesh_onload;  //first call to this function is always during onload
             biblemesh_onload = false;
 
@@ -520,7 +520,10 @@ BookmarkData){
             if(!biblemesh_isOnload) biblemesh_savePlace();
             updateUI(pageChangeData);
 
-            spin(false);
+            if(pageChangeData.spineItem) {  // biblemesh_
+                spin(false);
+                $("#epub-reader-frame").css("opacity", "");
+            }
 
             if (!_tocLinkActivated) return;
             _tocLinkActivated = false;
@@ -717,7 +720,13 @@ BookmarkData){
         if(spineItemsLen <= 1) return;
 
         $('a', tocDOM).each(function(idx, el) {
-            labels[$(el).attr('href')] = $(el).text().replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            var elHref = $(el).attr('href');
+            var elLabel = $(el).text().replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            if(elLabel.match(/^[0-9]*$/)) return;
+            if(!labels[elHref]) labels[elHref] = elLabel;
+            if(elHref.indexOf('#') != -1) {
+                if(!labels[elHref.replace(/#.*$/,'')]) labels[elHref.replace(/#.*$/,'')] = elLabel;
+            }
         });
 
         for( var i=0; i<spineItemsLen; i++ ) {
@@ -810,6 +819,8 @@ BookmarkData){
     }
 
     var hideUI = function(){
+        if(!$("#reading-area")[0]) return;  // biblemesh: ensure that toolbar is not hidden when in library
+
         hideTimeoutId = null;
         // don't hide it toolbar while toc open in non-embedded mode
         if (!embedded && $('#app-container').hasClass('toc-visible')){
@@ -1482,6 +1493,9 @@ BookmarkData){
             
             $(window).triggerHandler('loadlibrary', libraryURL);
             //$(window).trigger('loadlibrary');
+
+            Settings.clearCache();
+            $(document.body).removeClass('hide-ui');  // biblemesh
         };
 
         // biblemesh_ : following event commented out
@@ -1611,6 +1625,7 @@ BookmarkData){
             dialogs: Dialogs,
             keyboard: Keyboard,
             idp_logo_src: Settings.getUserAttr('idpLogoSrc'),  // biblemesh_
+            idp_small_logo_src: Settings.getUserAttr('idpSmallLogoSrc'),  // biblemesh_
             logout_of_idp: Strings.biblemesh_logout_of + Settings.getUserAttr('idpName'),  // biblemesh_
             firstname: Settings.getUserAttr('firstname')  // biblemesh_
         }));
@@ -1623,6 +1638,7 @@ BookmarkData){
 
         // biblemesh_ : following event
         $('#navusersettings').on('click', function(){
+            biblemesh_delHighlightOpts();
             $('#settings-dialog').modal("show");
         });
 
@@ -1938,7 +1954,8 @@ BookmarkData){
 
             readium.reader.on(ReadiumSDK.Events.CONTENT_DOCUMENT_LOAD_START, function($iframe, spineItem) {
                 Globals.logEvent("CONTENT_DOCUMENT_LOAD_START", "ON", "EpubReader.js [ " + spineItem.href + " ]");
-                
+
+                $("#epub-reader-frame").css("opacity", ".01");
                 spin(true);
             });
 

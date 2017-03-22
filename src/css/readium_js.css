@@ -142,3 +142,16 @@ a:hover {
 :fullscreen .glyphicon-resize-full {
     display: none !important;
 }
+
+.navbar-left-small-logo {
+	display: none;
+}
+
+@media (max-width: 500px) {
+    .navbar-left {
+        display: none;
+    }
+    .navbar-left-small-logo {
+        display: block;
+    }
+}

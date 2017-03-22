@@ -191,3 +191,77 @@
 {
     margin-right:0.2em;
 }
+
+
+/* biblemesh_ items follow */
+
+#theme-radio-group .author-theme {
+    color: #777;
+}
+
+.setting-header {
+    display: inline-block;
+}
+
+.setting-header-td {
+    vertical-align: top;
+    padding: 5px 15px 0 10px;
+}
+
+.setting-td {
+    padding-bottom: 15px;
+}
+
+
+#single-page-radio, #double-page-radio {
+    margin: 0 5px 0 5px;
+    vertical-align: middle;
+}
+
+#double-page-radio {
+    margin-right: 9px;
+}
+.colImg {
+    margin: -5px -3px -10px -10px;;
+}
+
+.theme-option{
+    display: block;
+    width: 100%;
+}
+
+.setting-theme-td {
+    width: 100%;
+    padding-right: 30px;
+}
+
+#settings-dialog label {
+    cursor: pointer;
+}
+
+.setting-theme-div {
+    position: relative;
+}
+
+.setting-theme-div > .glyphicon {
+    position: absolute;
+    right: -23px;
+    top: 6px;
+    color: #666;
+    display: none;
+}
+
+.setting-theme-sel > .glyphicon {
+    display: block;
+}
+.two-col-req {
+    font-size: 11px;
+    margin-left: 2px;
+}
+
+@media (min-width: 450px) {
+    #settings-dialog > .modal-dialog {
+        width: 400px;
+        margin: 30px auto;
+    }
+}

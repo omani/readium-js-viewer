@@ -1,0 +1,62 @@
+<div tabindex="-1" class="modal fade" id="settings-dialog" role="dialog" aria-label="{{strings.settings}}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+           <div class="modal-header">
+            <button type="button" class="close" id="closeSettingsCross" data-dismiss="modal" title="{{strings.i18n_close}} {{strings.settings}}" aria-label="{{strings.i18n_close}} {{strings.settings}}"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="settings-label">{{strings.settings}}</h4>
+           </div>
+
+            <div class="modal-body">
+
+                <div style="display: none">
+                    <div data-theme="default-theme" class="preview-text default-theme"></div>
+                </div>
+
+                <table>
+                    <tr class="setting-tr">
+                        <td class="setting-header-td setting-td">{{strings.biblemesh_text_size}}</td>
+                        <td class="setting-td">
+                            <button id="buttReduceFontSize"  type="button" class="btn btn-default">–</button>
+                            <button id="buttIncreaseFontSize"  type="button" class="btn btn-default">+</button>
+                        </td>
+                    </tr>
+
+                    <tr class="setting-tr">
+                        <td class="setting-header-td setting-td">{{strings.biblemesh_columns}}</td>
+                        <td class="setting-td">
+                            <label id="one-up-option" for="single-page-radio">
+                                <input  name="display-format" value="single" type="radio" id="single-page-radio"/>
+                                <img class="colImg" src="{{{imagePathPrefix}}}images/ico_singlepage_up.png" alt="{{strings.i18n_display_format}} {{strings.i18n_single_pages}}"/>
+                            </label>
+                            <label id="two-up-option">
+                                <input  name="display-format" value="auto" type="radio" id="double-page-radio" />
+                                <img class="colImg" src="{{{imagePathPrefix}}}images/ico_doublepage_up.png" alt="{{strings.i18n_display_format}} {{strings.i18n_double_pages}}">
+                                <span class="two-col-req">{{strings.biblemesh_width_permitting}}</span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr class="setting-tr">
+                        <td class="setting-header-td setting-td">{{strings.biblemesh_theme}}</td>
+                        <td class="setting-td setting-theme-td">
+                            <div class="setting-theme-div setting-theme-div-author-theme">
+                                <button role="button" data-theme="author-theme" class="theme-option author-theme clickable">{{strings.biblemesh_author_theme}}</button>
+                                <span class="glyphicon glyphicon-check"></span>
+                            </div>
+                            <div class="setting-theme-div setting-theme-div-default-theme">
+                                <button role="button" data-theme="default-theme" class="theme-option default-theme clickable">{{strings.biblemesh_high_contrast}}</button>
+                                <span class="glyphicon glyphicon-check"></span>
+                            </div>
+                            <div class="setting-theme-div setting-theme-div-night-theme">
+                                <button role="button" data-theme="night-theme" class="theme-option night-theme clickable" >{{strings.biblemesh_low_light}}</button> <!-- accesskey="{{keyboard.accesskeys.NightTheme}}" -->
+                                <span class="glyphicon glyphicon-check"></span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
