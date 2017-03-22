@@ -931,6 +931,22 @@ button.close {
   display: inline-block;
 }
 
+html[data-theme=night-theme] #readium-toc-body .close {
+	color: #bbb;
+	text-shadow: none;
+}
+html[data-theme=night-theme] #readium-toc-body a {
+	color: #bbb;
+}
+
+html[data-theme=night-theme] #readium-toc-body a:hover {
+	color: white;
+}
+
+html[data-theme=night-theme] #readium-toc-body {
+	background: #333333;
+}
+
 @media (max-width:800px){
   .toc-visible #readium-toc-body {
     width: 42%;
