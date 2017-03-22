@@ -147,6 +147,12 @@ a:hover {
 	display: none;
 }
 
+html,
+body {
+  position: fixed;
+  overflow: hidden;
+}
+
 @media (max-width: 500px) {
     .navbar-left {
         display: none;

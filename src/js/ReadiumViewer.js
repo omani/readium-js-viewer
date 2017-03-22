@@ -74,15 +74,16 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
             console.debug("BROWSER HISTORY POP STATE:");
             console.log(state);
             
-            $('html').attr('data-theme','');
-
             if (state && state.epub) {
+                $('html').attr('data-theme','');
                 readerView(state);
             }
             else if (state && state.epubs) {
+                $('html').attr('data-theme','library');
                 libraryView(state.epubs);
             }
             else {
+                $('html').attr('data-theme','library');
                 libraryView();
             }
         });

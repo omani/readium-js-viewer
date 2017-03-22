@@ -282,3 +282,8 @@ body.list-view .details{
 .list-view .icon-thumbnails {
     display: inline-block;
 }
+
+#app-container {
+  -webkit-overflow-scrolling: touch;
+  z-index: 1050;
+}
