@@ -911,3 +911,46 @@ button.close {
   opacity: 1;
 }
 
+.istouchdevice #left-page-btn:hover, .istouchdevice #right-page-btn:hover {
+    color: black;
+    background: none !important;
+}
+
+.istouchdevice.hide-ui #left-page-btn:hover, .istouchdevice.hide-ui #right-page-btn:hover {
+    color: transparent;
+}
+
+.book-title-header {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	padding: 0 25px;
+}
+
+.navbar .btn-group > .btn.icon-full-screen {
+  display: inline-block;
+}
+
+@media (max-width:800px){
+  .toc-visible #readium-toc-body {
+    width: 42%;
+  }
+  .toc-visible #reading-area {
+    left: 42%;
+  }
+}
+
+@media (max-width:600px){
+  .toc-visible #readium-toc-body {
+    display: block;
+    width: 100%;
+    position: absolute;
+    height: 100%;
+    z-index: 2;
+  }
+
+  .toc-visible #reading-area {
+    left: 0px;
+    z-index: 1;
+  }
+}

@@ -113,6 +113,10 @@ BookmarkData){
     var tooltipSelector = function() {
         return 'nav *[title], #readium-page-btns *[title], #progressBar *[title]';
     };
+
+    var biblemesh_blurActive = function() {
+        if(document.activeElement) document.activeElement.blur();
+    }
    
     var ensureUrlIsRelativeToApp = function(ebookURL) {
 
@@ -273,6 +277,14 @@ BookmarkData){
                 }));
                 $("#left-page-btn").on("click", prevPage);
                 $("#right-page-btn").on("click", nextPage);
+                $("#left-page-btn, #right-page-btn").on("touchstart", function(e) {
+                    $('body').addClass('istouchdevice');
+                    biblemesh_blurActive();
+                    e.preventDefault();
+                    e.stopPropagation();
+                    $(this).click();
+                });
+                
                 $("#left-page-btn").mouseleave(function() {
                   $(tooltipSelector()).tooltip('destroy');
                 });
@@ -324,11 +336,11 @@ BookmarkData){
         }
     };
 
-    var tocShowHideToggle = function(){
+    var tocShowHideToggle = function(skipReplaceState){
 
         unhideUI();
 
-        biblemesh_doReplaceState = true;
+        if(!skipReplaceState) biblemesh_doReplaceState = true;
 
         var $appContainer = $('#app-container'),
             hide = $appContainer.hasClass('toc-visible');
@@ -610,6 +622,8 @@ BookmarkData){
         $('#readium-toc-body').on('click', 'a', function(e)
         {
             try {
+                if($(document.documentElement).width() <= 600) tocShowHideToggle(true);
+
                 spin(true);
     
                 var href = $(this).attr('href');
@@ -773,11 +787,29 @@ BookmarkData){
 
     } // end of biblemesh_updateProgressBar
 
-    var toggleFullScreen = function(){
-
-        if (!screenfull.enabled) return;
-
-        screenfull.toggle();
+    var biblemesh_inFullScreen = function() {
+        return document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement;
+    }
+    var biblemesh_toggleFullScreen = function(){
+        if(biblemesh_inFullScreen()) {
+            if(document.cancelFullScreen) {
+                document.cancelFullScreen();
+            } else if(document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if(document.webkitCancelFullScreen) {
+                document.webkitCancelFullScreen();
+            }
+        } else {
+            var docEl = document.documentElement;
+            
+            if(docEl.requestFullscreen) {
+                docEl.requestFullscreen();
+            } else if(docEl.mozRequestFullScreen) {
+                docEl.mozRequestFullScreen();
+            } else if(docEl.webkitRequestFullscreen) {
+                docEl.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+            }
+        }
     }
 
     var isChromeExtensionPackagedApp = (typeof chrome !== "undefined") && chrome.app
@@ -818,10 +850,16 @@ BookmarkData){
         hideLoop();
     }
 
+    var hideTimeoutId;
+
     var hideUI = function(){
         if(!$("#reading-area")[0]) return;  // biblemesh: ensure that toolbar is not hidden when in library
 
-        hideTimeoutId = null;
+        if (hideTimeoutId){
+            window.clearTimeout(hideTimeoutId);
+            hideTimeoutId = null;
+        }
+        
         // don't hide it toolbar while toc open in non-embedded mode
         if (!embedded && $('#app-container').hasClass('toc-visible')){
             hideLoop()
@@ -854,8 +892,6 @@ BookmarkData){
 
         $(document.body).addClass('hide-ui');
     }
-
-    var hideTimeoutId;
 
     var hideLoop = function(e, immediate){
 
@@ -1238,8 +1274,8 @@ BookmarkData){
             var midLeft = docLeft * -1 + parseInt((selectionVeryLeft + selectionVeryRight) / 2);
             var moreRoomAtTop = (selectionVeryTop + selectionVeryBottom) / 2 > docHt / 2;
 
-            style.left = Math.max( SHADOW_WIDTH , Math.min( docWd - docLeft - style.width - SHADOW_WIDTH*2 , midLeft - parseInt(style.width/2) ) );
-            style.top = Math.max( SHADOW_WIDTH , Math.min( docHt - style.height - SHADOW_WIDTH*2 , moreRoomAtTop ? selectionVeryTop - style.height : selectionVeryBottom ) );;
+            style.left = Math.max( SHADOW_WIDTH , Math.min( docWd - docLeft - style.width - SHADOW_WIDTH , midLeft - parseInt(style.width/2) ) );
+            style.top = Math.max( SHADOW_WIDTH , Math.min( docHt - style.height - SHADOW_WIDTH , moreRoomAtTop ? selectionVeryTop - style.height : selectionVeryBottom ) );;
 
             highlightOptsEl.css(style);
 
@@ -1481,7 +1517,12 @@ BookmarkData){
         // biblemesh_ : following event commented out
         // Keyboard.on(Keyboard.FullScreenToggle, 'reader', toggleFullScreen);
 
-        $('#buttFullScreenToggle').on('click', toggleFullScreen);
+        var docEl = document.documentElement;
+        if(docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullscreen) {
+            $('#buttFullScreenToggle').on('click', biblemesh_toggleFullScreen);
+        } else {
+            $('#buttFullScreenToggle').hide();
+        }
 
         var loadlibrary = function()
         {
@@ -1528,6 +1569,15 @@ BookmarkData){
         // });
 
         $('.icon-toc').on('click', tocShowHideToggle);
+
+        $('#app-navbar').on('touchstart', function(e) {
+            if($(document.body).hasClass('hide-ui')) {
+                $(document.body).removeClass('hide-ui');
+                e.preventDefault();
+                e.stopPropagation();
+                biblemesh_blurActive();
+            }
+        });
 
         var setTocSize = function(){
             var appHeight = $(document.body).height() - $('#app-container')[0].offsetTop;
@@ -1848,24 +1898,52 @@ BookmarkData){
                 // $('#reading-area').removeClass("contentFocus");  // biblemesh_
             });
 
-            // biblemesh_ : the following two listeners are new
-            readium.reader.addIFrameEventListener('mousedown', function(e) {
+            // biblemesh_ : the following listeners are new
+            var isTouchClick = false;
+            var iframeClickEvent = function(e) {
                 if(!e || !e.target) { return; }
 
-                hideUI();  // biblemesh_
+                if(isTouchClick && $(document.body).hasClass('hide-ui')) {
+                    $(document.body).removeClass('hide-ui');
+                } else {
+                    hideUI();
+                }
 
                 if($(e.target).attr('id') == "highlightOpts" || $(e.target).parents("#highlightOpts").length != 0) {
                     // e.preventDefault();
                     // e.stopPropagation();
                     return;
                 } else {
-                    var iframe = $("#epub-reader-frame iframe")[0];
-                    var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
-                    var docEl = $( doc.documentElement );
-
                     biblemesh_delHighlightOpts();
                 }
+            }
+            var startFromEmpty;
+            readium.reader.addIFrameEventListener('touchstart', function(e) {
+                $('body').addClass('istouchdevice');
+                var iframe = $("#epub-reader-frame iframe")[0];
+                var win = iframe.contentWindow || iframe;
+                startFromEmpty = !win.getSelection().toString();
             });
+            readium.reader.addIFrameEventListener('touchend', function(e) {
+                var iframe = $("#epub-reader-frame iframe")[0];
+                var win = iframe.contentWindow || iframe;
+                if(!startFromEmpty) {
+                    sel.removeAllRanges();
+                    return;
+                }
+                var emptyNow = !win.getSelection().toString();
+                if(!emptyNow) return;
+
+                setTimeout(function() {
+                    isTouchClick = false;
+                }, 1);
+                isTouchClick = true;
+                iframeClickEvent(e);
+                e.preventDefault();
+                e.stopPropagation();
+            });
+
+            readium.reader.addIFrameEventListener('click', iframeClickEvent);
             readium.reader.addIFrameEventListener('mouseup', function(e) {
                 if(!e || !e.target) { return; }
 
