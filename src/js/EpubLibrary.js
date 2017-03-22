@@ -749,6 +749,10 @@ biblemesh_Helpers){
         if(!Settings.getUserAttr('isAdmin')) {  // biblemesh_
             $('#addbutt').remove();
         }
+        var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if(iOS) {
+            $('.icon-list-view, #addbutt').remove();
+        }
         $('.icon-list-view').on('click', function(){
             $(document.body).addClass('list-view');
             // setTimeout(function(){ $('.icon-thumbnails')[0].focus(); }, 50);  biblemesh_ commented
