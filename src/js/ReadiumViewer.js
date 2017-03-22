@@ -188,6 +188,8 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
         libraryView(libraryURL, importEPUB);
     });
 
+    var biblemesh_showtooltips = true;
+
     $(document.body).tooltip({
         selector : EpubReader.tooltipSelector(),
         placement: function(tip, element){
@@ -201,6 +203,8 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
         },
         container: 'body' // do this to prevent weird navbar re-sizing issue when the tooltip is inserted
     }).on('show.bs.tooltip', function(e){
+        if(!biblemesh_showtooltips) return false;
+
         $(EpubReader.tooltipSelector()).not(e.target).tooltip('destroy');
         var target = e.target; 
         setTimeout(function(){
@@ -208,6 +212,13 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
         }, 8000);
     });
     
+    $(document.body).on('touchstart', function(){
+        biblemesh_showtooltips = false;
+    });
+
+    $(document.body).on('mouseenter', function(){
+        biblemesh_showtooltips = true;
+    });
     
     
     if (window.File
