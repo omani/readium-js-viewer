@@ -1381,12 +1381,12 @@ BookmarkData){
                     var bodyHt = $('body').height();
 
                     Dialogs.showModalMessage(Strings.biblemesh_share, '');
-                    $('.modal-body').addClass('withShareIFrame').html('').append(
+                    $('#managed-dialog .modal-body').addClass('withShareIFrame').html('').append(
                         $('<iframe class="shareIframe"></iframe>')
                             .attr('src', $(this).attr('href'))
                             .css('height', Math.min(500, bodyHt - 100) )
                     );
-                    $('.modal-footer').remove();
+                    $('#managed-dialog .modal-footer').remove();
 
                 });
 
