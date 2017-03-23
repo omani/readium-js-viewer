@@ -51,6 +51,35 @@ Note that the above command executes the following:
 * + some additional HTTP requests to the GitHub API in order to check for upstream library updates (wherever Readium uses a forked codebase)
 
 
+### ENV variables
+
+The following ENV variables are available for configurating the app. Note that you can set ENV variables locally via the [.env file](https://github.com/AndyHubert/readium-js-viewer/blob/master/.env).
+
+Required:
+* APP_URL
+* RDS_HOSTNAME
+* RDS_PORT
+* RDS_USERNAME
+* RDS_PASSWORD
+* RDS_DB_NAME
+
+Optional:
+* PORT
+* LOGLEVEL
+* REDIS_HOSTNAME
+* REDIS_PORT
+* ADMIN_EMAILS
+* SKIP_AUTH
+* SESSION_MAXAGE
+* APP_SESSION_MAXAGE
+* SESSION_SECRET
+* REQUIRE_HTTPS
+* S3_BUCKET
+* IS_DEV
+* GOOGLE_ANALYTICS_CODE
+* APP_PATH
+
+
 ### Running locally
 
 * `npm start`
