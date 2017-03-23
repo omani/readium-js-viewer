@@ -84,11 +84,6 @@
     font-size: 13px;
 }
 
-.highlightOpts-box.highlightOpts-sel::after {
-    content: '✓';
-    position: relative;
-}
-
 .highlightOpts-box:not(.highlightOpts-sel):hover {
     cursor: pointer;
     border-color: black;
@@ -137,6 +132,17 @@
 }
 .highlightOpts-undo {
     background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjwhRE9DVFlQRSBzdmcgIFBVQkxJQyAnLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4nICAnaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkJz48c3ZnIGhlaWdodD0iNTEycHgiIGlkPSJMYXllcl8xIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA1MTIgNTEyOyIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiIgd2lkdGg9IjUxMnB4IiB4bWw6c3BhY2U9InByZXNlcnZlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48Zz48cGF0aCBkPSJNNDQ3LjksMzY4LjJjMC0xNi44LDMuNi04My4xLTQ4LjctMTM1LjdjLTM1LjItMzUuNC04MC4zLTUzLjQtMTQzLjMtNTYuMlY5Nkw2NCwyMjRsMTkyLDEyOHYtNzkuOCAgIGM0MCwxLjEsNjIuNCw5LjEsODYuNywyMGMzMC45LDEzLjgsNTUuMyw0NCw3NS44LDc2LjZsMTkuMiwzMS4ySDQ0OEM0NDgsMzg5LjksNDQ3LjksMzc3LjEsNDQ3LjksMzY4LjJ6Ii8+PC9nPjwvc3ZnPg==);
+}
+.highlightOpts-box.highlightOpts-sel::after {
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjwhRE9DVFlQRSBzdmcgIFBVQkxJQyAnLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4nICAnaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkJz48c3ZnIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDQ3IDM5IiBoZWlnaHQ9IjM5cHgiIGlkPSJMYXllcl8xIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCA0NyAzOSIgd2lkdGg9IjQ3cHgiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxwb2x5Z29uIGZpbGw9IiMyMzFGMjAiIHBvaW50cz0iMzcuMTQzLDAuNDQ0IDM1LjE2MiwyLjQyMyAyNi4yNTIsMTEuMzMzIDE3LjM0MywyMC4yNDIgMTYuNjM2LDIwLjk0OSAxNC44NzksMTkuMTkyIDkuNzg3LDE0LjEwMSAgIDguODU3LDEzLjE3MSAtMC4zMzUsMjIuMzYzIDAuNTk0LDIzLjI5MyA1LjY4NywyOC4zODUgNy40NDQsMzAuMTQzIDcuNDQzLDMwLjE0MyAxNi42MzYsMzkuMzM0IDI1LjgyOCwzMC4xNDMgMjUuODI4LDMwLjE0MyAgIDI2LjUzNSwyOS40MzYgMzUuNDQ1LDIwLjUyNSA0NC4zNTQsMTEuNjE2IDQ2LjMzNSw5LjYzNiAiLz48L3N2Zz4=);
+    content: '';
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-size: 15px;
+    background-repeat: no-repeat;
+    background-position: center;    
 }
 
 .highlightOpts-undo:hover, .highlightOpts-share:hover, .highlightOpts-copy:hover, #highlightOpts.nonote .highlightOpts-addnote:hover {
