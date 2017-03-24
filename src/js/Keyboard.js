@@ -443,6 +443,7 @@ define(['i18nStrings', 'keymaster', 'biblemesh_Settings'], function(Strings, key
         PageNext: 'right', // ALT BELOW
         PagePreviousAlt: '1', //accesskey'ed
         PageNextAlt: '2', //accesskey'ed
+        Escape: 'esc', //
 
         ToolbarShow: 'v', //accesskey'ed
         ToolbarHide: 'x', //accesskey'ed

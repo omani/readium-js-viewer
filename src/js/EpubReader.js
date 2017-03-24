@@ -987,13 +987,18 @@ BookmarkData){
         if(!iframe) return;
         var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
         var docEl = $( doc.documentElement );
+        var highlightOptsEl = docEl.children("#highlightOpts");
 
-        docEl.find('.highlightOpts-note-text').trigger('blur');
+        if(highlightOptsEl) {
 
-        readium.reader.plugins.highlights.removeHighlight("highlightOpts-sel-highlight");
-        docEl.children("#highlightOpts").remove();
+            docEl.find('.highlightOpts-note-text').trigger('blur');
 
-        Keyboard.scope('reader');
+            readium.reader.plugins.highlights.removeHighlight("highlightOpts-sel-highlight");
+            highlightOptsEl.remove();
+
+            Keyboard.scope('reader');
+
+        }
     }
 
     //TODO: also update "previous/next page" commands status (disabled/enabled), not just button visibility.
@@ -1372,7 +1377,13 @@ BookmarkData){
                 .on('change', saveHighlight)
                 .on('mouseup', saveHighlight)
                 .on('touchend', saveHighlight)
-                .on('keyup', saveHighlight);
+                .on('keyup', function(e) {
+                    if (e.keyCode === 27 || e.which === 27) {
+                        biblemesh_delHighlightOpts();
+                    } else {
+                        saveHighlight.call(this);
+                    }
+                });
 
             highlightOptsEl.find('.highlightOpts-share')
                 .on('click', function(e) {
@@ -1416,7 +1427,7 @@ BookmarkData){
 
                 });
 
-            Keyboard.scope('highlights');
+            Keyboard.scope('reader');
 
             docEl.append(highlightOptsEl);
 
@@ -1427,14 +1438,14 @@ BookmarkData){
     }
 
     var nextPage = function () {
-
+        biblemesh_delHighlightOpts();
         biblemesh_doReplaceState = true;  // biblemesh_
         readium.reader.openPageRight();
         return false;
     };
 
     var prevPage = function () {
-
+        biblemesh_delHighlightOpts();
         biblemesh_doReplaceState = true;  // biblemesh_
         readium.reader.openPageLeft();
         return false;
@@ -1512,6 +1523,10 @@ BookmarkData){
 
         Keyboard.on(Keyboard.PageNext, 'reader', function(){
             if (!isWithinForbiddenNavKeysArea()) nextPage();
+        });
+
+        Keyboard.on(Keyboard.Escape, 'reader', function(){
+            biblemesh_delHighlightOpts();
         });
 
         // biblemesh_ : following event commented out
@@ -1875,13 +1890,21 @@ BookmarkData){
                 if (e.keyCode === 9 || e.which === 9) {
                     e.preventDefault();
                     e.stopPropagation();
-                    if(document.activeElement) {
-                        document.activeElement.blur();
-                    }
+                    biblemesh_blurActive();
                     return;
                 }
                 
                 Keyboard.dispatch(document.documentElement, e.originalEvent);
+
+                //biblemesh_ : Next if statement to prevent scroll on right/left arrows in FF
+                if(
+                    !$(e.target).is('textarea, input')
+                    && $(e.target).closest('[contenteditable="true"]').length == 0
+                    && ([37,39].indexOf(e.keyCode) != -1 || [37,39].indexOf(e.which) != -1)
+                ) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
             });
 
             readium.reader.addIFrameEventListener('keyup', function(e) {
@@ -1955,6 +1978,7 @@ BookmarkData){
 
                 setTimeout(function() {
                     biblemesh_showHighlightOptions();
+                    biblemesh_blurActive();
                 }, 1);
                 
             });
