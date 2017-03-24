@@ -622,7 +622,7 @@ BookmarkData){
         $('#readium-toc-body').on('click', 'a', function(e)
         {
             try {
-                if($(document.documentElement).width() <= 600) tocShowHideToggle(true);
+                if($(document.body).width() <= 600) tocShowHideToggle(true);
 
                 spin(true);
     
