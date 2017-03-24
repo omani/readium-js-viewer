@@ -1278,8 +1278,9 @@ BookmarkData){
 
             var midLeft = docLeft * -1 + parseInt((selectionVeryLeft + selectionVeryRight) / 2);
             var moreRoomAtTop = (selectionVeryTop + selectionVeryBottom) / 2 > docHt / 2;
+            var pageShift = (parseInt(docEl.css('left'), 10) || 0) * -1;
 
-            style.left = Math.max( SHADOW_WIDTH , Math.min( docWd - docLeft - style.width - SHADOW_WIDTH , midLeft - parseInt(style.width/2) ) );
+            style.left = Math.max( SHADOW_WIDTH + pageShift , Math.min( docWd - docLeft - style.width - SHADOW_WIDTH , midLeft - parseInt(style.width/2) ) );
             style.top = Math.max( SHADOW_WIDTH , Math.min( docHt - style.height - SHADOW_WIDTH , moreRoomAtTop ? selectionVeryTop - style.height : selectionVeryBottom ) );;
 
             highlightOptsEl.css(style);
