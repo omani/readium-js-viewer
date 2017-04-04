@@ -1364,9 +1364,9 @@ BookmarkData){
                     highlightOptsEl.find('.highlightOpts-note-text').val(noteBeforeDel);
 
                     highlightOptsEl.hide();  //needed to properly calculate visible area and place the highlight
-                    readium.reader.plugins.highlights.removeHighlight(highlightId);
-                    readium.reader.plugins.highlights.addHighlight(cfiObj.idref, cfiObj.cfi, highlightId, "user-highlight");
-                    // biblemesh_drawHighlights();  -- I do not need to do the two above instead of this, but I believe it is faster. If bugs happen, revert.
+                    // I do the next line instead of a remove and add (which would be quicker)
+                    // because it makes sure the ordering of overlapping highlights is correct.
+                    biblemesh_drawHighlights();
                     highlightOptsEl.show();  //needed to properly calculate visible area and place the highlight
 
                 }
