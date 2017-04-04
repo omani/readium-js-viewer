@@ -563,5 +563,17 @@
   },
   "biblemesh_width_permitting" : {
     "message" : "Width permitting"
+  },
+  "biblemesh_android_app" : {
+    "message" : "Android App Available"
+  },
+  "biblemesh_about_the_app" : {
+    "message" : "Download the app from the Play Store to get a smoother experience."
+  },
+  "biblemesh_get_the_app" : {
+    "message" : "Get the App"
+  },
+  "biblemesh_no_thanks" : {
+    "message" : "No Thanks"
   }
 }

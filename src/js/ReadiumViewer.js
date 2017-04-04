@@ -50,6 +50,26 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
                     }
                 });
 
+                // biblemesh_ : The following block has been added
+                var isAndroid = navigator.userAgent.toLowerCase().indexOf("android") > -1;
+                if(isAndroid) {
+                    Settings.get('alertedToAndroidApp', function(val){
+                        if (!val){
+                            Dialogs.showModalPrompt(
+                                Strings.biblemesh_android_app,
+                                Strings.biblemesh_about_the_app,
+                                Strings.biblemesh_get_the_app,
+                                Strings.biblemesh_no_thanks,
+                                function() {
+                                    window.open('https://play.google.com/store/apps/details?id=com.biblearc.biblearc&hl=en');
+                                }
+                            );
+        
+                            //set localstorage variable so they are only alerted once.
+                            Settings.put('alertedToAndroidApp', true);
+                        }
+                    })
+                }
             });
 
         }, function() {
