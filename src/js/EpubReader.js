@@ -730,38 +730,61 @@ BookmarkData){
         var idRef = biblemesh_getCurrentIdRef();
         var spineItemsLen = readium.reader.spine().items.length;
         var labels = {};
-
+        var tocUrl = currentPackageDocument.getToc();
+        
         if(spineItemsLen <= 1) return;
 
         $('a', tocDOM).each(function(idx, el) {
-            var elHref = $(el).attr('href');
+            var elHref = $(el).attr('href').replace(/#$/,'');
+            var elHrefNoHash = $(el).attr('href').replace(/#.*$/,'');
             var elLabel = $(el).text().replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
             if(elLabel.match(/^[0-9]*$/)) return;
-            if(!labels[elHref]) labels[elHref] = elLabel;
-            if(elHref.indexOf('#') != -1) {
-                if(!labels[elHref.replace(/#.*$/,'')]) labels[elHref.replace(/#.*$/,'')] = elLabel;
+
+            if(!labels[elHrefNoHash]) labels[elHrefNoHash] = {
+                hrefsAndLabels: [],
+                hrefs: {}
+            };
+            if(!labels[elHrefNoHash].hrefs[elHref]) {
+                labels[elHrefNoHash].hrefsAndLabels.push({
+                    href: elHref,
+                    label: elLabel
+                });
+                labels[elHrefNoHash].hrefs[elHref] = true;
             }
         });
 
         for( var i=0; i<spineItemsLen; i++ ) {
             var spineItem = readium.reader.spine().item(i);
             if(spineItem) {
-                var lineContEl = $( biblemesh_progressBarItem(
-                    {
-                        idref: spineItem.idref,
-                        label: labels[spineItem.href]
-                    }
-                ) )
-                    .on('click', function(e) {
-                        var gotoIdRef = $(this).attr('data-idref');
-                        spin(true);
-                        readium.reader.openSpineItemElementId(gotoIdRef);
-                        biblemesh_updateProgressBar(gotoIdRef);
-                    });
-                
-                progressBarEl.append(lineContEl);
+                $.each((
+                    labels[spineItem.href]
+                    || {hrefsAndLabels:[{label:null}]}
+                ).hrefsAndLabels, function(idx, hrefAndLabel) {
+                    var lineContEl = $( biblemesh_progressBarItem(
+                        {
+                            idref: spineItem.idref,
+                            label: hrefAndLabel.label
+                        }
+                    ) )
+                        .on('click', function(e) {
+                            var gotoIdRef = $(this).attr('data-idref');
+                            spin(true);
+                            if(hrefAndLabel.href) {
+                                readium.reader.openContentUrl(hrefAndLabel.href, tocUrl, undefined);
+                            } else {
+                                readium.reader.openSpineItemElementId(gotoIdRef);
+                            }
+                            biblemesh_updateProgressBar(gotoIdRef);
+                        });
+                    
+                    progressBarEl.append(lineContEl);
+                });
+
             }
         }
+
+        // go through 
 
         $('#reading-area').append(progressBarEl);
 
