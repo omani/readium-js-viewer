@@ -967,6 +967,25 @@ BookmarkData){
         return idRef;
     }
 
+    var biblemesh_markHighlightsWithNotes = function() {
+        var iframe = $("#epub-reader-frame iframe")[0];
+        if(!iframe) return;
+        var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
+        var docEl = $( doc.documentElement );
+
+        docEl.children('.rd-highlight').removeClass('highlight-with-note');
+
+        biblemesh_userData.books[biblemesh_bookId].highlights.forEach(function(highlight) {
+            if(highlight.note) {
+                var highlightId = biblemesh_getHighlightId(highlight);
+                var highlightEl = docEl.children('[data-id="' + highlightId + '"]');
+                if(highlightEl) {
+                    highlightEl.addClass('highlight-with-note');
+                }
+            }
+        });
+    }
+
     var biblemesh_drawHighlights = function() {
         if (readium && readium.reader.plugins.highlights) {
 
@@ -1002,6 +1021,7 @@ BookmarkData){
                     // should never get here.
                 }
             });
+            biblemesh_markHighlightsWithNotes();
         }
     }
     
@@ -1022,6 +1042,8 @@ BookmarkData){
             Keyboard.scope('reader');
 
         }
+
+        biblemesh_markHighlightsWithNotes();
     }
 
     //TODO: also update "previous/next page" commands status (disabled/enabled), not just button visibility.
@@ -1044,6 +1066,7 @@ BookmarkData){
                 // quicker than running biblemesh_drawHighlights
                 // needed because highlights off screen when a new spine is loaded are not drawn
                 readium.reader.plugins.highlights.redrawAnnotations();
+                biblemesh_markHighlightsWithNotes();
             } catch(e) {}
         } else {
             biblemesh_drawHighlights();
@@ -1391,6 +1414,12 @@ BookmarkData){
                     sel.addRange(highlightRange);
 
                     biblemesh_showHighlightOptions(true);
+                    
+                    // display this highlight as having a note
+                    var highlightEl = docEl.children('[data-id="' + highlightId + '"]');
+                    if(highlightEl) {
+                        highlightEl.addClass('highlight-with-note');
+                    }
 
                     docEl.find('.highlightOpts-note-text').focus();
                 });
@@ -1462,6 +1491,7 @@ BookmarkData){
 
             highlightOptsEl.hide();  //needed to properly calculate visible area and place the highlight
             readium.reader.plugins.highlights.addSelectionHighlight("highlightOpts-sel-highlight", "sel-highlight", undefined, true);
+            biblemesh_markHighlightsWithNotes();
             highlightOptsEl.show();  //needed to properly calculate visible area and place the highlight
             biblemesh_setupShareLink();
 
