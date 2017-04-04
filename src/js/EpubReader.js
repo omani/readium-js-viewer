@@ -1205,6 +1205,8 @@ BookmarkData){
 
         if(!sel.isCollapsed && selStr!='' && cfiObj) {
 
+            var highlightId = biblemesh_getHighlightId(cfiObj);
+            
             var highlightOptsEl = $( biblemesh_highlightOptions(
                 {
                     strings: Strings
@@ -1318,7 +1320,7 @@ BookmarkData){
                 var highlightChoice = parseInt($(this).attr('data-choice'));
 
                 if(highlightChoice == 0) {
-                    readium.reader.plugins.highlights.removeHighlight(biblemesh_getHighlightId(cfiObj));
+                    readium.reader.plugins.highlights.removeHighlight(highlightId);
 
                     if(currentHighlight) {
                         if(currentHighlight.highlight.note != "") {
@@ -1340,8 +1342,6 @@ BookmarkData){
                     }
 
                 } else {
-                    // readium.reader.plugins.highlights.addHighlight(cfiObj.idref, cfiObj.cfi, biblemesh_getHighlightId(cfiObj), "user-highlight");
-
                     var highlightData = {
                         spineIdRef: cfiObj.idref,
                         cfi: cfiObj.cfi,
@@ -1363,7 +1363,12 @@ BookmarkData){
                     highlightOptsEl.find('.highlightOpts-undo').remove();
                     highlightOptsEl.find('.highlightOpts-note-text').val(noteBeforeDel);
 
-                    biblemesh_drawHighlights();
+                    highlightOptsEl.hide();  //needed to properly calculate visible area and place the highlight
+                    readium.reader.plugins.highlights.removeHighlight(highlightId);
+                    readium.reader.plugins.highlights.addHighlight(cfiObj.idref, cfiObj.cfi, highlightId, "user-highlight");
+                    // biblemesh_drawHighlights();  -- I do not need to do the two above instead of this, but I believe it is faster. If bugs happen, revert.
+                    highlightOptsEl.show();  //needed to properly calculate visible area and place the highlight
+
                 }
 
                 Settings.patch(biblemesh_userData, biblemesh_refreshUserDataCallback);
@@ -1455,7 +1460,9 @@ BookmarkData){
 
             docEl.append(highlightOptsEl);
 
+            highlightOptsEl.hide();  //needed to properly calculate visible area and place the highlight
             readium.reader.plugins.highlights.addSelectionHighlight("highlightOpts-sel-highlight", "sel-highlight", undefined, true);
+            highlightOptsEl.show();  //needed to properly calculate visible area and place the highlight
             biblemesh_setupShareLink();
 
         }
