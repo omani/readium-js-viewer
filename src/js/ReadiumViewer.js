@@ -61,7 +61,7 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
                                 Strings.biblemesh_get_the_app,
                                 Strings.biblemesh_no_thanks,
                                 function() {
-                                    window.open('https://play.google.com/store/apps/details?id=com.biblearc.biblearc&hl=en');
+                                    window.open('https://play.google.com/store/apps/details?id=com.biblemesh.ereader&hl=en');
                                 }
                             );
         
