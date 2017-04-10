@@ -161,3 +161,24 @@ body {
         display: block;
     }
 }
+
+
+.widget #app-navbar,
+.widget .book-title-header,
+.widget #progressBar,
+.widget #readium-page-btns {
+	display: none;
+}
+
+body.widget,
+.widget #app-container {
+	height: 10000px !important;
+}
+
+.widget #reading-area {
+	top: 0;
+}
+
+.widget #epub-reader-frame {
+	border: none;
+}

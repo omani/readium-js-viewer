@@ -66,6 +66,8 @@ BookmarkData){
     // initialised in loadReaderUI(), with passed data.embedded
     var embedded = undefined;
     
+    var biblemesh_isWidget = undefined;
+    
     // initialised in loadReaderUI(), with passed data.epub
     var ebookURL = undefined;
     var ebookURL_filepath = undefined;
@@ -987,7 +989,7 @@ BookmarkData){
     }
 
     var biblemesh_drawHighlights = function() {
-        if (readium && readium.reader.plugins.highlights) {
+        if (readium && readium.reader.plugins.highlights && !biblemesh_isWidget) {
 
             var idRef = biblemesh_getCurrentIdRef();;
             var highlightsToDraw = [];
@@ -1214,6 +1216,8 @@ BookmarkData){
     }
 
     var biblemesh_showHighlightOptions = function(forceShowNote) {
+
+        if(biblemesh_isWidget) return;
         
         var iframe = $("#epub-reader-frame iframe")[0];
         var win = iframe.contentWindow || iframe;
@@ -1459,12 +1463,9 @@ BookmarkData){
 
                 });
 
-            highlightOptsEl.find('.highlightOpts-copy')
-                .on('click', function(e) {
-                    if(e) e.preventDefault();
-
+            var biblemesh_doCopy = function(text, copiedMsg) {
                     var copyEl = $('<input class="copyel" />');
-                    copyEl.val(selStr);
+                    copyEl.val(text);
                     $('body').append(copyEl);
                     copyEl.select()
                     copyEl.focus();
@@ -1473,7 +1474,7 @@ BookmarkData){
 
                     copyEl.remove();
                     
-                    highlightOptsEl.find('.highlightOpts-msg3').html(Strings.biblemesh_copied);
+                    highlightOptsEl.find('.highlightOpts-msg3').html(copiedMsg);
                     highlightOptsEl.find('.highlightOpts-msg').addClass('show').addClass('top');
                     setTimeout(function() {
                         highlightOptsEl.find('.highlightOpts-msg').removeClass('show');
@@ -1482,7 +1483,32 @@ BookmarkData){
                             highlightOptsEl.find('.highlightOpts-msg').removeClass('top');
                         }, 600);
                     }, 1000);
+            }
 
+            highlightOptsEl.find('.highlightOpts-code')
+                .on('click', function(e) {
+                    if(e) e.preventDefault();
+
+                    var codeUrl = location.origin + '/book/' + biblemesh_bookId
+                                + '?goto=' + encodeURIComp(JSON.stringify({
+                                    idref: cfiObj.idref,
+                                    elementCfi: cfiObj.cfi
+                                }))
+                    var embedCode = '<a class="erasereader-widget" '
+                                  + 'href="' + codeUrl + '" target="_blank"'
+                                  + ' data-width="" data-maxheight="" data-textsize="" data-theme="" data-quotestyle=""'
+                                  + '>' + Strings.biblemesh_open_book + '</a>'
+                                  + '<script>!function(d,i,s){if(!window.erasereader){if(!d.getElementById(i)) {var c=d.getElementsByTagName(s)[0],j=d.createElement(s);j.id=i;'
+                                  + 'j.src="' + location.origin + '/scripts/widget_setup.js";'
+                                  + 'c.parentNode.insertBefore(j,c);}}else{erasereader.setup()}}(document,"erasereader-widget-script","script");</script>';
+                    
+                    biblemesh_doCopy(embedCode, Strings.biblemesh_copied_code);
+                });
+
+            highlightOptsEl.find('.highlightOpts-copy')
+                .on('click', function(e) {
+                    if(e) e.preventDefault();
+                    biblemesh_doCopy(selStr, Strings.biblemesh_copied);
                 });
 
             Keyboard.scope('reader');
@@ -1777,6 +1803,7 @@ BookmarkData){
 
         ebookURL = data.epub;
         ebookURL_filepath = Helpers.getEbookUrlFilePath(ebookURL);
+        biblemesh_isWidget = !!data.widget;
 
 
         Analytics.trackView('/reader');
@@ -2030,6 +2057,7 @@ BookmarkData){
             readium.reader.addIFrameEventListener('click', iframeClickEvent);
             readium.reader.addIFrameEventListener('mouseup', function(e) {
                 if(!e || !e.target) { return; }
+                if(biblemesh_isWidget) return;
 
                 if($(e.target).attr('id') == "highlightOpts" || $(e.target).parents("#highlightOpts").length != 0) {
                     // e.preventDefault();
@@ -2079,7 +2107,16 @@ BookmarkData){
             if (settings.reader){
                 readerSettings = settings.reader;   // biblemesh_
             }
-            if (!embedded){
+            if(biblemesh_isWidget) {
+                readerSettings = readerSettings || SettingsDialog.defaultSettings;
+                readerSettings.scroll = 'scroll-doc';
+                readerSettings.theme = 'author-theme';
+                readerSettings.columnMaxWidth = 99999;
+                readerSettings.columnMinWidth = 100;
+                readerSettings.syntheticSpread = 'single';
+                readerSettings.fontSize = 100;
+                SettingsDialog.updateReader(readium.reader, readerSettings);
+            } else if (!embedded){
                 readerSettings = readerSettings || SettingsDialog.defaultSettings;
                 SettingsDialog.updateReader(readium.reader, readerSettings);
             }
@@ -2089,6 +2126,7 @@ BookmarkData){
                     scroll: "auto"
                 });
             }
+
 
 
             var toggleNightTheme = function(){

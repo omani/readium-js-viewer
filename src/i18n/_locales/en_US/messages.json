@@ -477,6 +477,9 @@
   "biblemesh_copied" : {
     "message": "Highlight copied"
   },
+  "biblemesh_copied_code" : {
+    "message": "Embed code copied"
+  },
   "biblemesh_add_note" : {
     "message": "Add note"
   },
@@ -575,5 +578,8 @@
   },
   "biblemesh_no_thanks" : {
     "message" : "No Thanks"
+  },
+  "biblemesh_open_book" : {
+    "message" : "Open book"
   }
 }

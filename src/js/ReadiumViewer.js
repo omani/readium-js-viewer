@@ -14,12 +14,17 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
                 var ebookURL = urlParams['epub'];
                 var libraryURL = urlParams['epubs'];
                 var embedded = urlParams['embedded'];
+                var biblemesh_widget = !!urlParams['widget'];
 
                 // we use triggerHandler() so that the pushState logic is invoked from the first-time open 
+
+                if(biblemesh_widget) {
+                    $(document.body).addClass("widget");
+                }
                 
                 if (ebookURL) {
                     //EpubReader.loadUI(urlParams);
-                    var eventPayload = {embedded: embedded, epub: ebookURL, epubs: libraryURL};
+                    var eventPayload = {embedded: embedded, epub: ebookURL, epubs: libraryURL, widget: biblemesh_widget ? '1' : ''};
                     $(window).triggerHandler('readepub', eventPayload);
                 }
                 else {
@@ -167,7 +172,8 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
         var urlState = biblemesh_Helpers.buildUrlQueryParameters(undefined, {
             epub: ebookURL_filepath,
             epubs: (epubs ? epubs : undefined),
-            embedded: (eventPayload.embedded ? eventPayload.embedded : undefined)
+            embedded: (eventPayload.embedded ? eventPayload.embedded : undefined),
+            widget: eventPayload.widget  // biblemesh_
         });
         
         var func = _initialLoad ? replaceState : pushState;
