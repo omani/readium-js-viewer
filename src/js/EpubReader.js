@@ -67,6 +67,8 @@ BookmarkData){
     var embedded = undefined;
     
     var biblemesh_isWidget = undefined;
+    var biblemesh_widgetMetaData = undefined;
+    var biblemesh_spinelabels = {};
     
     // initialised in loadReaderUI(), with passed data.epub
     var ebookURL = undefined;
@@ -268,7 +270,14 @@ BookmarkData){
                 var metadata = options.metadata;
     
                 setBookTitle(metadata.title);
-    
+                
+                if(biblemesh_isWidget) {
+                    biblemesh_widgetMetaData = {
+                        title: metadata.title || "",
+                        author: metadata.author || metadata.publisher || ""
+                    };
+                }
+
                 $("#left-page-btn").unbind("click");
                 $("#right-page-btn").unbind("click");
                 var $pageBtnsContainer = $('#readium-page-btns');
@@ -491,6 +500,7 @@ BookmarkData){
 
         readium.reader.on(ReadiumSDK.Events.CONTENT_DOCUMENT_LOADED, function ($iframe, spineItem)
         {
+
             Globals.logEvent("CONTENT_DOCUMENT_LOADED", "ON", "EpubReader.js [ " + spineItem.href + " ]");
             
             var isFixed = readium.reader.isCurrentViewFixedLayout();
@@ -510,6 +520,94 @@ BookmarkData){
             $iframe.attr("aria-label", "EPUB");
 
             lastIframe = $iframe[0];
+
+            if(biblemesh_isWidget) {
+                if(typeof biblemesh_isWidget != 'boolean') {
+
+                    // put in start and end marker elements
+                    var widgetScopeBookmarkData = new BookmarkData(biblemesh_isWidget.idref, biblemesh_isWidget.elementCfi);
+                    var widgetScopeRange = readium.reader.getDomRangeFromRangeCfi(widgetScopeBookmarkData);
+
+                    var startMarkerEl = $('<span></span>');
+                    var endMarkerEl = $('<span></span>');
+
+                    widgetScopeRange.insertNode(startMarkerEl[0]);
+                    widgetScopeRange.collapse();
+                    widgetScopeRange.insertNode(endMarkerEl[0]);
+
+                    // hide all before start and after end
+                    var widgetHide = function(baseEl, direction) {
+                        var sibling = baseEl[0][direction + 'Sibling'];
+                        while(sibling) {
+                            if(sibling.nodeType == 3) {  // text node
+                                $(sibling).wrap('<span></span>');
+                                sibling = sibling.parentElement;
+                            }
+                            if(sibling.nodeType == 1) {  // element
+                                $(sibling)
+                                    .css('cssText', $(sibling).attr('style') + ';display: none !important;')
+                                    .attr('data-hiddenbywidget', '');
+                            }
+                            sibling = sibling[direction + 'Sibling'];
+                        }
+                        var baseElParent = baseEl.parent();
+                        if(baseElParent.length > 0 && !baseElParent.is('body, html')) {
+                            widgetHide(baseElParent, direction);
+                        }
+                    }
+                    widgetHide(startMarkerEl, 'previous');
+                    widgetHide(endMarkerEl, 'next');
+
+                    // get rid of margin-top at the beginning, and margin-bottom at the end
+                    var widgetRemoveMargin = function(baseEl, direction) {
+                        var sibling = baseEl[0][direction + 'Sibling'];
+                        while(sibling) {
+                            if(sibling.nodeType == 3) {  // text node
+                                $(sibling).wrap('<span></span>');
+                                sibling = sibling.parentElement;
+                            }
+                            if(sibling.nodeType == 1) {  // element
+                                $(sibling)
+                                    .css('cssText', $(sibling).attr('style') + ';display: none !important;')
+                                    .attr('data-hiddenbywidget', '');
+                            }
+                            sibling = sibling[direction + 'Sibling'];
+                        }
+                        var baseElParent = baseEl.parent();
+                        if(baseElParent.length > 0 && !baseElParent.is('body, html')) {
+                            widgetHide(baseElParent, direction);
+                        }
+                    }
+
+                    // remove markers
+                    startMarkerEl.remove();
+                    endMarkerEl.remove();
+
+                }
+
+                $(document.body).removeClass("widgetloading");
+
+                var spineInfo = biblemesh_spinelabels[spineItem.href.replace(/#.*$/,'')];
+                var spineLabel = (spineInfo.hrefsAndLabels && spineInfo.hrefsAndLabels[0] && spineInfo.hrefsAndLabels[0].label) || "";
+                var referenceEl = $('<div class="widget-reference"></div>');
+                referenceEl.append($('<div class="widget-spinelabel"></div>').html('“' + spineLabel + '”'));
+                referenceEl.append($('<div class="widget-title"></div>').html(biblemesh_widgetMetaData.title));
+                referenceEl.append($('<div class="widget-author"></div>').html(biblemesh_widgetMetaData.author));
+                $iframe.after(referenceEl);
+
+                var doc = ( $iframe[0].contentWindow || $iframe[0].contentDocument ).document;
+                var docHt = $(doc).find('html').height();
+                parent.postMessage({
+                    action: 'setHeight',
+                    iframeid: window.name,
+                    payload: docHt + referenceEl.height()
+                }, '*');
+
+                $('.content-doc-frame, #scaler').css('height', docHt);
+   
+                spin(false);
+                $("#epub-reader-frame").css("opacity", "");
+            }
         });
 
         readium.reader.on(ReadiumSDK.Events.CONTENT_DOCUMENT_LOAD_START, function (loadStartData, loadStartSpineItem)
@@ -534,7 +632,7 @@ BookmarkData){
             if(!biblemesh_isOnload) biblemesh_savePlace();
             updateUI(pageChangeData);
 
-            if(pageChangeData.spineItem) {  // biblemesh_
+            if(pageChangeData.spineItem && !biblemesh_isWidget) {  // biblemesh_
                 spin(false);
                 $("#epub-reader-frame").css("opacity", "");
             }
@@ -731,8 +829,8 @@ BookmarkData){
         var progressBarEl = $("<div id='progressBar'></div>");
         var idRef = biblemesh_getCurrentIdRef();
         var spineItemsLen = readium.reader.spine().items.length;
-        var labels = {};
         var tocUrl = currentPackageDocument.getToc();
+        biblemesh_spinelabels = {};
         
         if(spineItemsLen <= 1) return;
 
@@ -743,16 +841,16 @@ BookmarkData){
 
             if(elLabel.match(/^[0-9]*$/)) return;
 
-            if(!labels[elHrefNoHash]) labels[elHrefNoHash] = {
+            if(!biblemesh_spinelabels[elHrefNoHash]) biblemesh_spinelabels[elHrefNoHash] = {
                 hrefsAndLabels: [],
                 hrefs: {}
             };
-            if(!labels[elHrefNoHash].hrefs[elHref]) {
-                labels[elHrefNoHash].hrefsAndLabels.push({
+            if(!biblemesh_spinelabels[elHrefNoHash].hrefs[elHref]) {
+                biblemesh_spinelabels[elHrefNoHash].hrefsAndLabels.push({
                     href: elHref,
                     label: elLabel
                 });
-                labels[elHrefNoHash].hrefs[elHref] = true;
+                biblemesh_spinelabels[elHrefNoHash].hrefs[elHref] = true;
             }
         });
 
@@ -760,7 +858,7 @@ BookmarkData){
             var spineItem = readium.reader.spine().item(i);
             if(spineItem) {
                 $.each((
-                    labels[spineItem.href]
+                    biblemesh_spinelabels[spineItem.href]
                     || {hrefsAndLabels:[{label:null}]}
                 ).hrefsAndLabels, function(idx, hrefAndLabel) {
                     var lineContEl = $( biblemesh_progressBarItem(
@@ -1168,6 +1266,8 @@ BookmarkData){
     }
 
     var biblemesh_savePlace = function(){
+        if(biblemesh_isWidget) return; 
+
         var spotInfo = biblemesh_Helpers.getCurrentSpotInfo();
 
         if(biblemesh_bookId) {
@@ -1206,6 +1306,7 @@ BookmarkData){
     }
 
     var biblemesh_updateURL = function(){
+        if(biblemesh_isWidget) return;         
 
         var url = biblemesh_getBookmarkURL();
         
@@ -1494,13 +1595,17 @@ BookmarkData){
                                     idref: cfiObj.idref,
                                     elementCfi: cfiObj.cfi
                                 }))
-                    var embedCode = '<a class="erasereader-widget" '
+                    var embedCode = 
+                                  + '<!-- Change widget width, height, text size and theme via the data attributes. -->';
+                                  + '<!-- Style the widget encasement using the !important flag on the .erasereader-widget css class. -->';
+                                  + '<a class="erasereader-widget" '
                                   + 'href="' + codeUrl + '" target="_blank"'
-                                  + ' data-width="" data-maxheight="" data-textsize="" data-theme="" data-quotestyle=""'
-                                  + '>' + Strings.biblemesh_open_book + '</a>'
+                                  + ' data-width="" data-maxheight="" data-textsize="" data-theme=""'
+                                  + '><div>' + Strings.biblemesh_open_book + '</div></a>'
                                   + '<script>!function(d,i,s){if(!window.erasereader){if(!d.getElementById(i)) {var c=d.getElementsByTagName(s)[0],j=d.createElement(s);j.id=i;'
                                   + 'j.src="' + location.origin + '/scripts/widget_setup.js";'
-                                  + 'c.parentNode.insertBefore(j,c);}}else{erasereader.setup()}}(document,"erasereader-widget-script","script");</script>';
+                                  + 'c.parentNode.insertBefore(j,c);}}else{erasereader.setup()}}(document,"erasereader-widget-script","script");</script>'
+                                  ;
                     
                     biblemesh_doCopy(embedCode, Strings.biblemesh_copied_code);
                 });
@@ -1804,7 +1909,15 @@ BookmarkData){
         ebookURL = data.epub;
         ebookURL_filepath = Helpers.getEbookUrlFilePath(ebookURL);
         biblemesh_isWidget = !!data.widget;
+        
+        if(biblemesh_isWidget) {
+            parent.postMessage({
+                action: 'loading',
+                iframeid: window.name
+            }, '*');
+        }
 
+        $(document.body).addClass("widgetloading");
 
         Analytics.trackView('/reader');
         embedded = data.embedded;
@@ -1878,7 +1991,7 @@ BookmarkData){
             var goto = spotInfo.ebookSpot;  //biblemesh_
             if (goto) {
                 console.log("Goto override? " + goto);
-                
+
                 try {
                     var gotoObj = JSON.parse(goto);
                     
@@ -1909,6 +2022,9 @@ BookmarkData){
                     
                     
                     if (openPageRequest_) {
+                        if(biblemesh_isWidget) {
+                            biblemesh_isWidget = openPageRequest_;
+                        }
                         openPageRequest = openPageRequest_;
                         console.debug("Open request (goto): " + JSON.stringify(openPageRequest));
                     }

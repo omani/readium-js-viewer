@@ -119,16 +119,16 @@ a:hover {
     display: none !important;
 }
 :-webkit-full-screen .glyphicon-resize-small {
-	display: inline-block !important;
+    display: inline-block !important;
 }
 :-moz-full-screen .glyphicon-resize-small {
-	display: inline-block !important;
+    display: inline-block !important;
 }
 :-ms-full-screen .glyphicon-resize-small {
-	display: inline-block !important;
+    display: inline-block !important;
 }
 :fullscreen .glyphicon-resize-small {
-	display: inline-block !important;
+    display: inline-block !important;
 }
 :-webkit-full-screen .glyphicon-resize-full {
     display: none !important;
@@ -144,13 +144,13 @@ a:hover {
 }
 
 .navbar-left-small-logo {
-	display: none;
+    display: none;
 }
 
 html,
 body {
-  position: fixed;
-  overflow: hidden;
+position: fixed;
+overflow: hidden;
 }
 
 @media (max-width: 500px) {
@@ -167,18 +167,49 @@ body {
 .widget .book-title-header,
 .widget #progressBar,
 .widget #readium-page-btns {
-	display: none;
+    display: none;
 }
 
-body.widget,
-.widget #app-container {
-	height: 10000px !important;
-}
+/*body.widget:not(.widgetloading),
+.widget:not(.widgetloading) #app-container {
+    height: 99999px !important;
+}*/
 
+.widget #epub-reader-container {
+    bottom: 0;
+}
 .widget #reading-area {
-	top: 0;
+    top: 0;
 }
 
 .widget #epub-reader-frame {
-	border: none;
+    border: none;
+}
+
+.widget #reflowable-book-frame {
+    top: 0;
+    bottom: 0;
+}
+
+.widget .iframe-fixed {
+    vertical-align: top;
+}
+
+.widget-reference {
+    text-align: right;
+}
+
+.widget-title {
+    font-weight: bold;
+    font-size: 1em;
+    color: black;
+}
+.widget-author {
+    color: #999;
+    font-size: 1em;
+    padding-bottom: 5px;
+}
+.widget-spinelabel {
+    padding-top: 5px;
+    font-size: .85em;
 }
