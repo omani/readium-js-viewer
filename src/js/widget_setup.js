@@ -62,7 +62,12 @@
                     + '.erasereader-widget-div-dark {'
                         + "background: #141414;"
                     + '}'
-                    + '.erasereader-widget-div-dark .widget-reference-a {'
+                    + '.erasereader-widget-forbidden {'
+                        + 'text-align: center;'
+                        + 'padding: 50px 0;'
+                        + 'font-style: italic;'
+                    + '}'
+                    + '.erasereader-widget-div-dark .widget-reference-a, .erasereader-widget-div-dark .erasereader-widget-forbidden {'
                         + "color: white;"
                     + '}'
                     + '';
@@ -133,6 +138,14 @@
                                 iframeEl.style.height = height + "px";
                             }
                             iframeEl.style.visibility = "";  // just in case
+                            break;
+                        
+                        case 'forbidden':
+                            var forbiddenEl = newEl('div', {
+                                className: 'erasereader-widget-forbidden',
+                                innerText: data.payload,
+                            });
+                            iframeEl.parentNode.replaceChild(forbiddenEl, iframeEl);
                             break;
                         
                         case 'loading':

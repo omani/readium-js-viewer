@@ -581,5 +581,8 @@
   },
   "biblemesh_open_book" : {
     "message" : "Open book"
+  },
+  "biblemesh_widget_no_access" : {
+    "message" : "Sorry, you do not have access to this book."
   }
 }
