@@ -585,6 +585,45 @@ BookmarkData){
 
                 }
 
+                var doc = ( $iframe[0].contentWindow || $iframe[0].contentDocument ).document;
+                
+                $(doc).find('a').off('click').on('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();                    
+
+                    var aHref = $(this).attr('href');
+                    var combinedPath = aHref.match(/^#/) ? $iframe.attr('data-src').replace(/#.*$/, '') + aHref : Helpers.ResolveContentRef(aHref, $iframe.attr('data-src'));
+                    var hashIndex = combinedPath.indexOf("#");
+                    var hrefPart;
+                    var elementId;
+                    if (hashIndex >= 0) {
+                        hrefPart = combinedPath.substr(0, hashIndex);
+                        elementId = combinedPath.substr(hashIndex + 1);
+                    }
+                    else {
+                        hrefPart = combinedPath;
+                        elementId = undefined;
+                    }
+
+                    var linkSpineItem = readium.reader.spine().getItemByHref(hrefPart);
+                    var bookmark = new BookmarkData(linkSpineItem.idref, null);
+                    debugBookmarkData(bookmark);
+                    
+                    bookmark.elementCfi = bookmark.contentCFI;
+                    bookmark.contentCFI = undefined;
+                    bookmark = JSON.stringify(bookmark);
+                    
+                    ebookURL = ensureUrlIsRelativeToApp(ebookURL);
+
+                    var url = biblemesh_Helpers.buildUrlQueryParameters(undefined, {
+                        epub: ebookURL,
+                        goto: bookmark,
+                        elementId: elementId
+                    }, true);
+
+                    window.open(url);
+                });
+
                 $(document.body).removeClass("widgetloading");
 
                 var spineInfo = biblemesh_spinelabels[spineItem.href.replace(/#.*$/,'')];
@@ -601,7 +640,6 @@ BookmarkData){
                     }
                 }, '*');
 
-                var doc = ( $iframe[0].contentWindow || $iframe[0].contentDocument ).document;
                 var docHt = $(doc).find('html').height();
                 parent.postMessage({
                     action: 'setHeight',
@@ -614,6 +652,18 @@ BookmarkData){
                 spin(false);
                 $("#epub-reader-frame").css("opacity", "");
             }
+
+            setTimeout(function() {
+                var urlParams = biblemesh_Helpers.getURLQueryParams();
+                if(!biblemesh_isWidget && urlParams.elementId) {
+                    readium.reader.openSpineItemElementId(spineItem.idref, urlParams.elementId);
+
+                    var url = biblemesh_Helpers.buildUrlQueryParameters(undefined, {
+                        elementId: " "
+                    });
+                    history.replaceState({epub: "/epub_content/book_" + biblemesh_bookId}, null, url);
+                }
+            }, 1);
         });
 
         readium.reader.on(ReadiumSDK.Events.CONTENT_DOCUMENT_LOAD_START, function (loadStartData, loadStartSpineItem)

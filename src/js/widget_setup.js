@@ -27,18 +27,26 @@
                     + '.widget-reference {'
                         + 'text-align: right;'
                     + '}'
+                    + '.widget-reference-a {'
+                        + 'display: inline-block;'
+                        + 'color: black;'
+                        + 'text-decoration: none;'
+                        + 'position: relative;'
+                    + '}'
+                    + '.widget-reference-a:hover .widget-title {'
+                        + 'text-decoration: underline;'
+                    + '}'
                     + '.widget-spinelabel {'
-                        + 'color: #222;'
+                        + 'opacity: .9;'
                         + 'padding-top: 5px;'
                         + 'font-size: .85em;'
                     + '}'
                     + '.widget-title {'
                         + 'font-weight: bold;'
                         + 'font-size: 1em;'
-                        + 'color: black;'
                     + '}'
                     + '.widget-author {'
-                        + 'color: #999;'
+                        + 'opacity: .5;'
                         + 'font-size: 1em;'
                         + 'padding-bottom: 5px;'
                     + '}'
@@ -51,6 +59,12 @@
                         + 'line-height: 90px;'
                         + 'padding: 0 5px 0 8px;'
                     + '}'
+                    + '.erasereader-widget-div-dark {'
+                        + "background: #141414;"
+                    + '}'
+                    + '.erasereader-widget-div-dark .widget-reference-a {'
+                        + "color: white;"
+                    + '}'
                     + '';
         d.head.appendChild(node);
     }
@@ -61,7 +75,7 @@
                 width: '100%',
                 maxheight: '10000px',
                 textsize: 100,  // percentage
-                theme: 'default-theme',  // OR author-theme OR night-theme
+                theme: 'author-theme',  // OR author-theme OR night-theme
             }
 
             var els = d.getElementsByClassName('erasereader-widget');
@@ -98,7 +112,7 @@
                 });
 
                 var divEl = newEl('div', {
-                    className: 'erasereader-widget-div',
+                    className: 'erasereader-widget-div' + (queryParamObj.theme=='night-theme' ? ' erasereader-widget-div-dark' : ''),
                     style: ""
                         + "width: " + queryParamObj.width + " !important;",
                 });
@@ -130,6 +144,11 @@
                             var refEl = newEl('div', {
                                 className: "widget-reference",
                             });
+                            var refElA = newEl('a', {
+                                className: "widget-reference-a",
+                                target: '_blank',
+                                href: iframeEl.src.replace(/&widget=1.*$/, '&flash=1'),
+                            });
                             var spineLblEl = newEl('div', {
                                 className: "widget-spinelabel",
                                 innerText: '“' + (payload.spineLabel || "") + '”',
@@ -144,9 +163,10 @@
                                 innerText: (payload.author || ""),
                             });
 
-                            refEl.appendChild(spineLblEl);
-                            refEl.appendChild(titleEl);
-                            refEl.appendChild(authorEl);
+                            refElA.appendChild(spineLblEl);
+                            refElA.appendChild(titleEl);
+                            refElA.appendChild(authorEl);
+                            refEl.appendChild(refElA);
                             iframeEl.parentNode.insertBefore(refEl, null);
                             
                             break;
