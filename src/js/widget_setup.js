@@ -1,81 +1,162 @@
-var erasereader = erasereader || {
-    setup: function() {
-        var settings = {
-            width: '100%',
-            maxheight: '10000px',
-            textsize: 100,  // percentage
-            theme: 'default-theme',  // OR author-theme OR night-theme
-        }
+!(function(d){
 
-        var d = document;
-        
-        var els = d.getElementsByClassName('erasereader-widget');
-        var basename = Date.now();
-
-        for (var i = 0; i < els.length; i++) {
-            var el = els[i];
-            var attrs = el.attributes;
-            var divEl = d.createElement('div');
-            var iframeEl = d.createElement('iframe');
-            
-            var queryParamObj = Object.assign({}, settings);
-            for(var i=0; i<attrs.length; i++) {
-                var attr = attrs[i].nodeName;
-                var attrVal = attrs[i].nodeValue;
-                if(attr.match(/^data-/) && attrVal) {
-                    queryParamObj[attr.replace(/^data-/,'')] = attrVal;
-                }
-            }
-            var queryParamArray = [];
-            for(var p in queryParamObj) {
-                queryParamArray.push( encodeURIComponent(p) + "=" + encodeURIComponent(queryParamObj[p]) );
-            }
-
-            iframeEl.id = iframeEl.name = 'erasereader-widget-iframe-' + (basename + i);
-            iframeEl.className = 'erasereader-widget-iframe';
-            iframeEl.src = el.href + '&widget=1&' + queryParamArray.join('&');
-            iframeEl.style = ""
-                + "visibility: hidden !important;"
-                + "display: block !important;"
-                + "border: none !important;"
-                + "width: 100% !important;"
-                + "max-height: " + queryParamObj.maxheight + " !important;"
-                + "height: " + Math.min(queryParamObj.maxheight, 200) + "px;";
-
-            divEl.className = 'erasereader-widget-div';
-            divEl.style = ""
-                + "width: " + queryParamObj.width + " !important;"
-                + "box-sizing: border-box;"
-                + "box-shadow: 2px 2px 15px #ccc;"
-                + "border: 0 solid #1c60ab;"
-                + "border-width: 0 2px 0 17px;"
-                + "margin: 10px 0;"
-                + "padding: 6px 14px;";
-            divEl.appendChild(iframeEl);
-
-            el.parentNode.replaceChild(divEl, el);
-        }
-
-        window.addEventListener('message', function(event) {
-            var data = event.data;
-            var iframeEl = d.getElementById(data.iframeid);
-
-            if(iframeEl) {
-                switch(data.action) {
-                    case 'setHeight':
-                        var height = parseInt(data.payload, 10);
-                        if(iframeEl && height) {
-                            iframeEl.style.height = height + "px";
-                        }
-                        // no break; here on purpose
-                    case 'loading':
-                        iframeEl.style.visibility = "";
-                        break;
-                }
-            }
-
-        }, false);
+    var newEl = function(type, attrs) {
+        var el = d.createElement(type);
+        for(var attr in attrs) {
+            el[attr] = attrs[attr];
+        } 
+        return el;
     }
-};
 
-erasereader.setup();
+    if(!window.erasereader) {
+        var node = d.createElement('style');
+        node.innerHTML = ''
+                    + '.erasereader-widget-iframe {'
+                        + "display: block;"
+                        + "border: none;"
+                        + "width: 100%;"
+                    + '}'
+                    + '.erasereader-widget-div {'
+                        + "box-sizing: border-box;"
+                        + "box-shadow: 2px 2px 15px #CCC;"
+                        + "border: 0 solid #1c60ab;"
+                        + "border-width: 0 2px 0 17px;"
+                        + "margin: 10px 0;"
+                        + "padding: 6px 14px;"
+                    + '}'
+                    + '.widget-reference {'
+                        + 'text-align: right;'
+                    + '}'
+                    + '.widget-spinelabel {'
+                        + 'color: #222;'
+                        + 'padding-top: 5px;'
+                        + 'font-size: .85em;'
+                    + '}'
+                    + '.widget-title {'
+                        + 'font-weight: bold;'
+                        + 'font-size: 1em;'
+                        + 'color: black;'
+                    + '}'
+                    + '.widget-author {'
+                        + 'color: #999;'
+                        + 'font-size: 1em;'
+                        + 'padding-bottom: 5px;'
+                    + '}'
+                    + '.widget-reference::before {'
+                        + 'content: "”";'
+                        + 'float: right;'
+                        + 'font-size: 100px;'
+                        + 'font-family: cursive;'
+                        + 'color: #1c60ab;'
+                        + 'line-height: 90px;'
+                        + 'padding: 0 5px 0 8px;'
+                    + '}'
+                    + '';
+        d.head.appendChild(node);
+    }
+
+    var erasereader = erasereader || {
+        setup: function() {
+            var settings = {
+                width: '100%',
+                maxheight: '10000px',
+                textsize: 100,  // percentage
+                theme: 'default-theme',  // OR author-theme OR night-theme
+            }
+
+            var els = d.getElementsByClassName('erasereader-widget');
+            var elsLen = els.length;
+            var basename = Date.now();
+
+            for(var i = 0; i < elsLen; i++) {
+                var el = els[0];
+                var attrs = el.attributes;
+                
+                var queryParamObj = Object.assign({}, settings);
+                for(var j=0; j<attrs.length; j++) {
+                    var attr = attrs[j].nodeName;
+                    var attrVal = attrs[j].nodeValue;
+                    if(attr.match(/^data-/) && attrVal) {
+                        queryParamObj[attr.replace(/^data-/,'')] = attrVal;
+                    }
+                }
+                var queryParamArray = [];
+                for(var p in queryParamObj) {
+                    queryParamArray.push( encodeURIComponent(p) + "=" + encodeURIComponent(queryParamObj[p]) );
+                }
+
+                var iframeIdName = 'erasereader-widget-iframe-' + (basename + i);
+                var iframeEl = newEl('iframe', {
+                    id: iframeIdName,
+                    name: iframeIdName,
+                    className: 'erasereader-widget-iframe',
+                    src: el.href + '&widget=1&' + queryParamArray.join('&'),
+                    style: ""
+                        + "visibility: hidden;"
+                        + "max-height: " + queryParamObj.maxheight + ";"
+                        + "height: " + (queryParamObj.maxheight.match(/px$/) ? Math.min(queryParamObj.maxheight, 200) : 200) + "px;",
+                });
+
+                var divEl = newEl('div', {
+                    className: 'erasereader-widget-div',
+                    style: ""
+                        + "width: " + queryParamObj.width + " !important;",
+                });
+
+                divEl.appendChild(iframeEl);
+                el.parentNode.replaceChild(divEl, el);
+            }
+
+            window.addEventListener('message', function(event) {
+                var data = event.data;
+                var iframeEl = d.getElementById(data.iframeid);
+
+                if(iframeEl) {
+                    switch(data.action) {
+                        case 'setHeight':
+                            var height = parseInt(data.payload, 10);
+                            if(iframeEl && height) {
+                                iframeEl.style.height = height + "px";
+                            }
+                            iframeEl.style.visibility = "";  // just in case
+                            break;
+                        
+                        case 'loading':
+                            iframeEl.style.visibility = "";
+                            break;
+
+                        case 'setReference':
+                            var payload = data.payload || {};
+                            var refEl = newEl('div', {
+                                className: "widget-reference",
+                            });
+                            var spineLblEl = newEl('div', {
+                                className: "widget-spinelabel",
+                                innerText: '“' + (payload.spineLabel || "") + '”',
+                                // note: it is important I do not inject HTML as I do not check the postMessage source
+                            });
+                            var titleEl = newEl('div', {
+                                className: "widget-title",
+                                innerText: (payload.title || ""),
+                            });
+                            var authorEl = newEl('div', {
+                                className: "widget-author",
+                                innerText: (payload.author || ""),
+                            });
+
+                            refEl.appendChild(spineLblEl);
+                            refEl.appendChild(titleEl);
+                            refEl.appendChild(authorEl);
+                            iframeEl.parentNode.insertBefore(refEl, null);
+                            
+                            break;
+                    }
+                }
+
+            }, false);
+        }
+    };
+
+    erasereader.setup();
+
+})(document);

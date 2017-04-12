@@ -588,19 +588,25 @@ BookmarkData){
                 $(document.body).removeClass("widgetloading");
 
                 var spineInfo = biblemesh_spinelabels[spineItem.href.replace(/#.*$/,'')];
-                var spineLabel = (spineInfo.hrefsAndLabels && spineInfo.hrefsAndLabels[0] && spineInfo.hrefsAndLabels[0].label) || "";
-                var referenceEl = $('<div class="widget-reference"></div>');
-                referenceEl.append($('<div class="widget-spinelabel"></div>').html('“' + spineLabel + '”'));
-                referenceEl.append($('<div class="widget-title"></div>').html(biblemesh_widgetMetaData.title));
-                referenceEl.append($('<div class="widget-author"></div>').html(biblemesh_widgetMetaData.author));
-                $iframe.after(referenceEl);
+                var spineLabel = $('<textarea />').html((spineInfo.hrefsAndLabels && spineInfo.hrefsAndLabels[0] && spineInfo.hrefsAndLabels[0].label) || "").text();
+                var title = $('<textarea />').html(biblemesh_widgetMetaData.title).text();
+                var author = $('<textarea />').html(biblemesh_widgetMetaData.author).text();
+                parent.postMessage({
+                    action: 'setReference',
+                    iframeid: window.name,
+                    payload: {
+                        spineLabel: spineLabel,
+                        title: title,
+                        author: author,
+                    }
+                }, '*');
 
                 var doc = ( $iframe[0].contentWindow || $iframe[0].contentDocument ).document;
                 var docHt = $(doc).find('html').height();
                 parent.postMessage({
                     action: 'setHeight',
                     iframeid: window.name,
-                    payload: docHt + referenceEl.height()
+                    payload: docHt,
                 }, '*');
 
                 $('.content-doc-frame, #scaler').css('height', docHt);
@@ -1565,7 +1571,7 @@ BookmarkData){
                 });
 
             var biblemesh_doCopy = function(text, copiedMsg) {
-                    var copyEl = $('<input class="copyel" />');
+                    var copyEl = $('<textarea class="copyel" />');
                     copyEl.val(text);
                     $('body').append(copyEl);
                     copyEl.select()
@@ -1595,16 +1601,22 @@ BookmarkData){
                                     idref: cfiObj.idref,
                                     elementCfi: cfiObj.cfi
                                 }))
-                    var embedCode = 
-                                  + '<!-- Change widget width, height, text size and theme via the data attributes. -->';
-                                  + '<!-- Style the widget encasement using the !important flag on the .erasereader-widget css class. -->';
+                    var embedCode = ''
+                                  + '<!-- Change width, max-height, text size (%) and theme (author-theme, default-theme or night-theme) of the reader via the data attributes. -->'
+                                  + "\n"
+                                  + '<!-- Style the widget encasement via css rules, doubling the class name. -->'
+                                  + "\n"
+                                  + '<!-- Eg. .erasereader-widget-div.erasereader-widget-div, .widget-reference.widget-reference::before { border-color: #ab781c; color: #ab781c; } -->'
+                                  + "\n"
                                   + '<a class="erasereader-widget" '
                                   + 'href="' + codeUrl + '" target="_blank"'
-                                  + ' data-width="" data-maxheight="" data-textsize="" data-theme=""'
+                                  + ' data-maxheight="" data-textsize="" data-theme=""'
                                   + '><div>' + Strings.biblemesh_open_book + '</div></a>'
+                                  + "\n"
                                   + '<script>!function(d,i,s){if(!window.erasereader){if(!d.getElementById(i)) {var c=d.getElementsByTagName(s)[0],j=d.createElement(s);j.id=i;'
                                   + 'j.src="' + location.origin + '/scripts/widget_setup.js";'
                                   + 'c.parentNode.insertBefore(j,c);}}else{erasereader.setup()}}(document,"erasereader-widget-script","script");</script>'
+                                  + "\n"
                                   ;
                     
                     biblemesh_doCopy(embedCode, Strings.biblemesh_copied_code);
@@ -2224,13 +2236,13 @@ BookmarkData){
                 readerSettings = settings.reader;   // biblemesh_
             }
             if(biblemesh_isWidget) {
-                readerSettings = readerSettings || SettingsDialog.defaultSettings;
+                var urlParams = biblemesh_Helpers.getURLQueryParams();
                 readerSettings.scroll = 'scroll-doc';
-                readerSettings.theme = 'author-theme';
+                readerSettings.theme = urlParams.theme || 'author-theme'; 
                 readerSettings.columnMaxWidth = 99999;
                 readerSettings.columnMinWidth = 100;
                 readerSettings.syntheticSpread = 'single';
-                readerSettings.fontSize = 100;
+                readerSettings.fontSize = parseInt(urlParams.textsize, 10) || 100;
                 SettingsDialog.updateReader(readium.reader, readerSettings);
             } else if (!embedded){
                 readerSettings = readerSettings || SettingsDialog.defaultSettings;

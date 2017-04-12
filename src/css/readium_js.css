@@ -194,22 +194,3 @@ overflow: hidden;
 .widget .iframe-fixed {
     vertical-align: top;
 }
-
-.widget-reference {
-    text-align: right;
-}
-
-.widget-title {
-    font-weight: bold;
-    font-size: 1em;
-    color: black;
-}
-.widget-author {
-    color: #999;
-    font-size: 1em;
-    padding-bottom: 5px;
-}
-.widget-spinelabel {
-    padding-top: 5px;
-    font-size: .85em;
-}
