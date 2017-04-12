@@ -64,7 +64,7 @@
     "remotestoragejs": "latest",
     "spin.js": "latest",
     "gift": "latest",
-    "clean-css": "latest",
+    "clean-css": "3.4.25",
     "uglify-js": "latest",
     "mocha": "latest",
     "wd": "latest",
