@@ -627,7 +627,7 @@ BookmarkData){
                 $(document.body).removeClass("widgetloading");
 
                 var spineInfo = biblemesh_spinelabels[spineItem.href.replace(/#.*$/,'')];
-                var spineLabel = $('<textarea />').html((spineInfo.hrefsAndLabels && spineInfo.hrefsAndLabels[0] && spineInfo.hrefsAndLabels[0].label) || "").text();
+                var spineLabel = $('<textarea />').html((spineInfo && spineInfo.hrefsAndLabels && spineInfo.hrefsAndLabels[0] && spineInfo.hrefsAndLabels[0].label) || "").text();
                 var title = $('<textarea />').html(biblemesh_widgetMetaData.title).text();
                 var author = $('<textarea />').html(biblemesh_widgetMetaData.author).text();
                 parent.postMessage({
@@ -1670,6 +1670,9 @@ BookmarkData){
                                   ;
                     
                     biblemesh_doCopy(embedCode, Strings.biblemesh_copied_code);
+                    if(!docEl.find('.highlightOpts-note-text').val()) {
+                        docEl.find('.highlightOpts-box-0').click();
+                    }
                 });
 
             highlightOptsEl.find('.highlightOpts-copy')

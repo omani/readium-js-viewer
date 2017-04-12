@@ -164,7 +164,7 @@
                             });
                             var spineLblEl = newEl('div', {
                                 className: "widget-spinelabel",
-                                innerText: '“' + (payload.spineLabel || "") + '”',
+                                innerText: payload.spineLabel ? ('“' + payload.spineLabel + '”') : "",
                                 // note: it is important I do not inject HTML as I do not check the postMessage source
                             });
                             var titleEl = newEl('div', {
