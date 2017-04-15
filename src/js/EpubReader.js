@@ -891,8 +891,10 @@ BookmarkData){
         if(spineItemsLen <= 1) return;
 
         $('a', tocDOM).each(function(idx, el) {
-            var elHref = $(el).attr('href').replace(/#$/,'');
-            var elHrefNoHash = $(el).attr('href').replace(/#.*$/,'');
+            var elHref = $(el).attr('href');
+            if(!elHref) return;
+            var elHref = elHref.replace(/#$/,'');
+            var elHrefNoHash = elHref.replace(/#.*$/,'');
             var elLabel = $(el).text().replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
             if(elLabel.match(/^[0-9]*$/)) return;
