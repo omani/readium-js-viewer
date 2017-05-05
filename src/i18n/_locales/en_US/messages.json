@@ -584,5 +584,8 @@
   },
   "biblemesh_widget_no_access" : {
     "message" : "Sorry, you do not have access to this book."
+  },
+  "biblemesh_isbn" : {
+    "message" : "ISBN: "
   }
 }
