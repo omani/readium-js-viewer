@@ -728,7 +728,7 @@ ul.nav-tabs li:not(.active) button:hover
   position: relative;
 }
 
-.navlogo::after {
+.navlogo::before {
   content: attr(data-namefirstletter);
   display: inline-block;
   background: rgba(255,255,255,.2);
@@ -741,12 +741,15 @@ ul.nav-tabs li:not(.active) button:hover
   color: #000;
   border: 1px solid rgba(0,0,0,.5);
   text-transform: uppercase;
-  position: absolute;
+  position: relative;
   top: 0;
   left: 0;
+  z-index: 1;
+  vertical-align: top;
+  margin-right: -18px;
 }
 
-.navlogo::before {
+.navlogo::after {
   content: attr(alt);
   position: absolute;
   top: 0;
