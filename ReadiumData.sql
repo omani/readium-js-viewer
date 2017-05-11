@@ -7,7 +7,7 @@
 #
 # Host: localhost (MySQL 5.7.17)
 # Database: readiumdata
-# Generation Time: 2017-05-11 09:07:13 +0000
+# Generation Time: 2017-05-11 09:37:24 +0000
 # ************************************************************
 
 
@@ -83,6 +83,7 @@ CREATE TABLE `idp` (
   `spcert` text COLLATE utf8_bin,
   `spkey` text COLLATE utf8_bin,
   `language` varchar(5) COLLATE utf8_bin DEFAULT NULL,
+  `adminUserEmails` text COLLATE utf8_bin NOT NULL,
   `created_at` datetime NOT NULL,
   `demo_expires_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
