@@ -57,7 +57,28 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
 
                 // biblemesh_ : The following block has been added
                 var isAndroid = navigator.userAgent.toLowerCase().indexOf("android") > -1;
-                if(isAndroid) {
+                var idpExpire = Settings.getUserAttr('idpExpire');
+                if(idpExpire) {
+                    var hours_until_expire = parseInt((idpExpire - new Date().getTime()) / (1000 * 60 * 60));
+                    var time_until_expire;
+                    if(hours_until_expire < 1) {
+                        time_until_expire = Strings.biblemesh_less_than_an_hour;
+                    } else if(hours_until_expire < 48) {
+                        time_until_expire = Strings.biblemesh_num_hours
+                            .replace('NUMBER', hours_until_expire);
+                    } else {
+                        time_until_expire = Strings.biblemesh_num_days
+                            .replace('NUMBER', parseInt(hours_until_expire / 24));
+                    }
+                    var demo_reader2_text = Strings.biblemesh_demo_reader2
+                        .replace('TIME_UNTIL_EXPIRE', time_until_expire);
+                    Dialogs.showModalMessageEx(
+                        Strings.biblemesh_demo_reader,
+                        '<p>' + Strings.biblemesh_demo_reader1 + '</p>' + 
+                        '<p>' + '<span class="emphasize">' + demo_reader2_text + '</span> ' + Strings.biblemesh_demo_reader3 + '</p>' + 
+                        '<p>' + Strings.biblemesh_demo_reader4 + '</p>'
+                    );
+                } else if(isAndroid) {
                     Settings.get('alertedToAndroidApp', function(val){
                         if (!val){
                             Dialogs.showModalPrompt(

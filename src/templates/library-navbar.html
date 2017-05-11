@@ -4,10 +4,10 @@
     <button id="aboutButt1" tabindex="1" type="button" class="btn icon-logo" data-toggle="modal" data-target="#about-dialog" title="{{strings.about}}" aria-label="{{strings.about}}"></button>
 </div>-->
 <div class="navbar-left">
-    <img class="navlogo" src="{{idp_logo_src}}" alt="">{{strings.biblemesh_reader}}
+    <img class="navlogo" src="{{idp_logo_src}}" alt="{{idp_name}}" data-namefirstletter="{{idp_first_letter_of_name}}">{{reader_txt}}
 </div>
 <div class="navbar-left navbar-left-small-logo">
-    <img class="navlogo" src="{{idp_small_logo_src}}" alt="">
+    <img class="navlogo" src="{{idp_small_logo_src}}" data-namefirstletter="{{idp_first_letter_of_name}}">
 </div>
 <div class="btn-group navbar-right">
     <button tabindex="1" type="button" class="btn icon-thumbnails" title="{{strings.thumbnail_view}}" aria-label="{{strings.thumbnail_view}}">

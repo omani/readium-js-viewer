@@ -194,3 +194,8 @@ overflow: hidden;
 .widget .iframe-fixed {
     vertical-align: top;
 }
+
+.emphasize {
+    color: #9a0909;
+}
+

@@ -1944,13 +1944,19 @@ BookmarkData){
         $appContainer.append(ReaderBody({strings: Strings, dialogs: Dialogs, keyboard: Keyboard}));
         $('nav').empty();
         $('nav').attr("aria-label", Strings.i18n_toolbar);
+        var idpId = Settings.getUserAttr('idpId');  // biblemesh_
+        var idpName = Settings.getUserAttr('idpName');  // biblemesh_
+        var idpAssetsBaseUrl = Settings.getUserAttr('idpAssetsBaseUrl');  // biblemesh_
         $('nav').append(ReaderNavbar({
             strings: Strings,
             dialogs: Dialogs,
             keyboard: Keyboard,
-            idp_logo_src: Settings.getUserAttr('idpLogoSrc'),  // biblemesh_
-            idp_small_logo_src: Settings.getUserAttr('idpSmallLogoSrc'),  // biblemesh_
-            logout_of_idp: Strings.biblemesh_logout_of + Settings.getUserAttr('idpName'),  // biblemesh_
+            idp_logo_src: idpAssetsBaseUrl + 'logo-' + idpId + '.png',  // biblemesh_
+            reader_txt: Settings.getUserAttr('idpUseReaderTxt') ? Strings.biblemesh_reader : "",  // biblemesh_
+            idp_name: idpName,  // biblemesh_
+            idp_first_letter_of_name: idpName.substr(0,1),  // biblemesh_
+            idp_small_logo_src: idpAssetsBaseUrl + 'small-logo-' + idpId + '.png',  // biblemesh_
+            logout_of_idp: Settings.getUserAttr('idpNoAuth') ? Strings.biblemesh_refresh : (Strings.biblemesh_logout_of + idpName),  // biblemesh_
             firstname: Settings.getUserAttr('firstname')  // biblemesh_
         }));
         installReaderEventHandlers();

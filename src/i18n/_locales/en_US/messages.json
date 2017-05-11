@@ -525,6 +525,9 @@
   "biblemesh_logout_of" : {
     "message": "Log out of "
   },
+  "biblemesh_refresh" : {
+    "message": "Refresh Demo Library"
+  },
   "biblemesh_no_books" : {
     "message": "No books available."
   },
@@ -542,6 +545,9 @@
   },
   "biblemesh_no_permission" : {
     "message" : "You do not have proper permissions to do this action."
+  },
+  "biblemesh_no_idp" : {
+    "message" : "This temporary domain has expired and is no longer available."
   },
   "biblemesh_invalid_filename" : {
     "message" : "Invalid file name."
@@ -587,5 +593,29 @@
   },
   "biblemesh_isbn" : {
     "message" : "ISBN: "
+  },
+  "biblemesh_demo_reader1" : {
+    "message" : "This is a custom Toad Reader demo. Some books have been automatically added to get you started. Add more EPUB3 files via the + icon on the top right menu."
+  },
+  "biblemesh_demo_reader2" : {
+    "message" : "This custom demo will expire in TIME_UNTIL_EXPIRE."
+  },
+  "biblemesh_demo_reader3" : {
+    "message" : "At that point, all books and user data associated with this demo will be deleted."
+  },
+  "biblemesh_demo_reader4" : {
+    "message" : "Questions? Interested in getting a reader for your institution, business, organization or online courses? Contact us at erasisrael@gmail.com."
+  },
+  "biblemesh_less_than_an_hour" : {
+    "message" : "less than an hour"
+  },
+  "biblemesh_num_hours" : {
+    "message" : "NUMBER hour(s)"
+  },
+  "biblemesh_num_days" : {
+    "message" : "NUMBER days"
+  },
+  "biblemesh_demo_reader" : {
+    "message" : "Reader Demo"
   }
 }
