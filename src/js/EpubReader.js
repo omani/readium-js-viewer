@@ -2298,6 +2298,7 @@ BookmarkData){
             }
             if(biblemesh_isWidget) {
                 var urlParams = biblemesh_Helpers.getURLQueryParams();
+                readerSettings = readerSettings || SettingsDialog.defaultSettings;
                 readerSettings.scroll = 'scroll-doc';
                 readerSettings.theme = urlParams.theme || 'author-theme'; 
                 readerSettings.columnMaxWidth = 99999;
