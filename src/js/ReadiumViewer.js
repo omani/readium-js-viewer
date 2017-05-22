@@ -74,9 +74,9 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
                         .replace('TIME_UNTIL_EXPIRE', time_until_expire);
                     Dialogs.showModalMessageEx(
                         Strings.biblemesh_demo_reader,
-                        '<p>' + Strings.biblemesh_demo_reader1 + '</p>' + 
+                        '<p>' + Strings.biblemesh_demo_reader1b + '</p>' + 
                         '<p>' + '<span class="emphasize">' + demo_reader2_text + '</span> ' + Strings.biblemesh_demo_reader3 + '</p>' + 
-                        '<p>' + Strings.biblemesh_demo_reader4 + '</p>'
+                        '' // '<p>' + Strings.biblemesh_demo_reader4 + '</p>'
                     );
                 } else if(isAndroid) {
                     Settings.get('alertedToAndroidApp', function(val){

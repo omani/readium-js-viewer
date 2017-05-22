@@ -597,6 +597,9 @@
   "biblemesh_demo_reader1" : {
     "message" : "This is a custom Toad Reader demo. Some books have been automatically added to get you started. Add more EPUB3 files via the + icon on the top right menu. Change to list view to delete books."
   },
+  "biblemesh_demo_reader1b" : {
+    "message" : "This is a custom demo. Some books have been automatically added to get you started. Add more EPUB3 files via the + icon on the top right menu. Change to list view to delete books."
+  },
   "biblemesh_demo_reader2" : {
     "message" : "This custom demo will expire in TIME_UNTIL_EXPIRE."
   },
