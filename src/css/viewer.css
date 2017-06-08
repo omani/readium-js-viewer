@@ -722,14 +722,45 @@ ul.nav-tabs li:not(.active) button:hover
 }
 
 .navlogo {
-  height: 24px;
-  margin: -3px 10px 0 0;
+  height: 44px;
   vertical-align: top;
-  position: relative;
+  margin-right: 5px;
 }
 
-.navlogo::before {
-  content: attr(data-namefirstletter);
+.navlogo,
+.navlogoalt,
+.navlogo-readertxt {
+  opacity: 0;
+  -webkit-transition: opacity .2s ease-in-out;
+  -moz-transition: opacity .2s ease-in-out;
+  -ms-transition: opacity .2s ease-in-out;
+  -o-transition: opacity .2s ease-in-out;
+  transition: opacity .2s ease-in-out;
+}
+
+body:not(.loaded) .navlogo,
+body:not(.loaded) .navlogoalt,
+body:not(.loaded) .navlogo-readertxt {
+}
+
+.navlogonone .navlogo,
+.navlogoloaded .navlogo + .navlogoalt {
+  display: none;
+}
+
+.navlogoloaded .navlogo,
+.navlogonone .navlogo + .navlogoalt,
+.navlogonone .navlogo + .navlogoalt + .navlogo-readertxt,
+.navlogoloaded .navlogo + .navlogoalt + .navlogo-readertxt {
+  opacity: 1;
+}
+
+.navlogonone .navlogo + .navlogoalt {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.navlogoalt-letter {
   display: inline-block;
   background: rgba(255,255,255,.2);
   width: 29px;
@@ -741,30 +772,31 @@ ul.nav-tabs li:not(.active) button:hover
   color: #000;
   border: 1px solid rgba(0,0,0,.5);
   text-transform: uppercase;
-  position: relative;
-  top: 0;
-  left: 0;
-  z-index: 1;
   vertical-align: top;
-  margin-right: -18px;
+  margin: 7px 3px 0 7px;
 }
 
-.navlogo::after {
-  content: attr(alt);
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding: 2px 0 2px 36px;
-  min-width: 100%;
-  min-height: 29px;
-  line-height: 27px;
-  background: #333;
+.navlogoalt-name {
+  display: inline-block;
+  margin: 0 5px 0 0;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 44px;
   color: rgba(255,255,255,.5);
+  vertical-align: top;
+}
+
+.navlogo-readertxt {
+    display: inline-block;
+    margin: 0 5px 0 -5px;
+    line-height: 44px;
+    vertical-align: top;
 }
 
 .navbar-left {
   line-height: 24px;
-  padding: 10px 0 0 8px;
+  padding: 0;
   font-size: 19px;
   color: rgba(191, 216, 230, 0.5);
   height: 44px;
