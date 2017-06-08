@@ -12,7 +12,8 @@ define(['hgn!readium_js_viewer_html_templates/managed-dialog.html', 'hgn!readium
     var showModalDialog = function(dismissable, title, body, buttons){
         if (!$currentModal){
             $currentModal = $(ManagedDialog({}));
-            $('#app-container').append($currentModal);
+            // $('#app-container').append($currentModal);
+            $(document.body).append($currentModal);   // biblemesh_ : the modal was not coming to the front on mobile safari
 
         }
 
