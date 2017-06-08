@@ -738,11 +738,6 @@ ul.nav-tabs li:not(.active) button:hover
   transition: opacity .2s ease-in-out;
 }
 
-body:not(.loaded) .navlogo,
-body:not(.loaded) .navlogoalt,
-body:not(.loaded) .navlogo-readertxt {
-}
-
 .navlogonone .navlogo,
 .navlogoloaded .navlogo + .navlogoalt {
   display: none;
