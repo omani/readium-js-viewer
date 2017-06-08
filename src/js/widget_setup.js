@@ -74,7 +74,7 @@
         d.head.appendChild(node);
     }
 
-    var erasereader = erasereader || {
+    window.erasereader = window.erasereader || {
         setup: function() {
             var settings = {
                 width: '100%',
