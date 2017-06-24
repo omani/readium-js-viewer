@@ -109,7 +109,7 @@
                     id: iframeIdName,
                     name: iframeIdName,
                     className: 'erasereader-widget-iframe',
-                    src: el.href + '&widget=1&' + queryParamArray.join('&'),
+                    src: el.href + '&widget=1&parent_domain=' + encodeURIComponent(location.host) + '&' + queryParamArray.join('&'),
                     style: ""
                         + "visibility: hidden;"
                         + "max-height: " + queryParamObj.maxheight + ";"
