@@ -750,9 +750,11 @@ biblemesh_Helpers){
             idp_first_letter_of_name: idpName.substr(0,1),  // biblemesh_
             idp_small_logo_src: idpAssetsBaseUrl + 'small-logo-' + idpId + '.png',  // biblemesh_
             logout_of_idp: Settings.getUserAttr('idpNoAuth') ? Strings.biblemesh_refresh : (Strings.biblemesh_logout_of + idpName),  // biblemesh_
+            view_usage: Strings.biblemesh_usage_costs,  // biblemesh_
             firstname: Settings.getUserAttr('firstname')  // biblemesh_
         }));
         if(!Settings.getUserAttr('isAdmin')) {  // biblemesh_
+            $('#navusagecosts').remove();
             $('#addbutt').remove();
         }
         var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;

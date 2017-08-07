@@ -525,6 +525,9 @@
   "biblemesh_logout_of" : {
     "message": "Log out of "
   },
+  "biblemesh_usage_costs" : {
+    "message": "Usage costs report"
+  },
   "biblemesh_refresh" : {
     "message": "Refresh Demo Library"
   },
