@@ -510,6 +510,9 @@
   "biblemesh_import_instructions" : {
     "message": "Choose one or more packaged EPUB files."
   },
+  "biblemesh_import_instructions2" : {
+    "message": "To set stardard price, ensure that file names end in properly formatted prices. Examples: \"book1--$12.99.epub\", \"another_book_$30.00.epub\""
+  },
   "biblemesh_import_instructions_note" : {
     "message": "NOTE: We will inform you of the newly assigned book id's after the import is complete."
   },
