@@ -86,6 +86,9 @@ require.config({
         'biblemesh_Settings':
             process._RJS_rootDir(3) + '/src/js/storage/biblemesh_Settings',
 
+        'biblemesh_AppComm':
+            process._RJS_rootDir(3) + '/src/js/biblemesh_AppComm',
+
         'StorageManager':
             process._RJS_rootDir(3) + '/src/js/storage/StaticStorageManager',
 

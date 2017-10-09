@@ -1,85 +1,26 @@
-define(['jquery', './EpubReader', 'readium_shared_js/helpers'], function($, EpubReader, Helpers){
-
+define(['jquery', './EpubReader', 'readium_shared_js/helpers', 'biblemesh_AppComm'], function($, EpubReader, Helpers, biblemesh_AppComm){
+    
     if(typeof Raven != 'undefined') Raven.config('https://0569beced42c4b068367c8d47cfddf36@sentry.io/144504').install()
         
-    // decide where to put this code so as all functionality can work through it
-
-   // setup receiving goToCfi messages
-
-   // have specialAssetRetrievalMethod set via postMessage
-
-    // do post pageChanged message instead of updating the URL and messing with pushState or replaceState
-
-    // do post showPageListView message when appropriate
-
-    // do post textSelected message when appropriate
-
-    // do post textUnselected message when appropriate
-
-    // do post reportError message when appropriate
-
-    // setup receiving loadSpineAndGetPagesInfo messages
-        // do post pagesInfo messages
-
-    // setup receiving renderHighlights messages
-
-    // setup receiving setDisplaySettings messages
-
-    // only use postMessage if we are in native apps (in the future, this may also be used for offline books in the web app)
- alert('test')
-    
-    // var specialAssetRetrievalMethod = 'none'
-    var specialAssetRetrievalMethod = 'ajaxThroughPostMessage'
-    var fileAsTextCallbacksByURL = {}
-
-    // This next function is needed because when the app in android
-    // sends a postMessage to the WebView, it runs decodeURIComponent
-    // on it for some reason. To fix this I swap out % for {"} (an
-    // impossible sequence in JSON) before sending it and then
-    // swap {"} out for % in the cloud-reader-lite.
-    const percentageUnescape = (str) => str.replace(/{"}/g, '%')
-    
-    document.addEventListener('message', function(event) {
-        if(event.origin && event.origin !== window.location.origin) return  // only allow from the the apps or the same origin
-
-        var message = JSON.parse(percentageUnescape(event.data))
-
-        switch(message.identifier) {
-            case 'setSpecialAssetRetrievalMethod':
-                if([ 'none', 'ajaxThroughPostMessage' ].indexOf(message.payload) != -1) {
-                    specialAssetRetrievalMethod = message.payload.method
-                }
-                break;
-            case 'fileAsText':
-                var uri = message.payload.uri
-                if(fileAsTextCallbacksByURL[uri]) {
-                    if(message.payload.error) {
-                        fileAsTextCallbacksByURL[uri].error({}, 'error', null)
-                    } else {
-                        fileAsTextCallbacksByURL[uri].success(message.payload.fileText)
-                    }
-                    delete fileAsTextCallbacksByURL[uri]
-                }
-                break;
-            case 'loadSpineAndGetPagesInfo':
-                break;
-            case 'goToCfi':
-                break;
-            case 'renderHighlights':
-                break;
-            case 'setDisplaySettings':
-                break;
+    var specialAssetRetrievalMethod = 'ajaxThroughPostMessage'  // or 'none'
+    biblemesh_AppComm.subscribe('setSpecialAssetRetrievalMethod', function(payload) {
+        if([ 'none', 'ajaxThroughPostMessage' ].indexOf(payload) != -1) {
+            specialAssetRetrievalMethod = payload.method
         }
-    })  
+    })
     
-    var consoleLog = function(message) {
-        parent.postMessage(JSON.stringify({
-            identifier: 'consoleLog',
-            payload: {
-                message: message,
-            },
-        }), location.origin);
-    }
+    var fileAsTextCallbacksByURL = {};
+    biblemesh_AppComm.subscribe('fileAsText', function(payload) {
+        var uri = payload.uri
+        if(fileAsTextCallbacksByURL[uri]) {
+            if(payload.error) {
+                fileAsTextCallbacksByURL[uri].error({}, 'error', null)
+            } else {
+                fileAsTextCallbacksByURL[uri].success(payload.fileText)
+            }
+            delete fileAsTextCallbacksByURL[uri]
+        }
+    })
 
     $._ajax = $.ajax;
     $.ajax = function(settings) {
@@ -117,7 +58,7 @@ define(['jquery', './EpubReader', 'readium_shared_js/helpers'], function($, Epub
     
         // embedded, epub
         // (epub is ebookURL)
-      EpubReader.loadUI(urlParams);
+        EpubReader.loadUI(urlParams);
 
         $(document.body).on('click', function()
         {
@@ -133,13 +74,13 @@ define(['jquery', './EpubReader', 'readium_shared_js/helpers'], function($, Epub
     $(document.body).tooltip({
         selector : EpubReader.tooltipSelector(),
         placement: function(tip, element){
-          var placeValue = 'auto';
-          if (element.id == 'left-page-btn'){
+            var placeValue = 'auto';
+            if (element.id == 'left-page-btn'){
             placeValue = 'right';
-          } else if (element.id == 'right-page-btn') {
+            } else if (element.id == 'right-page-btn') {
             placeValue = 'left'
-          }
-          return placeValue;
+            }
+            return placeValue;
         },
         container: 'body' // do this to prevent weird navbar re-sizing issue when the tooltip is inserted
     }).on('show.bs.tooltip', function(e){
@@ -154,8 +95,8 @@ define(['jquery', './EpubReader', 'readium_shared_js/helpers'], function($, Epub
     
     
     if (window.File
-         //&& window.FileReader
-     ) {
+            //&& window.FileReader
+        ) {
         var fileDragNDropHTMLArea = $(document.body);
         fileDragNDropHTMLArea.on("dragover", function(ev) {
             ev.stopPropagation();
@@ -188,10 +129,11 @@ define(['jquery', './EpubReader', 'readium_shared_js/helpers'], function($, Epub
                 
                 if (file.type == "application/epub+zip" || (/\.epub$/.test(file.name))) {
                     
-                      EpubReader.loadUI({epub: file});
+                        EpubReader.loadUI({epub: file});
                 }
             }
         });
     }
 
 });
+    
