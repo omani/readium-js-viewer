@@ -137,17 +137,14 @@ define([
                         console.error("ERROR OPENING EBOOK: " + ebookURL_filepath);
                         
                         spin(false);
-                        
-                        parent.postMessage(JSON.stringify({
-                            identifier: 'reportError',
-                            payload: {
-                                errorCode: 'error opening package document',
-                                info: {
-                                    filepath: ebookURL_filepath,
-                                },
+
+                        biblemesh_AppComm.postMsg('reportError', {
+                            errorCode: 'error opening package document',
+                            info: {
+                                filepath: ebookURL_filepath,
                             },
-                        }), location.origin);
-                                
+                        });
+                        
                         return;
                     }
                     
@@ -211,20 +208,15 @@ define([
         };
         
         var loadToc = function(dom){
-            var lastIframe = undefined;
-                
     
             readium.reader.on(ReadiumSDK.Events.CONTENT_DOCUMENT_LOADED, function ($iframe, spineItem)
             {
     
                 Globals.logEvent("CONTENT_DOCUMENT_LOADED", "ON", "EpubReader.js [ " + spineItem.href + " ]");
 
-                
                 //TODO not picked-up by all screen readers, so for now this short description will suffice
                 $iframe.attr("title", "EPUB");
                 $iframe.attr("aria-label", "EPUB");
-    
-                lastIframe = $iframe[0];
     
                 if(biblemesh_isWidget) {
                     if(typeof biblemesh_isWidget != 'boolean') {
@@ -557,7 +549,7 @@ define([
         }
     
         var biblemesh_showHighlightOptions = function(forceShowNote) {
-    
+
             var iframe = $("#epub-reader-frame iframe")[0];
             var win = iframe.contentWindow || iframe;
             var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
@@ -570,10 +562,12 @@ define([
     
             if(!sel.isCollapsed && selStr!='' && cfiObj) {
     
+                var spotInfo = biblemesh_Helpers.getCurrentSpotInfo();
+
                 var highlightId = biblemesh_getHighlightId(cfiObj);
-                
+                    
                 var currentHighlight = biblemesh_getHighlightDataObj(cfiObj);
-    
+                
                 var hasCurrentHighlight = function() {
                     return currentHighlight && !currentHighlight.highlight._delete;
                 }
@@ -583,16 +577,27 @@ define([
                 var cRect = rg.getBoundingClientRect();
                 var selectionVeryTop = cRect.top;
                 var selectionVeryBottom = cRect.top+cRect.height;
-    
-                // parent.postMessage(JSON.stringify({
-                //     identifier: 'textSelected',
-                //     payload: {
-                //         startCfi: '??',  // TODO
-                //         endCfi: '??',  // TODO
-                //         copyTooltipInLowerHalf: false,  // TODO
-                //     },
-                // }), location.origin);
-    
+                var winHt = $(win).height()
+
+                var tooltipHt = 30  // TODO: needs to be adjusted; likely differs between android and ios
+
+                var tooltipAboveText =
+                    (selectionVeryTop - tooltipHt) > 0
+                    || (selectionVeryBottom + tooltipHt) > winHt
+                var copyTooltipInLowerHalf = tooltipAboveText
+                    ? (selectionVeryTop - tooltipHt) > (winHt / 2)
+                    : (selectionVeryBottom + tooltipHt) > (winHt / 2)
+
+                biblemesh_AppComm.postMsg('textSelected', {
+                    text: selStr,
+                    bookURI: spotInfo.ebookURL,
+                    spineIdRef: cfiObj.idref,
+                    cfi: cfiObj.cfi,
+                    copyTooltipInLowerHalf: copyTooltipInLowerHalf,
+                });
+                
+            } else {
+                biblemesh_AppComm.postMsg('textUnselected');
             }
         }
     
@@ -648,7 +653,7 @@ define([
         };
     
         var initReadium = function(){
-            
+
             // biblemesh_ : next lines through the call to to getMultiple and the setting of biblemesh_userData are new
             var spotInfo = biblemesh_Helpers.getCurrentSpotInfo();
             biblemesh_bookId = spotInfo.bookId;
@@ -765,14 +770,16 @@ define([
                 e.stopPropagation();
             });
     
-            readium.reader.addIFrameEventListener('touchstart', function(e) {
-                var iframe = $("#epub-reader-frame iframe")[0];
-                var win = iframe.contentWindow || iframe;
-            });
-            readium.reader.addIFrameEventListener('touchend', function(e) {
-                var iframe = $("#epub-reader-frame iframe")[0];
-                var win = iframe.contentWindow || iframe;
-            });
+            // readium.reader.addIFrameEventListener('touchstart', function(e) {
+            //     var iframe = $("#epub-reader-frame iframe")[0];
+            //     var win = iframe.contentWindow || iframe;
+            // });
+            // readium.reader.addIFrameEventListener('touchend', function(e) {
+            //     var iframe = $("#epub-reader-frame iframe")[0];
+            //     var win = iframe.contentWindow || iframe;
+            // });
+
+            readium.reader.addIFrameEventListener('selectionchange', biblemesh_showHighlightOptions, 'document');
     
             var defaultSettings = {
                 fontSize: 100,

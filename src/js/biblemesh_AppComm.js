@@ -39,12 +39,6 @@ function(
 
     // do post showPageListView message when appropriate
 
-    // do post textSelected message when appropriate
-
-    // do post textUnselected message when appropriate
-
-    // do post reportError message when appropriate
-
     // setup receiving loadSpineAndGetPagesInfo messages
         // do post pagesInfo messages
 
