@@ -9,6 +9,10 @@ define(['jquery', './EpubReader', 'readium_shared_js/helpers', 'biblemesh_AppCom
         }
     })
     
+    // postMessageFileCache is irrelevant unless I have goToCfi switch pages
+    // without reloading the window (which would probably be good).
+    var postMessageFileCache = {}  
+
     var fileAsTextCallbacksByURL = {};
     biblemesh_AppComm.subscribe('fileAsText', function(payload) {
         var uri = payload.uri
@@ -16,6 +20,7 @@ define(['jquery', './EpubReader', 'readium_shared_js/helpers', 'biblemesh_AppCom
             if(payload.error) {
                 fileAsTextCallbacksByURL[uri].error({}, 'error', null)
             } else {
+                postMessageFileCache[uri] = payload.fileText
                 fileAsTextCallbacksByURL[uri].success(payload.fileText)
             }
             delete fileAsTextCallbacksByURL[uri]
@@ -35,6 +40,11 @@ define(['jquery', './EpubReader', 'readium_shared_js/helpers', 'biblemesh_AppCom
         }
 
         if(specialAssetRetrievalMethod == 'ajaxThroughPostMessage') {
+
+            if(postMessageFileCache[settings.url]) {
+                settings.success(postMessageFileCache[settings.url])
+                return
+            }
 
             fileAsTextCallbacksByURL[settings.url] = settings
             
