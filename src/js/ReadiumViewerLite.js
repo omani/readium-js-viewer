@@ -4,7 +4,7 @@ define(['jquery', './EpubReader', 'readium_shared_js/helpers', 'biblemesh_AppCom
         
     var specialAssetRetrievalMethod = 'ajaxThroughPostMessage'  // or 'none'
     biblemesh_AppComm.subscribe('setSpecialAssetRetrievalMethod', function(payload) {
-        if([ 'none', 'ajaxThroughPostMessage' ].indexOf(payload) != -1) {
+        if([ 'none', 'ajaxThroughPostMessage' ].indexOf(payload.method) != -1) {
             specialAssetRetrievalMethod = payload.method
         }
     })
