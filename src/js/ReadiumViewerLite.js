@@ -47,13 +47,8 @@ define(['jquery', './EpubReader', 'readium_shared_js/helpers', 'biblemesh_AppCom
             }
 
             fileAsTextCallbacksByURL[settings.url] = settings
-            
-            parent.postMessage(JSON.stringify({
-                identifier: 'getFileAsText',
-                payload: {
-                    uri: settings.url,
-                },
-            }), location.origin);
+
+            biblemesh_AppComm.postMsg('getFileAsText', { uri: settings.url });
 
             return
         } else {
