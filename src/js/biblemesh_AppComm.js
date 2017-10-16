@@ -37,8 +37,6 @@ function(
         },
     }
 
-    // do post showPageListView message when appropriate
-
     // setup receiving loadSpineAndGetPagesInfo messages
         // do post pagesInfo messages
 

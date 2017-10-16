@@ -779,6 +779,26 @@ define([
             //     var win = iframe.contentWindow || iframe;
             // });
 
+            readium.reader.addIFrameEventListener('click', function(e) {
+                var iframe = $("#epub-reader-frame iframe")[0];
+                var win = iframe.contentWindow || iframe;
+                biblemesh_AppComm.postMsg('consoleLog', { message: 'click' });
+                
+                var winWd = $(win).width()
+
+                if(e.pageX / winWd < .2) {
+                    readium.reader.openPageLeft();
+                    return
+                }
+
+                if(e.pageX / winWd > .8) {
+                    readium.reader.openPageRight();
+                    return
+                }
+
+                biblemesh_AppComm.postMsg('showPageListView');
+            });
+
             readium.reader.addIFrameEventListener('selectionchange', biblemesh_showHighlightOptions, 'document');
     
             var defaultSettings = {
