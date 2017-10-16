@@ -312,7 +312,6 @@ define([
     
                         var linkSpineItem = readium.reader.spine().getItemByHref(hrefPart);
                         var bookmark = new BookmarkData(linkSpineItem.idref, null);
-                        debugBookmarkData(bookmark);
                         
                         bookmark.elementCfi = bookmark.contentCFI;
                         bookmark.contentCFI = undefined;
@@ -622,7 +621,6 @@ define([
             bookmark = JSON.parse(bookmark);
             
             var cfi = new BookmarkData(bookmark.idref, bookmark.contentCFI);
-            debugBookmarkData(cfi);
             
             bookmark.elementCfi = bookmark.contentCFI;
             bookmark.contentCFI = undefined;
@@ -732,7 +730,7 @@ define([
         };
     
         var initReadium = function(){
-    
+            
             // biblemesh_ : next lines through the call to to getMultiple and the setting of biblemesh_userData are new
             var spotInfo = biblemesh_Helpers.getCurrentSpotInfo();
             biblemesh_bookId = spotInfo.bookId;
@@ -782,8 +780,6 @@ define([
                         }
                         else if (gotoObj.elementCfi) {
                                         
-                            _debugBookmarkData_goto = new BookmarkData(gotoObj.idref, gotoObj.elementCfi);
-                            
                             openPageRequest_ = {idref: gotoObj.idref, elementCfi: gotoObj.elementCfi};
                         }
                         else {
@@ -897,6 +893,12 @@ define([
             //epubReadingSystem
     
             loadEbook(readerSettings, openPageRequest);
+
+            biblemesh_AppComm.subscribe('goToCfi', function(payload) {
+                var aHref = "?epub=" + encodeURIComponent(payload.bookURI) + "&goto=" + encodeURIComponent(payload.cfi);
+                window.open(aHref);
+            });
+
         }
     
         var unloadReaderUI = function(){
