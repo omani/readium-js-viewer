@@ -37,12 +37,6 @@ function(
         },
     }
 
-    // setup receiving goToCfi messages
-
-    // have specialAssetRetrievalMethod set via postMessage
-
-    // do post pageChanged message instead of updating the URL and messing with pushState or replaceState
-
     // do post showPageListView message when appropriate
 
     // do post textSelected message when appropriate

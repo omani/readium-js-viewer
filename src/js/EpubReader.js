@@ -218,8 +218,8 @@ define([
             {
     
                 Globals.logEvent("CONTENT_DOCUMENT_LOADED", "ON", "EpubReader.js [ " + spineItem.href + " ]");
+
                 
-    
                 //TODO not picked-up by all screen readers, so for now this short description will suffice
                 $iframe.attr("title", "EPUB");
                 $iframe.attr("aria-label", "EPUB");
@@ -368,7 +368,7 @@ define([
             readium.reader.on(ReadiumSDK.Events.PAGINATION_CHANGED, function (pageChangeData)
             {
                 Globals.logEvent("PAGINATION_CHANGED", "ON", "EpubReader.js");
-    
+
                 // var biblemesh_isOnload = biblemesh_onload;  //first call to this function is always during onload
                 // biblemesh_onload = false;
     
@@ -380,91 +380,9 @@ define([
                     $("#epub-reader-frame").css("opacity", "");
                 }
     
-                // var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
-                // parent.postMessage(JSON.stringify({
-                //     identifier: 'pageChanged',
-                //     payload: {
-                //         newCfi: bookmark.contentCFI,
-                //     },
-                // }), location.origin);
+                var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
+                biblemesh_AppComm.postMsg('pageChanged', { newCfi: bookmark.contentCFI });
     
-                try
-                {
-                    var iframe = undefined;
-                    var element = undefined;
-    
-                    var id = pageChangeData.elementId;
-                    if (!id)
-                    {
-                        var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
-    
-                        //bookmark.idref; //manifest item
-                        if (pageChangeData.spineItem)
-                        {
-                            element = readium.reader.getElementByCfi(pageChangeData.spineItem.idref, bookmark.contentCFI,
-                                ["cfi-marker", "mo-cfi-highlight"],
-                                [],
-                                ["MathJax_Message"]);
-                            element = element[0];
-    
-                            if (element)
-                            {
-                                iframe = $("#epub-reader-frame iframe")[0];
-                                var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
-                                if (element.ownerDocument !== doc)
-                                {
-                                    iframe = $("#epub-reader-frame iframe")[1];
-                                    if (iframe)
-                                    {
-                                        doc = ( iframe.contentWindow || iframe.contentDocument ).document;
-                                        if (element.ownerDocument !== doc)
-                                        {
-                                            iframe = undefined;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        iframe = $("#epub-reader-frame iframe")[0];
-                        var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
-                        element = doc.getElementById(id);
-                        if (!element)
-                        {
-                            iframe = $("#epub-reader-frame iframe")[1];
-                            if (iframe)
-                            {
-                                doc = ( iframe.contentWindow || iframe.contentDocument ).document;
-                                element = doc.getElementById(id);
-                                if (!element)
-                                {
-                                    iframe = undefined;
-                                }
-                            }
-                        }
-                    }
-    
-                    if (!iframe)
-                    {
-                        iframe = lastIframe;
-                    }
-    
-    
-    /* Remove because is removing focus from the toc
-                    if (iframe)
-                    {
-                        //var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
-                        var toFocus = iframe; //doc.body
-                        setTimeout(function(){ toFocus.focus(); }, 50);
-                    }
-    */
-                }
-                catch (e)
-                {
-                    //
-                }
             });
     
         } // end of loadToc
