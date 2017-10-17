@@ -107,7 +107,7 @@ define([
         };
     
         // This function will retrieve a package document and load an EPUB
-        var loadEbook = function (readerSettings, openPageRequest) {
+        var loadEbook = function (openPageRequest) {
             readium.openPackageDocument(
                 
                 ebookURL,
@@ -770,9 +770,10 @@ define([
                 readerSettings.columnMinWidth = 100;
                 readerSettings.syntheticSpread = 'single';
                 readerSettings.fontSize = parseInt(urlParams.textsize, 10) || 100;
-                // SettingsDialog.updateReader(readium.reader, readerSettings);
             }
-    
+
+            readium.reader.updateSettings(defaultSettings);
+            
             readium.reader.on(ReadiumSDK.Events.CONTENT_DOCUMENT_LOAD_START, function($iframe, spineItem) {
                 Globals.logEvent("CONTENT_DOCUMENT_LOAD_START", "ON", "EpubReader.js [ " + spineItem.href + " ]");
     
@@ -840,6 +841,11 @@ define([
             biblemesh_AppComm.subscribe('renderHighlights', function(payload) {
                 biblemesh_highlights = payload.highlights;
                 biblemesh_drawHighlights();
+            });
+
+            biblemesh_AppComm.subscribe('setDisplaySettings', function(payload) {
+                payload.syntheticSpread = payload.columns;
+                readium.reader.updateSettings(payload);
             });
 
         }
