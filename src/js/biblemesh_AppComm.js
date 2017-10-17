@@ -37,11 +37,6 @@ function(
         },
     }
 
-    // setup receiving loadSpineAndGetPagesInfo messages
-        // do post pagesInfo messages
-
-    // setup receiving renderHighlights messages
-
     // setup receiving setDisplaySettings messages
 
     // only use postMessage if we are in native apps (in the future, this may also be used for offline books in the web app)

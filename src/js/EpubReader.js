@@ -38,11 +38,11 @@ define([
         var biblemesh_isWidget = undefined;
         var biblemesh_widgetMetaData = undefined;
         var biblemesh_spineLoadedFunc = undefined;
+        var biblemesh_highlights = [];
     
         // initialised in loadReaderUI(), with passed data.epub
         var ebookURL = undefined;
         var ebookURL_filepath = undefined;
-        var biblemesh_bookId = undefined;
     
         // initialised in loadEbook() >> readium.openPackageDocument()
         var currentPackageDocument = undefined;
@@ -50,27 +50,6 @@ define([
         // initialised in initReadium()
         // (variable not actually used anywhere here, but top-level to indicate that its lifespan is that of the reader object (not to be garbage-collected))
         var gesturesHandler = undefined;
-    
-        var biblemesh_userData = { books: {} };
-        /*  EXAMPLE
-            books: {
-                <book_id>: {
-                    latest_location: xxxx,
-                    updated_at: xxxx,
-                    highlights: [
-                        {
-                            spineIdRef: xxxx,
-                            cfi: xxxx,
-                            color: 1,
-                            note: "lorem ipsum",
-                            updated_at: xxxx
-                        },
-                        …
-                    ]
-                },
-                …
-            }
-        */
     
         var ensureUrlIsRelativeToApp = function(ebookURL) {
     
@@ -387,7 +366,7 @@ define([
             var returnObj = false;
             var cfiObjId = biblemesh_getHighlightId(cfiObj);
     
-            biblemesh_userData.books[biblemesh_bookId].highlights.forEach(function(highlight, idx) {
+            biblemesh_highlights.forEach(function(highlight, idx) {
                 if(biblemesh_getHighlightId(highlight) == cfiObjId) {
                     returnObj = {
                         highlight: highlight,
@@ -411,8 +390,8 @@ define([
     
             docEl.children('.rd-highlight').removeClass('highlight-with-note');
     
-            biblemesh_userData.books[biblemesh_bookId].highlights.forEach(function(highlight) {
-                if(highlight.note) {
+            biblemesh_highlights.forEach(function(highlight) {
+                if(highlight.hasNote) {
                     var highlightId = biblemesh_getHighlightId(highlight);
                     var highlightEl = docEl.children('[data-id="' + highlightId + '"]');
                     if(highlightEl) {
@@ -432,9 +411,7 @@ define([
                 // next line needed especially for switching between books
                 readium.reader.plugins.highlights.removeHighlightsByType("user-highlight");
     
-                biblemesh_initUserDataBook();
-    
-                biblemesh_userData.books[biblemesh_bookId].highlights.forEach(function(highlight) {
+                biblemesh_highlights.forEach(function(highlight) {
                     // without this line, highlights are sometimes not added because they are listed as still there
                     readium.reader.plugins.highlights.removeHighlight(biblemesh_getHighlightId(highlight));
                     if(highlight.spineIdRef == idRef && !highlight._delete) {
@@ -476,16 +453,6 @@ define([
                 biblemesh_drawHighlights();
             }
     
-        }
-    
-        var biblemesh_initUserDataBook = function(){
-            if(!biblemesh_userData.books[biblemesh_bookId]) {
-                biblemesh_userData.books[biblemesh_bookId] = {
-                    latest_location: '',
-                    updated_at: 0,
-                    highlights: []
-                }        
-            }
         }
     
         //copied from readium-js/readium-shared-js/plugins/highlights
@@ -551,8 +518,6 @@ define([
             var sel = win.getSelection();
             var selStr = sel.toString().replace(/\n/g,' ').trim();
             var cfiObj = readium.reader.plugins.highlights.getCurrentSelectionCfi();
-    
-            biblemesh_initUserDataBook();
     
             if(!sel.isCollapsed && selStr!='' && cfiObj) {
     
@@ -635,18 +600,13 @@ define([
     
         var initReadium = function(){
 
-            // biblemesh_ : next lines through the call to to getMultiple and the setting of biblemesh_userData are new
-            var spotInfo = biblemesh_Helpers.getCurrentSpotInfo();
-            biblemesh_bookId = spotInfo.bookId;
-            var bookKey = 'books/' + biblemesh_bookId;
+            var spotInfo = biblemesh_Helpers.getCurrentSpotInfo(); // biblemesh_
     
             try { ga('send', 'pageview', window.location.pathname); } catch(e) {} // biblemesh_
     
             var settings = {
     
             }
-    
-            biblemesh_userData.books[biblemesh_bookId] = settings[bookKey] || null;
     
             var readerOptions =  {
                 el: "#epub-reader-frame",
@@ -867,6 +827,11 @@ define([
                 } else {
                     readium.reader.openSpineItemElementId(payload.spineIdRef);
                 }
+            });
+
+            biblemesh_AppComm.subscribe('renderHighlights', function(payload) {
+                biblemesh_highlights = payload.highlights;
+                biblemesh_drawHighlights();
             });
 
         }
