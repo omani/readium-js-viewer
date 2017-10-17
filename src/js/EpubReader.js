@@ -39,6 +39,7 @@ define([
         var biblemesh_widgetMetaData = undefined;
         var biblemesh_spineLoadedFunc = undefined;
         var biblemesh_highlights = [];
+        var biblemesh_clickAction = function() {};
     
         // initialised in loadReaderUI(), with passed data.epub
         var ebookURL = undefined;
@@ -699,7 +700,7 @@ define([
                         sel.removeAllRanges();
                         sel.addRange(highlightRange);
         
-                        biblemesh_showHighlightOptions();
+                        biblemesh_clickAction = function() {}; // prevents the page turn and zoom out clicks
     
                     });
                 }
@@ -721,23 +722,30 @@ define([
             // });
 
             readium.reader.addIFrameEventListener('click', function(e) {
-                var iframe = $("#epub-reader-frame iframe")[0];
-                var win = iframe.contentWindow || iframe;
-                biblemesh_AppComm.postMsg('consoleLog', { message: 'click' });
+                biblemesh_clickAction = function() {
                 
-                var winWd = $(win).width()
+                    var iframe = $("#epub-reader-frame iframe")[0];
+                    var win = iframe.contentWindow || iframe;
+                    biblemesh_AppComm.postMsg('consoleLog', { message: 'click' });
+                    
+                    var winWd = $(win).width()
 
-                if(e.pageX / winWd < .2) {
-                    readium.reader.openPageLeft();
-                    return
+                    if(e.pageX / winWd < .2) {
+                        readium.reader.openPageLeft();
+                        return
+                    }
+
+                    if(e.pageX / winWd > .8) {
+                        readium.reader.openPageRight();
+                        return
+                    }
+
+                    biblemesh_AppComm.postMsg('showPageListView');
+
                 }
 
-                if(e.pageX / winWd > .8) {
-                    readium.reader.openPageRight();
-                    return
-                }
-
-                biblemesh_AppComm.postMsg('showPageListView');
+                setTimeout(function() { biblemesh_clickAction(); }, 50);  // wait and see if a highlight is clicked first
+                
             });
 
             readium.reader.addIFrameEventListener('selectionchange', biblemesh_showHighlightOptions, 'document');
