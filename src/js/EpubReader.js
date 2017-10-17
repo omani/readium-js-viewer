@@ -37,6 +37,7 @@ define([
     
         var biblemesh_isWidget = undefined;
         var biblemesh_widgetMetaData = undefined;
+        var biblemesh_spineLoadedFunc = undefined;
     
         // initialised in loadReaderUI(), with passed data.epub
         var ebookURL = undefined;
@@ -354,6 +355,9 @@ define([
                     if(!biblemesh_isWidget && urlParams.elementId) {
                         readium.reader.openSpineItemElementId(spineItem.idref, urlParams.elementId);
                     }
+                    if(biblemesh_spineLoadedFunc) {
+                        biblemesh_spineLoadedFunc()
+                    }
                 }, 1);
             });
     
@@ -399,17 +403,6 @@ define([
             return (highlight.spineIdRef || highlight.idref) + ' ' + highlight.cfi;
         }
     
-        var biblemesh_getCurrentIdRef = function() {
-            var spotInfo = biblemesh_Helpers.getCurrentSpotInfo();
-            var idRef;
-            try {
-                idRef = JSON.parse(spotInfo.ebookSpot).idref;
-            } catch(e) {
-                idRef = '';
-            }
-            return idRef;
-        }
-    
         var biblemesh_markHighlightsWithNotes = function() {
             var iframe = $("#epub-reader-frame iframe")[0];
             if(!iframe) return;
@@ -432,7 +425,8 @@ define([
         var biblemesh_drawHighlights = function() {
             if (readium && readium.reader.plugins.highlights) {
     
-                var idRef = biblemesh_getCurrentIdRef();;
+                var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
+                var idRef = bookmark.idref;
                 var highlightsToDraw = [];
     
                 // next line needed especially for switching between books
@@ -562,8 +556,6 @@ define([
     
             if(!sel.isCollapsed && selStr!='' && cfiObj) {
     
-                var spotInfo = biblemesh_Helpers.getCurrentSpotInfo();
-
                 var highlightId = biblemesh_getHighlightId(cfiObj);
                     
                 var currentHighlight = biblemesh_getHighlightDataObj(cfiObj);
@@ -590,7 +582,6 @@ define([
 
                 biblemesh_AppComm.postMsg('textSelected', {
                     text: selStr,
-                    bookURI: spotInfo.ebookURL,
                     spineIdRef: cfiObj.idref,
                     cfi: cfiObj.cfi,
                     copyTooltipInLowerHalf: copyTooltipInLowerHalf,
@@ -601,16 +592,6 @@ define([
             }
         }
     
-        var nextPage = function () {
-            readium.reader.openPageRight();
-            return false;
-        };
-    
-        var prevPage = function () {
-            readium.reader.openPageLeft();
-            return false;
-        };
-        
         var loadReaderUIPrivate = function(){
             var $appContainer = $('#app-container');
             $appContainer.empty();
@@ -840,8 +821,52 @@ define([
             loadEbook(readerSettings, openPageRequest);
 
             biblemesh_AppComm.subscribe('goToCfi', function(payload) {
-                var aHref = "?epub=" + encodeURIComponent(payload.bookURI) + "&goto=" + encodeURIComponent(payload.cfi);
-                window.open(aHref);
+                try {
+                    var cfi = JSON.parse(payload.cfi);
+                    readium.reader.openSpineItemElementCfi(cfi.idref, cfi.elementCfi);
+                } catch(e) {
+                    biblemesh_AppComm.postMsg('reportError', { errorCode: 'invalid cfi' });
+                }
+            });
+
+            biblemesh_AppComm.subscribe('goToPage', function(payload) {
+
+                if(biblemesh_spineLoadedFunc) {
+                    biblemesh_AppComm.postMsg('reportError', { errorCode: 'conflicting request currently running' });
+                    return;
+                }
+
+                var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
+                
+                if(bookmark.idref == payload.spineIdRef) {
+                    readium.reader.openPageIndex(payload.pageIndexInSpine);
+                } else {
+                    readium.reader.openSpineItemPage(payload.spineIdRef, payload.pageIndexInSpine);
+                }
+            });
+
+            biblemesh_AppComm.subscribe('loadSpineAndGetPagesInfo', function(payload) {
+
+                if(biblemesh_spineLoadedFunc) {
+                    biblemesh_AppComm.postMsg('reportError', { errorCode: 'conflicting request currently running' });
+                    return
+                }
+                
+                biblemesh_spineLoadedFunc = function() {
+                    biblemesh_spineLoadedFunc = undefined;
+                    biblemesh_AppComm.postMsg('pagesInfo', {
+                        spineIdRef: payload.spineIdRef,
+                        numPages: readium.reader.biblemesh_getColumnCount(),
+                    });
+                }
+
+                var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
+                
+                if(bookmark.idref == payload.spineIdRef) {
+                    biblemesh_spineLoadedFunc();
+                } else {
+                    readium.reader.openSpineItemElementId(payload.spineIdRef);
+                }
             });
 
         }
