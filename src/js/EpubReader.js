@@ -726,7 +726,6 @@ define([
                 
                     var iframe = $("#epub-reader-frame iframe")[0];
                     var win = iframe.contentWindow || iframe;
-                    biblemesh_AppComm.postMsg('consoleLog', { message: 'click' });
                     
                     var winWd = $(win).width()
 
