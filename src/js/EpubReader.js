@@ -712,17 +712,30 @@ define([
                 e.stopPropagation();
             });
     
-            // readium.reader.addIFrameEventListener('touchstart', function(e) {
-            //     var iframe = $("#epub-reader-frame iframe")[0];
-            //     var win = iframe.contentWindow || iframe;
-            // });
-            // readium.reader.addIFrameEventListener('touchend', function(e) {
-            //     var iframe = $("#epub-reader-frame iframe")[0];
-            //     var win = iframe.contentWindow || iframe;
-            // });
+            var touchPageX, touchPageY, touchIsClick;
 
+            readium.reader.addIFrameEventListener('touchstart', function(e) {
+                if(touchIsClick == null) {
+                    touchPageX = e.touches[0].pageX;
+                    touchPageY = e.touches[0].pageY;
+                    touchIsClick = true;
+                }
+            }, 'document');
+
+            readium.reader.addIFrameEventListener('touchmove', function(e) {
+                if(touchIsClick != null) {
+                    touchIsClick = touchIsClick && Math.sqrt((touchPageX - e.touches[0].pageX) * 2 + (touchPageY - e.touches[0].pageY) * 2) < 4
+                }
+            }, 'document');
+            
             readium.reader.addIFrameEventListener('touchend', function(e) {
-                
+
+                if(e.touches.length > 0) return;
+
+                var touchWasClick = touchIsClick;
+                touchIsClick = null;
+                if(!touchWasClick) return;
+
                 biblemesh_clickAction = function() {
 
                     var iframe = $("#epub-reader-frame iframe")[0];
@@ -733,12 +746,12 @@ define([
 
                     var winWd = $(win).width()
 
-                    if(e.pageX / winWd < .2) {
+                    if(touchPageX / winWd < .2) {
                         readium.reader.openPageLeft();
                         return
                     }
 
-                    if(e.pageX / winWd > .8) {
+                    if(touchPageX / winWd > .8) {
                         readium.reader.openPageRight();
                         return
                     }
