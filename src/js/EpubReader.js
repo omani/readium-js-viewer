@@ -721,12 +721,16 @@ define([
             //     var win = iframe.contentWindow || iframe;
             // });
 
-            readium.reader.addIFrameEventListener('click', function(e) {
-                biblemesh_clickAction = function() {
+            readium.reader.addIFrameEventListener('touchend', function(e) {
                 
+                biblemesh_clickAction = function() {
+
                     var iframe = $("#epub-reader-frame iframe")[0];
                     var win = iframe.contentWindow || iframe;
                     
+                    var sel = win.getSelection();
+                    if(!sel.isCollapsed) return
+
                     var winWd = $(win).width()
 
                     if(e.pageX / winWd < .2) {
@@ -745,7 +749,7 @@ define([
 
                 setTimeout(function() { biblemesh_clickAction(); }, 50);  // wait and see if a highlight is clicked first
                 
-            });
+            }, 'document');
 
             readium.reader.addIFrameEventListener('selectionchange', biblemesh_showHighlightOptions, 'document');
     
