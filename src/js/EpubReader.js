@@ -814,6 +814,17 @@ define([
                 }
             });
 
+            biblemesh_AppComm.subscribe('goToHref', function(payload) {
+                try {
+                    var spineItem = readium.reader.spine().getItemByHref(payload.href);
+                    var hrefUri = new URI(payload.href);
+                    var hashFrag = hrefUri.fragment();
+                    readium.reader.openSpineItemElementId(spineItem.idref, hashFrag);
+                } catch(e) {
+                    biblemesh_AppComm.postMsg('reportError', { errorCode: 'invalid href' });
+                }
+            });
+
             biblemesh_AppComm.subscribe('goToPage', function(payload) {
 
                 if(biblemesh_spineLoadedFunc) {
