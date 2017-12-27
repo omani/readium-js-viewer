@@ -875,6 +875,8 @@ define([
                 readium.reader.updateSettings(payload);
             });
 
+            biblemesh_AppComm.postMsg('loaded');
+
         }
     
         var unloadReaderUI = function(){
