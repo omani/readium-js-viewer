@@ -809,8 +809,7 @@ define([
 
             biblemesh_AppComm.subscribe('goToCfi', function(payload) {
                 try {
-                    var cfi = JSON.parse(payload.cfi);
-                    readium.reader.openSpineItemElementCfi(cfi.idref, cfi.elementCfi);
+                    readium.reader.openSpineItemElementCfi(payload.spineIdRef, payload.cfi);
                 } catch(e) {
                     biblemesh_AppComm.postMsg('reportError', { errorCode: 'invalid cfi' });
                 }
