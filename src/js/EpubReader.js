@@ -37,7 +37,7 @@ define([
     
         var biblemesh_isWidget = undefined;
         var biblemesh_widgetMetaData = undefined;
-        var biblemesh_spineLoadedFunc = undefined;
+        var biblemesh_getPagesInfoFunc = undefined;
         var biblemesh_highlights = [];
         var biblemesh_clickAction = function() {};
     
@@ -335,9 +335,6 @@ define([
                     if(!biblemesh_isWidget && urlParams.elementId) {
                         readium.reader.openSpineItemElementId(spineItem.idref, urlParams.elementId);
                     }
-                    if(biblemesh_spineLoadedFunc) {
-                        biblemesh_spineLoadedFunc()
-                    }
                 }, 1);
             });
     
@@ -357,8 +354,13 @@ define([
                 }
     
                 var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
-                biblemesh_AppComm.postMsg('pageChanged', { newCfi: bookmark.contentCFI });
+
+                biblemesh_AppComm.postMsg('pageChanged', {
+                    newCfi: bookmark.contentCFI,
+                    newSpineIdRef: bookmark.idref,
+                });
     
+                biblemesh_getPagesInfoFunc && biblemesh_getPagesInfoFunc()
             });
     
         } // end of loadToc
@@ -827,11 +829,6 @@ define([
 
             biblemesh_AppComm.subscribe('goToPage', function(payload) {
 
-                if(biblemesh_spineLoadedFunc) {
-                    biblemesh_AppComm.postMsg('reportError', { errorCode: 'conflicting request currently running' });
-                    return;
-                }
-
                 var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
                 
                 if(bookmark.idref == payload.spineIdRef) {
@@ -843,24 +840,22 @@ define([
 
             biblemesh_AppComm.subscribe('loadSpineAndGetPagesInfo', function(payload) {
 
-                if(biblemesh_spineLoadedFunc) {
-                    biblemesh_AppComm.postMsg('reportError', { errorCode: 'conflicting request currently running' });
-                    return
-                }
-                
-                biblemesh_spineLoadedFunc = function() {
-                    biblemesh_spineLoadedFunc = undefined;
-                    biblemesh_AppComm.postMsg('pagesInfo', {
-                        spineIdRef: payload.spineIdRef,
-                        numPages: readium.reader.biblemesh_getColumnCount(),
-                    });
-                }
+                biblemesh_getPagesInfoFunc = function() {
+                    
+                    var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
 
-                var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
+                    if(bookmark.idref == payload.spineIdRef) {
+                        biblemesh_getPagesInfoFunc = undefined;
+                        biblemesh_AppComm.postMsg('pagesInfo', {
+                            spineIdRef: payload.spineIdRef,
+                            numPages: readium.reader.biblemesh_getColumnCount(),
+                        });
+                        return true;
+                    }
+
+                }
                 
-                if(bookmark.idref == payload.spineIdRef) {
-                    biblemesh_spineLoadedFunc();
-                } else {
+                if(!biblemesh_getPagesInfoFunc()) {
                     readium.reader.openSpineItemElementId(payload.spineIdRef);
                 }
             });
@@ -872,6 +867,7 @@ define([
 
             biblemesh_AppComm.subscribe('setDisplaySettings', function(payload) {
                 payload.syntheticSpread = payload.columns;
+                payload.fontSize = payload.textSize;
                 readium.reader.updateSettings(payload);
             });
 
