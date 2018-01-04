@@ -355,12 +355,13 @@ define([
     
                 var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
 
+                biblemesh_getPagesInfoFunc && biblemesh_getPagesInfoFunc()
+
                 biblemesh_AppComm.postMsg('pageChanged', {
                     newCfi: bookmark.contentCFI,
                     newSpineIdRef: bookmark.idref,
                 });
     
-                biblemesh_getPagesInfoFunc && biblemesh_getPagesInfoFunc()
             });
     
         } // end of loadToc
@@ -842,7 +843,7 @@ define([
                 biblemesh_getPagesInfoFunc = function() {
                     
                     var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
-
+                    
                     if(bookmark.idref == payload.spineIdRef) {
                         biblemesh_getPagesInfoFunc = undefined;
                         biblemesh_AppComm.postMsg('pagesInfo', {
