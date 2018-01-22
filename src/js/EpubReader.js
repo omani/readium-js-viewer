@@ -107,7 +107,7 @@ define([
         };
     
         // This function will retrieve a package document and load an EPUB
-        var loadEbook = function (readerSettings, openPageRequest) {
+        var loadEbook = function (openPageRequest) {
             readium.openPackageDocument(
                 
                 ebookURL,
@@ -601,16 +601,17 @@ define([
                 initReadium(); //async
             }, 0);
         };
+
+        var biblemesh_translateSettings = function(settings) {
+            settings.syntheticSpread = settings.columns;
+            settings.fontSize = settings.textSize;
+        }
     
         var initReadium = function(){
 
             var spotInfo = biblemesh_Helpers.getCurrentSpotInfo(); // biblemesh_
     
             try { ga('send', 'pageview', window.location.pathname); } catch(e) {} // biblemesh_
-    
-            var settings = {
-    
-            }
     
             var readerOptions =  {
                 el: "#epub-reader-frame",
@@ -779,19 +780,21 @@ define([
                 columnMinWidth: 300
             }
     
-            var readerSettings = settings.reader || defaultSettings;   // biblemesh_
-    
             if(biblemesh_isWidget) {
                 var urlParams = biblemesh_Helpers.getURLQueryParams();
-                readerSettings.scroll = 'scroll-doc';
-                readerSettings.theme = urlParams.theme || 'author-theme'; 
-                readerSettings.columnMaxWidth = 99999;
-                readerSettings.columnMinWidth = 100;
-                readerSettings.syntheticSpread = 'single';
-                readerSettings.fontSize = parseInt(urlParams.textsize, 10) || 100;
+                defaultSettings.scroll = 'scroll-doc';
+                defaultSettings.theme = urlParams.theme || 'author-theme'; 
+                defaultSettings.columnMaxWidth = 99999;
+                defaultSettings.columnMinWidth = 100;
+                defaultSettings.syntheticSpread = 'single';
+                defaultSettings.fontSize = parseInt(urlParams.textsize, 10) || 100;
             }
 
-            readium.reader.updateSettings(defaultSettings);
+            biblemesh_translateSettings(spotInfo.settings);
+
+            var readerSettings = Object.assign(defaultSettings, spotInfo.settings);   // biblemesh_
+
+            readium.reader.updateSettings(readerSettings);
             
             readium.reader.on(ReadiumSDK.Events.CONTENT_DOCUMENT_LOAD_START, function($iframe, spineItem) {
                 Globals.logEvent("CONTENT_DOCUMENT_LOAD_START", "ON", "EpubReader.js [ " + spineItem.href + " ]");
@@ -806,7 +809,7 @@ define([
     
             //epubReadingSystem
     
-            loadEbook(readerSettings, openPageRequest);
+            loadEbook(openPageRequest);
 
             biblemesh_AppComm.subscribe('goToCfi', function(payload) {
                 try {
@@ -866,8 +869,7 @@ define([
             });
 
             biblemesh_AppComm.subscribe('setDisplaySettings', function(payload) {
-                payload.syntheticSpread = payload.columns;
-                payload.fontSize = payload.textSize;
+                biblemesh_translateSettings(payload);
                 readium.reader.updateSettings(payload);
             });
 
