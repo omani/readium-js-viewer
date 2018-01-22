@@ -107,7 +107,7 @@ define([
         };
     
         // This function will retrieve a package document and load an EPUB
-        var loadEbook = function (openPageRequest) {
+        var loadEbook = function (readerSettings, openPageRequest) {
             readium.openPackageDocument(
                 
                 ebookURL,
