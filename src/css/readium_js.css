@@ -199,3 +199,7 @@ overflow: hidden;
     color: #9a0909;
 }
 
+#reflowable-book-frame {
+    top: 0;
+    bottom: 0;
+}

@@ -591,11 +591,13 @@ ul.nav-tabs li:not(.active) button:hover
   {
     display:none;
   }
+  /* biblemesh_ commented
   #epub-reader-frame
   {
       border-left: 30px solid transparent;
       border-right: 30px solid transparent;
   }
+  */
   .page-switch-overlay-icon
   {
       font-size: 30px;
@@ -634,10 +636,14 @@ ul.nav-tabs li:not(.active) button:hover
 
 /* biblemesh_ items follow */
 
-#epub-reader-container {
-  bottom: 38px;
+#epub-reader-frame {
+  border: none;
 }
 
+#epub-reader-container {
+  top: 30px;
+  bottom: 30px;
+}
 #progressBar {
   position: absolute;
   left: 0;
@@ -711,14 +717,7 @@ ul.nav-tabs li:not(.active) button:hover
 }
 
 .navbar {
-  background: #333;
-  box-shadow: none;
-  min-height: 44px;
-  border: none;
-  -webkit-user-select:none;
-  -moz-user-select:none;
-  -ms-user-select:none;
-  user-select:none;
+  display: none;
 }
 
 .navlogo {
@@ -904,7 +903,7 @@ ul.nav-tabs li:not(.active) button:hover
 }
 
 #reading-area {
-  top: 44px;
+  top: 0;
 }
 
 .btn-info, .btn-info:active,

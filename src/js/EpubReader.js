@@ -775,7 +775,7 @@ define([
                 syntheticSpread: "auto",
                 scroll: "auto",
                 theme: "author-theme",
-                columnGap: 45,
+                columnGap: 60,
                 columnMaxWidth: 600,
                 columnMinWidth: 300
             }
