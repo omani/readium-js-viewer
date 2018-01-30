@@ -759,13 +759,13 @@ define([
                     var lastOpenPage = paginationInfo.openPages[paginationInfo.openPages.length - 1];
             
                     if (lastOpenPage.spineItemPageIndex < lastOpenPage.spineItemPageCount - 1) {
-                        return true;
+                        return 'same spine';
                     }
             
                     var currentSpineItem = spine.getItemById(lastOpenPage.idref);
                     var nextSpineItem = spine.nextItem(currentSpineItem);
             
-                    return !!nextSpineItem;
+                    return nextSpineItem ? 'new spine' : false;
 
                 } else {
                     
@@ -776,13 +776,13 @@ define([
                     var firstOpenPage = paginationInfo.openPages[0];
             
                     if (firstOpenPage.spineItemPageIndex > 0) {
-                        return true;
+                        return 'same spine';
                     }
             
                     var currentSpineItem = spine.getItemById(firstOpenPage.idref);
                     var prevSpineItem = spine.prevItem(currentSpineItem);
             
-                    return !!prevSpineItem;
+                    return prevSpineItem ? 'new spine' : false;
                 }            
             }
 
@@ -839,18 +839,25 @@ define([
                         var winWd = $(win).width();
                         var pageToDirection = '';
     
-                        if(touchPageX / winWd < .2) {
+                        if(touchPageX / winWd < .3) {
                             pageToDirection = 'Left';
                         }
     
-                        if(touchPageX / winWd > .8) {
+                        if(touchPageX / winWd > .7) {
                             pageToDirection = 'Right';
                         }
 
                         if(pageToDirection) {
                             var existsPageInDesiredDirection = pageExistsToThe(pageToDirection);
                             if(existsPageInDesiredDirection) {
-                                wrapInTransition(readium.reader['openPage' + pageToDirection], 250);
+                                var pageWidth = $("#epub-reader-frame iframe").width();
+                                wrapInTransition(
+                                    function() {
+                                        docEl.css('left', (docElLeftBeforeStart + pageWidth * (pageToDirection === 'Left' ? 1 : -1)) + 'px')
+                                    },
+                                    250,
+                                    readium.reader['openPage' + pageToDirection]
+                                );
                             } else {
                                 wrapInTransition(
                                     function() {
@@ -896,9 +903,7 @@ define([
                                 docEl.css('left', (docElLeftBeforeStart + pageWidth * (direction === 'Left' ? 1 : -1)) + 'px')
                             },
                             transitionTime,
-                            function() {
-                                readium.reader['openPage' + direction]();
-                            }
+                            readium.reader['openPage' + direction]
                         );
                     } else {
                         cancelSwipe();
