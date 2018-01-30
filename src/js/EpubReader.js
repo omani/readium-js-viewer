@@ -716,56 +716,131 @@ define([
                 e.stopPropagation();
             });
     
-            var touchPageX, touchPageY, touchIsClick;
+            var docEl, touchPageX, touchPageY, touchIsClick, touchIsSwipe,
+                docElLeftBeforeStart, touchPageXAtStart, touchPageXOnLastMove,
+                touchPageXOnSecondToLastMove, timeAtStart, timeOnLastMove, timeOnSecondToLastMove,
+                isTransitioning;
+
+            var wrapInTransition = function(action, transitionTime, postAction) {
+                isTransitioning = true;
+                docEl.css("transition", "left " + (transitionTime / 1000) + "s linear");
+                requestAnimationFrame(action)
+                setTimeout(function() {
+                    docEl.css("transition", "");
+                    postAction && postAction();
+                    isTransitioning = false;
+                }, transitionTime + 100);  // 100ms grace to ensure it finished
+            }
+        
+            var cancelSwipe = function() {
+                touchIsClick = touchIsSwipe = false;
+
+                // bring back to original position
+                wrapInTransition(function() {
+                    docEl.css('left', docElLeftBeforeStart + 'px')
+                }, 200)
+            }
 
             readium.reader.addIFrameEventListener('touchstart', function(e) {
-                if(touchIsClick == null) {
-                    touchPageX = e.touches[0].pageX;
-                    touchPageY = e.touches[0].pageY;
-                    touchIsClick = true;
+                if(isTransitioning) return;
+                if(e.touches.length !== 1) {
+                    cancelSwipe();
+                    return;
                 }
+
+                var iframe = $("#epub-reader-frame iframe")[0];
+                var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
+                docEl = $( doc.documentElement );
+
+                touchPageXAtStart = touchPageXOnLastMove = touchPageX = e.touches[0].pageX;
+                touchPageY = e.touches[0].pageY;
+                touchIsClick = true;
+                touchIsSwipe = false;
+                docElLeftBeforeStart = parseInt(docEl.css('left'), 10);
+                timeAtStart = timeOnLastMove = Date.now();
             }, 'document');
 
             readium.reader.addIFrameEventListener('touchmove', function(e) {
-                if(touchIsClick != null) {
-                    touchIsClick = touchIsClick && Math.sqrt((touchPageX - e.touches[0].pageX) * 2 + (touchPageY - e.touches[0].pageY) * 2) < 4
+                if(isTransitioning) return;
+                if(e.touches.length !== 1) return;
+
+                if(touchIsClick) {
+                    touchIsClick = Math.sqrt((touchPageX - e.touches[0].pageX) * 2 + (touchPageY - e.touches[0].pageY) * 2) < 4
+                    touchIsSwipe = !touchIsClick;
+                }
+                
+                if(touchIsSwipe) {
+                    touchPageXOnSecondToLastMove = touchPageXOnLastMove;
+                    timeOnSecondToLastMove = timeOnLastMove;
+                    touchPageXOnLastMove = e.touches[0].pageX;
+                    timeOnLastMove = Date.now();
+                    docEl.css('left', (docElLeftBeforeStart + (touchPageXOnLastMove - touchPageXAtStart)) + 'px')
                 }
             }, 'document');
             
             readium.reader.addIFrameEventListener('touchend', function(e) {
+                if(isTransitioning) return;
+                if(e.touches.length !== 0) return;
 
-                if(e.touches.length > 0) return;
+                if(touchIsClick) {
 
-                var touchWasClick = touchIsClick;
-                touchIsClick = null;
-                if(!touchWasClick) return;
-
-                biblemesh_clickAction = function() {
-
-                    var iframe = $("#epub-reader-frame iframe")[0];
-                    var win = iframe.contentWindow || iframe;
-                    
-                    var sel = win.getSelection();
-                    if(!sel.isCollapsed) return
-
-                    var winWd = $(win).width()
-
-                    if(touchPageX / winWd < .2) {
-                        readium.reader.openPageLeft();
-                        return
+                    biblemesh_clickAction = function() {
+                        var iframe = $("#epub-reader-frame iframe")[0];
+                        var win = iframe.contentWindow || iframe;
+                        
+                        var sel = win.getSelection();
+                        if(!sel.isCollapsed) return
+    
+                        var winWd = $(win).width()
+    
+                        if(touchPageX / winWd < .2) {
+                            wrapInTransition(readium.reader.openPageLeft, 250);
+                            return
+                        }
+    
+                        if(touchPageX / winWd > .8) {
+                            wrapInTransition(readium.reader.openPageRight, 250);
+                            return
+                        }
+    
+                        biblemesh_AppComm.postMsg('showPageListView');
+    
                     }
 
-                    if(touchPageX / winWd > .8) {
-                        readium.reader.openPageRight();
-                        return
+                    if(Date.now() - timeAtStart < 500) {  // long touches should not be considered page turn taps
+                        setTimeout(function() { biblemesh_clickAction(); }, 50);  // wait and see if a highlight is clicked first
                     }
+    
 
-                    biblemesh_AppComm.postMsg('showPageListView');
+                } else if(touchIsSwipe) {
+
+                    var direction = touchPageXAtStart < touchPageXOnLastMove ? 'Left' : 'Right';
+                    var lastDirection = touchPageXOnSecondToLastMove < touchPageXOnLastMove ? 'Left' : 'Right';
+
+                    var lastSpeed = Math.abs(touchPageXOnLastMove - touchPageXOnSecondToLastMove) / (timeOnLastMove - timeOnSecondToLastMove);  // px/ms
+                    var pageWidth = $("#epub-reader-frame iframe").width();
+                    var dragLength = Math.abs(parseInt(docEl.css('left'), 10) - docElLeftBeforeStart);
+                    var speedToPxFactor = 900;
+
+                    if(direction === lastDirection && lastSpeed * speedToPxFactor + dragLength > pageWidth / 2) {
+                        var transitionTime = (pageWidth - dragLength) / Math.max(lastSpeed, .8)
+                        wrapInTransition(
+                            function() {
+                                docEl.css('left', (docElLeftBeforeStart + pageWidth * (direction === 'Left' ? 1 : -1)) + 'px')
+                            },
+                            transitionTime,
+                            function() {
+                                readium.reader['openPage' + direction]();
+                            }
+                        )
+                    } else {
+                        cancelSwipe()
+                    }
 
                 }
 
-                setTimeout(function() { biblemesh_clickAction(); }, 50);  // wait and see if a highlight is clicked first
-                
+                touchIsClick = touchIsSwipe = false;
+
             }, 'document');
 
             readium.reader.addIFrameEventListener('selectionchange', biblemesh_showHighlightOptions, 'document');
@@ -776,7 +851,7 @@ define([
                 scroll: "auto",
                 theme: "author-theme",
                 columnGap: 60,
-                columnMaxWidth: 600,
+                columnMaxWidth: 1000,
                 columnMinWidth: 300
             }
     
