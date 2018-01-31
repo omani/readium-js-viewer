@@ -836,9 +836,9 @@ define([
                         var sel = win.getSelection();
                         if(!sel.isCollapsed) return;
     
-                        var winWd = $(win).width();
+                        var winWd = window.innerWidth;
                         var pageToDirection = '';
-    
+
                         if(touchPageX / winWd < .3) {
                             pageToDirection = 'Left';
                         }
