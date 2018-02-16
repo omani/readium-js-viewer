@@ -3,9 +3,9 @@
 **EPUB reader written in HTML, CSS and Javascript.**
 
 See the following submodule repositories:
-* ( https://github.com/AndyHubert/readium-js )
-* ( https://github.com/AndyHubert/readium-shared-js )
-* ( https://github.com/AndyHubert/readium-cfi-js )
+* ( https://github.com/educational-resources-and-services/readium-js )
+* ( https://github.com/educational-resources-and-services/readium-shared-js )
+* ( https://github.com/educational-resources-and-services/readium-cfi-js )
 
 
 ## Changes to original Readium project
@@ -25,14 +25,14 @@ See ( https://github.com/readium/readium-js ) for more extensive information rel
 
 * A decent terminal. On Windows, GitShell works great ( http://git-scm.com ), GitBash works too ( https://msysgit.github.io ), and Cygwin adds useful commands ( https://www.cygwin.com ).
 * NodeJS ( https://nodejs.org ) **v4** (but not v5, because the installer ships with NPM v3 which seems to [have bugs](https://github.com/readium/readium-js-viewer/issues/453) related to the new flat module dependencies)
-* A MySQL database with [this structure](https://github.com/AndyHubert/readium-js-viewer/blob/master/ReadiumData.sql).
+* A MySQL database with [this structure](https://github.com/educational-resources-and-services/readium-js-viewer/blob/master/ReadiumData.sql).
 
 
 ## Development
 
 ### Git initialisation
 
-* `git clone --recursive -b BRANCH_NAME https://github.com/AndyHubert/readium-js-viewer.git readium-js-viewer` (replace "BRANCH_NAME" with e.g. "develop")
+* `git clone --recursive -b BRANCH_NAME https://github.com/educational-resources-and-services/readium-js-viewer.git readium-js-viewer` (replace "BRANCH_NAME" with e.g. "develop")
 * `cd readium-js-viewer`
 * `git submodule update --init --recursive` to ensure that the readium-js-viewer chain of dependencies is initialised (readium-js, readium-shared-js and readium-cfi-js)
 * `git checkout BRANCH_NAME && git submodule foreach --recursive "git checkout BRANCH_NAME"` (or simply `cd` inside each repository / submodule, and manually enter the desired branch name: `git checkout BRANCH_NAME`) Git should automatically track the corresponding branch in the 'origin' remote.
@@ -53,7 +53,7 @@ Note that the above command executes the following:
 
 ### ENV variables
 
-The following ENV variables are available for configurating the app. Note that you can set ENV variables locally via the [.env file](https://github.com/AndyHubert/readium-js-viewer/blob/master/.env).
+The following ENV variables are available for configurating the app. Note that you can set ENV variables locally via the [.env file](https://github.com/educational-resources-and-services/readium-js-viewer/blob/master/.env).
 
 Required:
 * APP_URL
