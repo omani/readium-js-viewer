@@ -160,7 +160,7 @@
                             var refElA = newEl('a', {
                                 className: "widget-reference-a",
                                 target: '_blank',
-                                href: iframeEl.src.replace(/&widget=1.*$/, '&flash=1'),
+                                href: iframeEl.src.replace(/&widget=1.*$/, '&flash=1').replace(/^https?:\/\/[^\/]+/, event.origin),
                             });
                             var spineLblEl = newEl('div', {
                                 className: "widget-spinelabel",
