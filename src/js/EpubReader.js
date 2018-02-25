@@ -609,6 +609,9 @@ define([
     
         var initReadium = function(){
 
+            biblemesh_highlights = window.initialHighlightsObjFromWebView || biblemesh_highlights;
+            delete window.initialHighlightsObjFromWebView;
+
             var spotInfo = biblemesh_Helpers.getCurrentSpotInfo(); // biblemesh_
     
             try { ga('send', 'pageview', window.location.pathname); } catch(e) {} // biblemesh_
