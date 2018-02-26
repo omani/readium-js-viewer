@@ -39,7 +39,7 @@ define([
         var biblemesh_widgetMetaData = undefined;
         var biblemesh_getPagesInfoFunc = undefined;
         var biblemesh_highlights = [];
-        var biblemesh_clickAction = function() {};
+        var biblemesh_highlightTouched = false;
     
         // initialised in loadReaderUI(), with passed data.epub
         var ebookURL = undefined;
@@ -692,6 +692,10 @@ define([
                         annotationCSSUrl: readerOptions.annotationCSSUrl
                     });
     
+                    readium.reader.plugins.highlights.on("annotationTouched", function(type, idref, cfi, id) {
+                        biblemesh_highlightTouched = true;
+                    });
+
                     readium.reader.plugins.highlights.on("annotationClicked", function(type, idref, cfi, id) {
                         console.debug("ANNOTATION CLICK: " + id);
                         // biblemesh_ : this function has all new contents
@@ -707,8 +711,6 @@ define([
                         sel.removeAllRanges();
                         sel.addRange(highlightRange);
         
-                        biblemesh_clickAction = function() {}; // prevents the page turn and zoom out clicks
-    
                     });
                 }
     
@@ -722,7 +724,7 @@ define([
             var docEl, touchPageX, touchPageY, touchIsClick, touchIsSwipe,
                 docElLeftBeforeStart, touchPageXAtStart, touchPageXOnLastMove,
                 touchPageXOnSecondToLastMove, timeAtStart, timeOnLastMove, timeOnSecondToLastMove,
-                isTransitioning;
+                isTransitioning, textWasSelectedAtStart;
 
             var wrapInTransition = function(action, transitionTime, postAction) {
                 var gracePeriodToFinish = Math.min(transitionTime / 2, 100);
@@ -797,9 +799,11 @@ define([
                 }
 
                 var iframe = $("#epub-reader-frame iframe")[0];
+                var win = iframe.contentWindow || iframe;
                 var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
                 docEl = $( doc.documentElement );
 
+                textWasSelectedAtStart = !win.getSelection().isCollapsed;
                 touchPageXAtStart = touchPageXOnLastMove = touchPageX = e.touches[0].pageX;
                 touchPageY = e.touches[0].pageY;
                 touchIsClick = true;
@@ -832,20 +836,19 @@ define([
 
                 if(touchIsClick) {
 
-                    biblemesh_clickAction = function() {
-                        var iframe = $("#epub-reader-frame iframe")[0];
-                        var win = iframe.contentWindow || iframe;
-                        
-                        var sel = win.getSelection();
-                        if(!sel.isCollapsed) return;
-    
+                    if(
+                        !textWasSelectedAtStart
+                        && !biblemesh_highlightTouched
+                        && Date.now() - timeAtStart < 500   // long touches should not be considered page turn taps
+                    ) {
+
                         var winWd = window.innerWidth;
                         var pageToDirection = '';
 
                         if(touchPageX / winWd < .3) {
                             pageToDirection = 'Left';
                         }
-    
+
                         if(touchPageX / winWd > .7) {
                             pageToDirection = 'Right';
                         }
@@ -872,17 +875,11 @@ define([
                                     200
                                 );
                             }
-                            return;
+                        } else {
+                            biblemesh_AppComm.postMsg('showPageListView');
                         }
                     
-                        biblemesh_AppComm.postMsg('showPageListView');
-    
                     }
-
-                    if(Date.now() - timeAtStart < 500) {  // long touches should not be considered page turn taps
-                        setTimeout(function() { biblemesh_clickAction(); }, 50);  // wait and see if a highlight is clicked first
-                    }
-    
 
                 } else if(touchIsSwipe) {
 
@@ -914,7 +911,7 @@ define([
 
                 }
 
-                touchIsClick = touchIsSwipe = false;
+                biblemesh_highlightTouched = touchIsClick = touchIsSwipe = false;
 
             }, 'document');
 
