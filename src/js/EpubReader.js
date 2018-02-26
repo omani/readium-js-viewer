@@ -1023,6 +1023,24 @@ define([
                 readium.reader.updateSettings(payload);
             });
 
+            biblemesh_AppComm.subscribe('setSelectionText', function(payload) {
+                var iframe = $("#epub-reader-frame iframe")[0];
+                var win = iframe.contentWindow || iframe;
+                var sel = win.getSelection();
+
+                if(!payload || !payload.spineIdRef || !payload.cfi) {
+                    sel.removeAllRanges();
+                    return;
+                }
+
+                // select the text of a highlight
+                var highlightBookmarkData = new BookmarkData(payload.spineIdRef, payload.cfi);
+                var highlightRange = readium.reader.getDomRangeFromRangeCfi(highlightBookmarkData);
+
+                sel.removeAllRanges();
+                sel.addRange(highlightRange);
+            });
+
             biblemesh_AppComm.postMsg('loaded');
 
         }
