@@ -30,10 +30,18 @@ function(
 
         },
         postMsg: function(identifier, payload) {
-            parent.postMessage(JSON.stringify({
-                identifier: identifier,
-                payload: payload,
-            }), location.origin);
+            var isInApp = location.search.match(/[\?&]app=1/);
+            var postIfReady = function() {
+                if(isInApp && window.postMessage.length !== 1) {
+                    setTimeout(postIfReady, 200);
+                } else {
+                    parent.postMessage(JSON.stringify({
+                        identifier: identifier,
+                        payload: payload,
+                    }), location.origin);
+                }
+            }
+            postIfReady();
         },
     }
 
