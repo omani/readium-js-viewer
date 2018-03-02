@@ -30,7 +30,7 @@ function(
 
         },
         postMsg: function(identifier, payload) {
-            var isInApp = location.search.match(/[\?&]app=1/);
+            var isInApp = location.search.match(/[\?&]android=1/);
             var postIfReady = function() {
                 if(isInApp && window.postMessage.length !== 1) {
                     setTimeout(postIfReady, 200);
