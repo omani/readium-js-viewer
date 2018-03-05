@@ -40,7 +40,10 @@ define([
         var biblemesh_getPagesInfoFunc = undefined;
         var biblemesh_highlights = [];
         var biblemesh_highlightTouched = false;
-    
+        var biblemesh_textSelected = false;
+        var biblemesh_preventAnnotationClick = false;
+        var biblemesh_isMobileSafari = !!navigator.userAgent.match(/(iPad|iPhone|iPod)/);
+
         // initialised in loadReaderUI(), with passed data.epub
         var ebookURL = undefined;
         var ebookURL_filepath = undefined;
@@ -555,9 +558,11 @@ define([
                     cfi: cfiObj.cfi,
                     copyTooltipInLowerHalf: copyTooltipInLowerHalf,
                 });
+                biblemesh_textSelected = true
                 
             } else {
                 biblemesh_AppComm.postMsg('textUnselected');
+                biblemesh_textSelected = false
             }
         }
     
@@ -699,7 +704,9 @@ define([
                     readium.reader.plugins.highlights.on("annotationClicked", function(type, idref, cfi, id) {
                         console.debug("ANNOTATION CLICK: " + id);
                         // biblemesh_ : this function has all new contents
-    
+
+                        if(biblemesh_preventAnnotationClick) return;
+
                         var iframe = $("#epub-reader-frame iframe")[0];
                         var win = iframe.contentWindow || iframe;
                         var sel = win.getSelection();
@@ -799,11 +806,10 @@ define([
                 }
 
                 var iframe = $("#epub-reader-frame iframe")[0];
-                var win = iframe.contentWindow || iframe;
                 var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
                 docEl = $( doc.documentElement );
 
-                textWasSelectedAtStart = !win.getSelection().isCollapsed;
+                textWasSelectedAtStart = biblemesh_textSelected;
                 touchPageXAtStart = touchPageXOnLastMove = touchPageX = e.touches[0].pageX;
                 touchPageY = e.touches[0].pageY;
                 touchIsClick = true;
@@ -835,6 +841,11 @@ define([
                 if(e.touches.length !== 0) return;
 
                 if(touchIsClick) {
+
+                    if(textWasSelectedAtStart) {
+                        biblemesh_AppComm.postMsg('textUnselected');
+                        biblemesh_textSelected = false
+                    }
 
                     if(
                         !textWasSelectedAtStart
@@ -906,9 +917,25 @@ define([
                             transitionTime,
                             readium.reader['openPage' + direction]
                         );
+
+                        // unselect text
+                        if(biblemesh_isMobileSafari) {
+                            biblemesh_AppComm.postMsg('textUnselected');
+                            biblemesh_textSelected = textWasSelectedAtStart;
+                        } else {
+                            var iframe = $("#epub-reader-frame iframe")[0];
+                            var win = iframe.contentWindow || iframe;
+                            var sel = win.getSelection();
+                            sel.removeAllRanges();
+                        }
+                                
                     } else {
                         cancelSwipe();
                     }
+
+                    // prevent annotation click to fire after this
+                    biblemesh_preventAnnotationClick = true;
+                    setTimeout(function() { biblemesh_preventAnnotationClick = false; }, 300)
 
                 }
 
@@ -1025,9 +1052,11 @@ define([
                 var iframe = $("#epub-reader-frame iframe")[0];
                 var win = iframe.contentWindow || iframe;
                 var sel = win.getSelection();
+                var textSelectedBefore = biblemesh_textSelected
 
                 if(!payload || !payload.spineIdRef || !payload.cfi) {
                     sel.removeAllRanges();
+                    biblemesh_textSelected = false;
                     return;
                 }
 
@@ -1037,6 +1066,11 @@ define([
 
                 sel.removeAllRanges();
                 sel.addRange(highlightRange);
+
+                if(biblemesh_isMobileSafari) {
+                    biblemesh_textSelected = textSelectedBefore
+                }
+
             });
 
             biblemesh_AppComm.postMsg('loaded');
