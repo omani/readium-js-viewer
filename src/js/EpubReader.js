@@ -1019,15 +1019,31 @@ define([
             biblemesh_AppComm.subscribe('loadSpineAndGetPagesInfo', function(payload) {
 
                 biblemesh_getPagesInfoFunc = function() {
-                    
+                    var $iframe = $("#epub-reader-frame iframe");
+                        
                     var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
                     
                     if(bookmark.idref == payload.spineIdRef) {
                         biblemesh_getPagesInfoFunc = undefined;
+
+                        var numPages = readium.reader.biblemesh_getColumnCount();
+
+                        var width = $iframe.width() * numPages;
+                        window.biblemesh_preventAllResizing = true;
+                        $iframe.css("width", width);
+                        $(document.body).css("width", width);
+
+                        var pageCfis = [];
+                        for(var pageIndex=0; pageIndex<numPages; pageIndex++) {
+                            var cfi = readium.reader.biblemesh_getFirstVisibleCfiOnSpineItemPageIndex(pageIndex);
+                            pageCfis.push(cfi);
+                        }
+
                         biblemesh_AppComm.postMsg('pagesInfo', {
                             spineIdRef: payload.spineIdRef,
-                            numPages: readium.reader.biblemesh_getColumnCount(),
+                            pageCfis: pageCfis,
                         });
+
                         return true;
                     }
 
