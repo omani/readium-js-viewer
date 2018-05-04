@@ -43,6 +43,7 @@ define([
         var biblemesh_textSelected = false;
         var biblemesh_preventAnnotationClick = false;
         var biblemesh_isMobileSafari = !!navigator.userAgent.match(/(iPad|iPhone|iPod)/);
+        var biblemesh_currentLoadedPageBookmark;
 
         // initialised in loadReaderUI(), with passed data.epub
         var ebookURL = undefined;
@@ -357,6 +358,7 @@ define([
                 }
     
                 var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
+                biblemesh_currentLoadedPageBookmark = bookmark;
 
                 biblemesh_getPagesInfoFunc && biblemesh_getPagesInfoFunc()
 
@@ -1021,9 +1023,9 @@ define([
                 biblemesh_getPagesInfoFunc = function() {
                     var $iframe = $("#epub-reader-frame iframe");
                         
-                    var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
+                    if(!biblemesh_currentLoadedPageBookmark) return  // this will be null if the initial load is not finished
                     
-                    if(bookmark.idref == payload.spineIdRef) {
+                    if(biblemesh_currentLoadedPageBookmark.idref == payload.spineIdRef) {
                         biblemesh_getPagesInfoFunc = undefined;
 
                         var numPages = readium.reader.biblemesh_getColumnCount();
@@ -1044,14 +1046,11 @@ define([
                             pageCfis: pageCfis,
                         });
 
-                        return true;
+                    } else {
+                        readium.reader.openSpineItemElementId(payload.spineIdRef);
                     }
-
                 }
                 
-                if(!biblemesh_getPagesInfoFunc()) {
-                    readium.reader.openSpineItemElementId(payload.spineIdRef);
-                }
             });
 
             biblemesh_AppComm.subscribe('renderHighlights', function(payload) {

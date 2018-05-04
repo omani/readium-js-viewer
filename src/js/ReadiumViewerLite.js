@@ -36,8 +36,23 @@ define(['jquery', './EpubReader', 'readium_shared_js/helpers', 'biblemesh_AppCom
             _error(xhr, status, errorThrown);
         }
         settings.success = function(result) {
+            // cache the most common files in localstorage: container.xml, opf and toc
+            if(settings.url.match(/(?:container\.xml|\.opf|\.ncx|toc\.xhtml|nav\.xhtml)$/) && result.length < 100000) {
+                try {
+                    localStorage.setItem("biblemesh_cache:" + settings.url, result);
+                } catch(e) {}
+            }
             _success(result);
         }
+
+        try {
+            // see if we have stored it in localstorage (used with most common files)
+            const localStorageFileCache = localStorage.getItem("biblemesh_cache:" + settings.url);
+            if(localStorageFileCache) {
+                settings.success(localStorageFileCache);
+                return
+            }
+        } catch(e) {}
 
         if(specialAssetRetrievalMethod == 'ajaxThroughPostMessage') {
 
