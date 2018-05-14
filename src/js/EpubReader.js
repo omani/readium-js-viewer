@@ -853,7 +853,7 @@ define([
                         !textWasSelectedAtStart
                         && !biblemesh_highlightTouched
                         && Date.now() - timeAtStart < 500   // long touches should not be considered page turn taps
-                        && !$(e.target || document.body).closest('a, [onclick], [onmousedown], [ontouchstart]')[0]  // it is a link/clickable, or is inside a link/clickable
+                        && !$(e.target || document.body).closest('a[href], [onclick], [onmousedown], [ontouchstart]')[0]  // it is a link/clickable, or is inside a link/clickable
                     ) {
 
                         var winWd = window.innerWidth;
