@@ -532,7 +532,7 @@
     "message": "Usage costs report"
   },
   "biblemesh_refresh" : {
-    "message": "Refresh Demo Library"
+    "message": "Refresh Library"
   },
   "biblemesh_no_books" : {
     "message": "No books available."
