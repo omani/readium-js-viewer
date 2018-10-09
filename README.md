@@ -40,9 +40,7 @@ See ( https://github.com/readium/readium-js ) for more extensive information rel
 
 ### Source tree preparation
 
-* `npm run prepare` (to perform required preliminary tasks, like patching code before building)
-
-Note that in some cases, administrator rights may be needed in order to install dependencies, because of NPM-related file access permissions (the console log would clearly show the error). Should this be the case, running `sudo npm run prepare` usually solves this.
+* `npm run prepare:all` (to perform required preliminary tasks, like patching code before building)
 
 Note that the above command executes the following:
 
@@ -82,7 +80,7 @@ Optional:
 
 ### Running locally
 
-* `npm start`
+* `sudo npm start`
 
 
 ### Forking
