@@ -24,7 +24,7 @@ See ( https://github.com/readium/readium-js ) for more extensive information rel
 ## Prerequisites
 
 * A decent terminal. On Windows, GitShell works great ( http://git-scm.com ), GitBash works too ( https://msysgit.github.io ), and Cygwin adds useful commands ( https://www.cygwin.com ).
-* NodeJS ( https://nodejs.org ) **v4** (but not v5, because the installer ships with NPM v3 which seems to [have bugs](https://github.com/readium/readium-js-viewer/issues/453) related to the new flat module dependencies)
+* NodeJS ( https://nodejs.org ) v8+
 * A MySQL database with [this structure](https://github.com/educational-resources-and-services/readium-js-viewer/blob/master/ReadiumData.sql).
 
 
@@ -81,7 +81,7 @@ Optional:
 ### Running locally
 
 * `sudo npm start`
-
+* Open browser to `http://localhost:8080`
 
 ### Forking
 
