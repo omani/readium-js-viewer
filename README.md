@@ -35,7 +35,7 @@ See ( https://github.com/readium/readium-js ) for more extensive information rel
 * `git clone --recursive -b master https://github.com/educational-resources-and-services/readium-js-viewer.git`
 * `cd readium-js-viewer`
 * `git submodule update --init --recursive` to ensure that the readium-js-viewer chain of dependencies is initialised (readium-js, readium-shared-js and readium-cfi-js)
-* `git checkout BRANCH_NAME && git submodule foreach --recursive "git checkout BRANCH_NAME"` (or simply `cd` inside each repository / submodule, and manually enter the desired branch name: `git checkout BRANCH_NAME`) Git should automatically track the corresponding branch in the 'origin' remote.
+* `git checkout master && git submodule foreach --recursive "git checkout master"`
 
 
 ### Source tree preparation
