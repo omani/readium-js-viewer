@@ -24,7 +24,7 @@ See ( https://github.com/readium/readium-js ) for more extensive information rel
 ## Prerequisites
 
 * A decent terminal. On Windows, GitShell works great ( http://git-scm.com ), GitBash works too ( https://msysgit.github.io ), and Cygwin adds useful commands ( https://www.cygwin.com ).
-* NodeJS ( https://nodejs.org ) **v4** (but not v5, because the installer ships with NPM v3 which seems to [have bugs](https://github.com/readium/readium-js-viewer/issues/453) related to the new flat module dependencies)
+* NodeJS ( https://nodejs.org ) v8+
 * A MySQL database with [this structure](https://github.com/AndyHubert/readium-js-viewer/blob/master/ReadiumData.sql).
 
 
@@ -32,23 +32,21 @@ See ( https://github.com/readium/readium-js ) for more extensive information rel
 
 ### Git initialisation
 
-* `git clone --recursive -b BRANCH_NAME https://github.com/AndyHubert/readium-js-viewer.git readium-js-viewer` (replace "BRANCH_NAME" with e.g. "develop")
+* `git clone --recursive -b for-version-2 https://github.com/educational-resources-and-services/readium-js-viewer.git`
 * `cd readium-js-viewer`
 * `git submodule update --init --recursive` to ensure that the readium-js-viewer chain of dependencies is initialised (readium-js, readium-shared-js and readium-cfi-js)
-* `git checkout BRANCH_NAME && git submodule foreach --recursive "git checkout BRANCH_NAME"` (or simply `cd` inside each repository / submodule, and manually enter the desired branch name: `git checkout BRANCH_NAME`) Git should automatically track the corresponding branch in the 'origin' remote.
+* `git checkout for-version-2 && git submodule foreach --recursive "git checkout for-version-2"`
 
 
 ### Source tree preparation
 
-* `npm run prepare` (to perform required preliminary tasks, like patching code before building)
-
-Note that in some cases, administrator rights may be needed in order to install dependencies, because of NPM-related file access permissions (the console log would clearly show the error). Should this be the case, running `sudo npm run prepare` usually solves this.
+* `npm run prepare:all` (to perform required preliminary tasks, like patching code before building)
 
 Note that the above command executes the following:
 
 * `npm install` (to download dependencies defined in `package.json` ... note that the `--production` option can be used to avoid downloading development dependencies, for example when testing only the pre-built `build-output` folder contents)
 * `npm update` (to make sure that the dependency tree is up to date)
-* + some additional HTTP requests to the GitHub API in order to check for upstream library updates (wherever Readium uses a forked codebase)
+* some additional HTTP requests to the GitHub API in order to check for upstream library updates (wherever Readium uses a forked codebase)
 
 
 ### ENV variables
@@ -92,9 +90,8 @@ Assuming a fork of `https://github.com/AndyHubert/readium-js-viewer` is made und
 
 ## Distribution
 
-* `npm run dist`
-  * Creates dist/cloud-reader for testing locally. In that directory, run `node app.js`.
-  * Creates cloud-reader-app.zip for deploying to AWS or the like.
+* `npm run dist:lite`
+  * Creates a timestamp-named directory under `dist` for deploying to AWS S3 or the like.
 
 
 ## License
