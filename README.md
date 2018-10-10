@@ -80,7 +80,7 @@ Optional:
 
 ### Running locally
 
-* `sudo npm start`
+* `npm start`
 * Open browser to `http://localhost:8080`
 
 
