@@ -45,14 +45,14 @@
     "README.md"
   ],
   "dependencies": {
-    "parallelshell": "latest",
+    "http-server": "github:danielweck/http-server#master",
     "opener": "latest",
-    "http-server": "github:danielweck/http-server#master"
+    "parallelshell": "latest"
   },
   "devDependencies": {
     "JSON2": "latest",
     "bootstrap": "3.x",
-    "bootstrap-accessibility-plugin": "paypal/bootstrap-accessibility-plugin#master",
+    "bootstrap-accessibility-plugin": "github:paypal/bootstrap-accessibility-plugin#master",
     "chai": "latest",
     "chai-as-promised": "latest",
     "clean-css": "3.4.25",
@@ -65,7 +65,7 @@
     "hogan": "latest",
     "hogan.js": "latest",
     "httpreq": "latest",
-    "jath": "github:danielweck/jath",
+    "jath": "github:danielweck/jath#master",
     "jquery-hammerjs": "latest",
     "keymaster": "github:danielweck/keymaster#master",
     "mathjax-single-file": "github:danielweck/MathJax-single-file#master",
