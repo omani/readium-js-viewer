@@ -1,6 +1,8 @@
 define(['jquery', './EpubReader', 'readium_shared_js/helpers', 'biblemesh_AppComm'], function($, EpubReader, Helpers, biblemesh_AppComm){
-    
-    if(typeof Raven != 'undefined') Raven.config('https://0569beced42c4b068367c8d47cfddf36@sentry.io/144504').install()
+        
+    if(typeof Sentry != 'undefined') Sentry.init({ dsn: 'https://0569beced42c4b068367c8d47cfddf36@sentry.io/144504' })
+    window.addEventListener("error", function(e) { Sentry.captureException(e) })
+    window.addEventListener("unhandledrejection", function(e) { Sentry.captureException(e) })
         
     var specialAssetRetrievalMethod = 'ajaxThroughPostMessage'  // or 'none'
     biblemesh_AppComm.subscribe('setSpecialAssetRetrievalMethod', function(payload) {
@@ -32,7 +34,7 @@ define(['jquery', './EpubReader', 'readium_shared_js/helpers', 'biblemesh_AppCom
         var _error = settings.error;
         var _success = settings.success;
         settings.error = function(xhr, status, errorThrown) {
-            Raven.captureException(new Error('Ajax call returned with error. Request: ' + JSON.stringify(settings)))
+            if(typeof Sentry != 'undefined') Sentry.captureMessage('Ajax call returned with error. Request: ' + JSON.stringify(settings))
             _error(xhr, status, errorThrown);
         }
         settings.success = function(result) {
