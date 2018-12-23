@@ -111,7 +111,7 @@
                     className: 'erasereader-widget-iframe',
                     src: el.href + '&widget=1&parent_domain=' + encodeURIComponent(location.host) + '&' + queryParamArray.join('&'),
                     style: ""
-                        + "visibility: hidden;"
+                        + "opacity: 0;"
                         + "max-height: " + queryParamObj.maxheight + ";"
                         + "height: " + (queryParamObj.maxheight.match(/px$/) ? Math.min(queryParamObj.maxheight, 200) : 200) + "px;",
                 });
@@ -149,7 +149,7 @@
                             break;
                         
                         case 'loading':
-                            iframeEl.style.visibility = "";
+                            iframeEl.style.opacity = "";
                             break;
 
                         case 'setReference':
