@@ -67,6 +67,7 @@ BookmarkData){
     var embedded = undefined;
     
     var biblemesh_isWidget = undefined;
+    var biblemesh_isWidgetWithAddedElements = false;
     var biblemesh_widgetMetaData = undefined;
     var biblemesh_spinelabels = {};
     
@@ -535,13 +536,24 @@ BookmarkData){
                     widgetScopeRange.collapse();
                     widgetScopeRange.insertNode(endMarkerEl[0]);
 
+                    if(!startMarkerEl[0].nextSibling) {
+                        $(startMarkerEl[0]).insertAfter($(startMarkerEl[0].parentElement))
+                    }
+
+                    if(!endMarkerEl[0].previousSibling) {
+                        $(endMarkerEl[0]).insertBefore($(endMarkerEl[0].parentElement))
+                    }
+
                     // hide all before start and after end
                     var widgetHide = function(baseEl, direction) {
                         var sibling = baseEl[0][direction + 'Sibling'];
                         while(sibling) {
                             if(sibling.nodeType == 3) {  // text node
-                                $(sibling).wrap('<span></span>');
-                                sibling = sibling.parentElement;
+                                if(sibling.textContent.trim() !== '') {
+                                    $(sibling).wrap('<span data-addedbywidget=""></span>');
+                                    biblemesh_isWidgetWithAddedElements = true;
+                                    sibling = sibling.parentElement;
+                                }
                             }
                             if(sibling.nodeType == 1) {  // element
                                 $(sibling)
@@ -558,30 +570,13 @@ BookmarkData){
                     widgetHide(startMarkerEl, 'previous');
                     widgetHide(endMarkerEl, 'next');
 
-                    // get rid of margin-top at the beginning, and margin-bottom at the end
-                    var widgetRemoveMargin = function(baseEl, direction) {
-                        var sibling = baseEl[0][direction + 'Sibling'];
-                        while(sibling) {
-                            if(sibling.nodeType == 3) {  // text node
-                                $(sibling).wrap('<span></span>');
-                                sibling = sibling.parentElement;
-                            }
-                            if(sibling.nodeType == 1) {  // element
-                                $(sibling)
-                                    .css('cssText', $(sibling).attr('style') + ';display: none !important;')
-                                    .attr('data-hiddenbywidget', '');
-                            }
-                            sibling = sibling[direction + 'Sibling'];
-                        }
-                        var baseElParent = baseEl.parent();
-                        if(baseElParent.length > 0 && !baseElParent.is('body, html')) {
-                            widgetHide(baseElParent, direction);
-                        }
-                    }
-
                     // remove markers
+                    var startMarkerParent = startMarkerEl[0].parentNode;
+                    var endMarkerParent = endMarkerEl[0].parentNode;
                     startMarkerEl.remove();
                     endMarkerEl.remove();
+                    startMarkerParent.normalize();
+                    endMarkerParent.normalize();
 
                 }
 
@@ -1145,7 +1140,7 @@ BookmarkData){
     }
 
     var biblemesh_drawHighlights = function() {
-        if (readium && readium.reader.plugins.highlights && !biblemesh_isWidget) {
+        if (readium && readium.reader.plugins.highlights && !biblemesh_isWidgetWithAddedElements) {
 
             var idRef = biblemesh_getCurrentIdRef();;
             var highlightsToDraw = [];
@@ -1289,7 +1284,7 @@ BookmarkData){
 
         biblemesh_drawHighlights();
 
-        if(!biblemesh_askedAboutLocationUpdate) {
+        if(!biblemesh_askedAboutLocationUpdate && !biblemesh_isWidget) {
             try {
                 var latLoc = biblemesh_userData.books[biblemesh_bookId].latest_location;
                 if(latLoc && latLoc != spotInfo.ebookSpot) {
@@ -1375,9 +1370,9 @@ BookmarkData){
     }
 
     var biblemesh_showHighlightOptions = function(forceShowNote) {
-
-        if(biblemesh_isWidget) return;
         
+        if(biblemesh_isWidgetWithAddedElements) return;
+
         var iframe = $("#epub-reader-frame iframe")[0];
         var win = iframe.contentWindow || iframe;
         var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
@@ -1471,7 +1466,7 @@ BookmarkData){
             var docHt = docEl.height();
             var docWd = docEl.width();
 
-            var docLeft = parseInt(docEl.css("left"), 10);
+            var docLeft = parseInt(docEl.css("left"), 10) || 0;
 
             // get selection bounding box
             var rg = sel.getRangeAt(0);
@@ -2246,7 +2241,7 @@ BookmarkData){
             readium.reader.addIFrameEventListener('click', iframeClickEvent);
             readium.reader.addIFrameEventListener('mouseup', function(e) {
                 if(!e || !e.target) { return; }
-                if(biblemesh_isWidget) return;
+                if(biblemesh_isWidgetWithAddedElements) return;
 
                 if($(e.target).attr('id') == "highlightOpts" || $(e.target).parents("#highlightOpts").length != 0) {
                     // e.preventDefault();
