@@ -507,6 +507,12 @@
   "biblemesh_successful" : {
     "message": "imported successfully and was assigned id #BOOK_ID."
   },
+  "biblemesh_associated-to-existing" : {
+    "message": "already exists in an associated tenant with id #BOOK_ID. It has been added to this tenant as well."
+  },
+  "biblemesh_already-associated" : {
+    "message": "already exists with id #BOOK_ID."
+  },
   "biblemesh_import_instructions" : {
     "message": "Choose one or more packaged EPUB files."
   },

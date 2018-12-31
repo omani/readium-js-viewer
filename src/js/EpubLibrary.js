@@ -585,6 +585,7 @@ biblemesh_Helpers){
                     success: function(response) {
                         if(typeof response.bookId !== 'undefined') {
                             result.bookId = response.bookId;
+                            result.note = response.note;
                         }
                         resultArray.push(result);
                         doImport();
@@ -604,7 +605,7 @@ biblemesh_Helpers){
                     if(typeof result.error !== 'undefined') {
                         return result.filename + " — ERROR: " + result.error;
                     } else {
-                        return result.filename + " " + Strings.biblemesh_successful.replace('BOOK_ID', result.bookId);
+                        return result.filename + " " + Strings['biblemesh_' + (result.note || 'successful')].replace('BOOK_ID', result.bookId);
                     }
                 }).join("<br>"));
                 
