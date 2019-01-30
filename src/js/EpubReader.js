@@ -858,6 +858,9 @@ define([
                         && (!e.target || !$(e.target).closest('a[href], [onclick], [onmousedown], [ontouchstart]')[0])  // it is a link/clickable, or is inside a link/clickable
                     ) {
 
+                        e.preventDefault();
+                        e.stopPropagation();
+
                         var winWd = window.innerWidth;
                         var pageToDirection = '';
 
