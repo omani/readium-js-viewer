@@ -32,7 +32,7 @@ define([
     BookmarkData,
     biblemesh_AppComm){
     
-        var biblemesh_MAX_PAGE_CFIS_FETCH_MILLISECONDS = 1000;
+        var biblemesh_MAX_PAGE_CFIS_FETCH_MILLISECONDS = 2500;
 
         // initialised in initReadium()
         var readium = undefined;
