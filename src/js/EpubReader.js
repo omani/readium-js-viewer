@@ -873,34 +873,39 @@ define([
                         }
 
                         if(pageToDirection) {
-                            var existsPageInDesiredDirection = pageExistsToThe(pageToDirection);
-                            if(existsPageInDesiredDirection) {
-                                var pageWidth = $("#epub-reader-frame iframe").width();
-                                wrapInTransition(
-                                    function() {
-                                        docEl.css('left', (docElLeftBeforeStart + pageWidth * (pageToDirection === 'Left' ? 1 : -1)) + 'px')
-                                    },
-                                    250,
-                                    readium.reader['openPage' + pageToDirection]
-                                );
-                            } else {
-                                wrapInTransition(
-                                    function() {
-                                        var shakeAdjAmount = (pageToDirection === 'Left' ? 100 : -100);
-                                        docEl.css('left', (docElLeftBeforeStart + shakeAdjAmount) + 'px');
-                                        setTimeout(function() { docEl.css('left', (docElLeftBeforeStart - shakeAdjAmount) + 'px'); }, 50);
-                                        setTimeout(function() { cancelSwipe(50); }, 100);
-                                    },
-                                    200
-                                );
+
+                            if(!spinner.willSpin && !spinner.isSpinning) {
+
+                                var existsPageInDesiredDirection = pageExistsToThe(pageToDirection);
+                                if(existsPageInDesiredDirection) {
+                                    var pageWidth = $("#epub-reader-frame iframe").width();
+                                    wrapInTransition(
+                                        function() {
+                                            docEl.css('left', (docElLeftBeforeStart + pageWidth * (pageToDirection === 'Left' ? 1 : -1)) + 'px')
+                                        },
+                                        250,
+                                        readium.reader['openPage' + pageToDirection]
+                                    );
+                                } else {
+                                    wrapInTransition(
+                                        function() {
+                                            var shakeAdjAmount = (pageToDirection === 'Left' ? 100 : -100);
+                                            docEl.css('left', (docElLeftBeforeStart + shakeAdjAmount) + 'px');
+                                            setTimeout(function() { docEl.css('left', (docElLeftBeforeStart - shakeAdjAmount) + 'px'); }, 50);
+                                            setTimeout(function() { cancelSwipe(50); }, 100);
+                                        },
+                                        200
+                                    );
+                                }
                             }
+
                         } else {
                             biblemesh_AppComm.postMsg('showPageListView');
                         }
                     
                     }
 
-                } else if(touchIsSwipe) {
+                } else if(touchIsSwipe && !spinner.willSpin && !spinner.isSpinning) {
 
                     var direction = touchPageXAtStart < touchPageXOnLastMove ? 'Left' : 'Right';
                     var lastDirection = touchPageXOnSecondToLastMove < touchPageXOnLastMove ? 'Left' : 'Right';
