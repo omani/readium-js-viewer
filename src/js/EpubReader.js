@@ -32,6 +32,8 @@ define([
     BookmarkData,
     biblemesh_AppComm){
     
+        var biblemesh_MAX_PAGE_CFIS_FETCH_MILLISECONDS = 1000;
+
         // initialised in initReadium()
         var readium = undefined;
     
@@ -1028,6 +1030,7 @@ define([
                     if(biblemesh_currentLoadedPageBookmark.idref == payload.spineIdRef) {
                         biblemesh_getPagesInfoFunc = undefined;
 
+                        var startTime = Date.now();
                         var numPages = readium.reader.biblemesh_getColumnCount();
 
                         var width = $iframe.width() * numPages;
@@ -1039,6 +1042,13 @@ define([
                         for(var pageIndex=0; pageIndex<numPages; pageIndex++) {
                             var cfi = readium.reader.biblemesh_getFirstVisibleCfiOnSpineItemPageIndex(pageIndex);
                             pageCfis.push(cfi);
+
+                            if(Date.now() - startTime > biblemesh_MAX_PAGE_CFIS_FETCH_MILLISECONDS) {
+                                while(++pageIndex < numPages) {
+                                    pageCfis.push('');
+                                }
+                                break;
+                            }
                         }
 
                         biblemesh_AppComm.postMsg('pagesInfo', {
