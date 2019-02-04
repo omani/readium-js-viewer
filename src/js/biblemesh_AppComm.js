@@ -30,10 +30,10 @@ function(
 
         },
         postMsg: function(identifier, payload) {
-            var isInApp = location.search.match(/[\?&]android=1/);
+            var isInAndroidApp = location.search.match(/[\?&]android=1/);
             var postIfReady = function() {
-                if(isInApp && window.postMessage.length !== 1) {
-                    setTimeout(postIfReady, 200);
+                if(isInAndroidApp && (window.postMessage.length !== 1 || !window.postMessagePatched)) {
+                    setTimeout(postIfReady, 20);
                 } else {
                     parent.postMessage(JSON.stringify({
                         identifier: identifier,
