@@ -854,11 +854,31 @@ define([
                         biblemesh_textSelected = false
                     }
 
+
+                    var iframe = $("#epub-reader-frame iframe")[0];
+                    var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
+                    var bodyEl = doc.body;
+        
+                    // create and dispatch media_overlay_touch_tap event
+                    var mediaOverlayClicked = false;
+                    var mediaOverlayTouchTapEvent = new CustomEvent("media_overlay_touch_tap", {
+                        detail: {
+                            pageX: e.pageX,
+                            pageY: e.pageY,
+                            target: e.target,
+                            indicateMediaChange: function() {
+                                mediaOverlayClicked = true;
+                            },
+                        }
+                    });
+                    bodyEl.dispatchEvent(mediaOverlayTouchTapEvent);
+
                     if(
                         !textWasSelectedAtStart
                         && !biblemesh_highlightTouched
                         && Date.now() - timeAtStart < 500   // long touches should not be considered page turn taps
                         && (!e.target || !$(e.target).closest('a[href], [onclick], [onmousedown], [ontouchstart]')[0])  // it is a link/clickable, or is inside a link/clickable
+                        && !mediaOverlayClicked
                     ) {
 
                         e.preventDefault();
@@ -903,6 +923,7 @@ define([
                             }
 
                         } else {
+                            readium.reader.pauseMediaOverlay();
                             biblemesh_AppComm.postMsg('showPageListView');
                         }
                     
