@@ -32,7 +32,8 @@ define([
     BookmarkData,
     biblemesh_AppComm){
     
-        var biblemesh_MAX_PAGE_CFIS_FETCH_MILLISECONDS = 2500;
+        var biblemesh_ALLOTTED_PAGE_CFIS_FETCH_MILLISECONDS = 250;
+        var biblemesh_MIN_NUMBER_OF_PAGES_IN_CFIS_FETCH = 3;
 
         // initialised in initReadium()
         var readium = undefined;
@@ -809,6 +810,8 @@ define([
                     return;
                 }
 
+                biblemesh_AppComm.postMsg('requestPauseProcessing');
+
                 var iframe = $("#epub-reader-frame iframe")[0];
                 var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
                 docEl = $( doc.documentElement );
@@ -1028,47 +1031,66 @@ define([
                 }
             });
 
-            biblemesh_AppComm.subscribe('loadSpineAndGetPagesInfo', function(payload) {
+            var biblemesh_loadSpineTime;
+            var biblemesh_getPagesInfo = function(payload) { return function() {
+                var $iframe = $("#epub-reader-frame iframe");
 
-                biblemesh_getPagesInfoFunc = function() {
-                    var $iframe = $("#epub-reader-frame iframe");
-                        
-                    if(!biblemesh_currentLoadedPageBookmark) return  // this will be null if the initial load is not finished
-                    
-                    if(biblemesh_currentLoadedPageBookmark.idref == payload.spineIdRef) {
-                        biblemesh_getPagesInfoFunc = undefined;
+                if(!biblemesh_currentLoadedPageBookmark) return  // this will be null if the initial load is not finished
 
-                        var startTime = Date.now();
-                        var numPages = readium.reader.biblemesh_getColumnCount();
+                if(biblemesh_currentLoadedPageBookmark.idref == payload.spineIdRef) {
+                    biblemesh_getPagesInfoFunc = undefined;
 
-                        var width = $iframe.width() * numPages;
-                        window.biblemesh_preventAllResizing = true;
-                        $iframe.css("width", width);
-                        $(document.body).css("width", width);
+                    var allottedMS = payload.allottedMS || biblemesh_ALLOTTED_PAGE_CFIS_FETCH_MILLISECONDS
+                    var minimumPagesToFetch = payload.minimumPagesToFetch || biblemesh_MIN_NUMBER_OF_PAGES_IN_CFIS_FETCH
 
-                        var pageCfis = [];
-                        for(var pageIndex=0; pageIndex<numPages; pageIndex++) {
+                    var startTime = Date.now();
+                    var startIndex = payload.startIndex || 0;
+                    var numPages = readium.reader.biblemesh_getColumnCount();
+
+                    var width = $iframe.width() * numPages;
+                    window.biblemesh_preventAllResizing = true;
+                    $iframe.css("width", width);
+                    $(document.body).css("width", width);
+
+                    var pageCfis = [];
+                    if(
+                        !biblemesh_loadSpineTime
+                        || Date.now() - biblemesh_loadSpineTime < allottedMS
+                    ) {
+                        for(var pageIndex=startIndex; pageIndex<numPages; pageIndex++) {
                             var cfi = readium.reader.biblemesh_getFirstVisibleCfiOnSpineItemPageIndex(pageIndex);
                             pageCfis.push(cfi);
-
-                            if(Date.now() - startTime > biblemesh_MAX_PAGE_CFIS_FETCH_MILLISECONDS) {
-                                while(++pageIndex < numPages) {
-                                    pageCfis.push('');
-                                }
+                    
+                            if(
+                                pageIndex+1 - startIndex >= minimumPagesToFetch
+                                && Date.now() - startTime > allottedMS
+                            ) {
                                 break;
                             }
                         }
-
-                        biblemesh_AppComm.postMsg('pagesInfo', {
-                            spineIdRef: payload.spineIdRef,
-                            pageCfis: pageCfis,
-                        });
-
-                    } else {
-                        readium.reader.openSpineItemElementId(payload.spineIdRef);
                     }
+
+                    biblemesh_loadSpineTime = null
+
+                    biblemesh_AppComm.postMsg('pagesInfo', {
+                        spineIdRef: payload.spineIdRef,
+                        pageCfis: pageCfis,
+                        startIndex: startIndex,
+                        completed: pageIndex === numPages,
+                    });
+
+                } else {
+                    readium.reader.openSpineItemElementId(payload.spineIdRef);
                 }
-                
+            }}
+
+            biblemesh_AppComm.subscribe('continueToGetPagesInfo', function(payload) {
+                biblemesh_getPagesInfo(payload)();
+            })
+
+            biblemesh_AppComm.subscribe('loadSpineAndGetPagesInfo', function(payload) {
+                biblemesh_loadSpineTime = Date.now();
+                biblemesh_getPagesInfoFunc = biblemesh_getPagesInfo(payload);
             });
 
             biblemesh_AppComm.subscribe('renderHighlights', function(payload) {
