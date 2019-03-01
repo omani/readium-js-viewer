@@ -706,6 +706,40 @@ ul.nav-tabs li:not(.active) button:hover
   background: #888;
 }
 
+#bookLinkCont {
+  position: absolute;
+  right: 0;
+  bottom: 50px;
+  display: block;
+  transform: rotate(270deg);
+  width: 0;
+  height: 0;
+  z-index: 110;
+}
+
+.bookLink, .bookLink:hover {
+  white-space: nowrap;
+  line-height: 34px;
+  background: white;
+  position: absolute;
+  display: block;
+  top: -34px;
+  left: 0;
+  padding: 0 18px 3px;
+  color: #999;
+  border-radius: 5px 5px 0 0;
+  box-shadow: -1px 1px 10px rgba(0,0,0,.3);
+  transition: color .1s, top .1s, box-shadow .1s;
+}
+
+.bookLink:hover, .bookLink:focus {
+  top: -37px;
+  color: #777;
+  box-shadow: -1px 1px 10px rgba(0,0,0,.6);
+  outline: none;
+  text-decoration: none;
+}
+
 .navbar .btn {
   background: none;
 }

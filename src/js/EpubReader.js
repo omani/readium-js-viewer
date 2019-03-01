@@ -8,6 +8,7 @@ define([
 'URIjs',
 './Spinner',
 'biblemesh_Settings',
+'./EpubLibraryManager',
 'i18nStrings',
 './Dialogs',
 './ReaderSettingsDialog',
@@ -17,6 +18,7 @@ define([
 'hgn!readium_js_viewer_html_templates/reader-body-page-btns.html',
 'hgn!readium_js_viewer_html_templates/biblemesh_highlight-opts.html',
 'hgn!readium_js_viewer_html_templates/biblemesh_progress-bar-item.html',
+'hgn!readium_js_viewer_html_templates/book_link.html',
 'Analytics',
 'screenfull',
 './Keyboard',
@@ -39,6 +41,7 @@ bootstrapA11y,
 URI,
 spinner,
 Settings,
+libraryManager,
 Strings,
 Dialogs,
 SettingsDialog,
@@ -48,6 +51,7 @@ ReaderBody,
 ReaderBodyPageButtons,
 biblemesh_highlightOptions,
 biblemesh_progressBarItem,
+biblemesh_bookLink,
 Analytics,
 screenfull,
 Keyboard,
@@ -266,6 +270,8 @@ BookmarkData){
                 currentPackageDocument.generateTocListDOM(function(dom){
                     loadToc(dom)
                 });
+
+                biblemesh_setupBookLink();
     
                 wasFixed = readium.reader.isCurrentViewFixedLayout();
                 var metadata = options.metadata;
@@ -875,6 +881,23 @@ BookmarkData){
           return;
       }); // end of onkeyup
     } // end of loadToc
+
+    var biblemesh_setupBookLink = function() {
+        $("#bookLink").remove();
+        libraryManager.retrieveAvailableEpubs(function(epubs) {
+            epubs.some(function(book, idx) {
+                if(book.id == biblemesh_bookId) {
+                    if(book.link_href && book.link_label) {
+                        $('#reading-area').append($(biblemesh_bookLink({
+                            href: book.link_href,
+                            label: book.link_label
+                        })));
+                    }
+                    return true;
+                }
+            });
+        });
+    }
 
     var biblemesh_setupProgressBar = function(tocDOM){
         var progressBarEl = $("<div id='progressBar'></div>");

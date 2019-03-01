@@ -166,6 +166,7 @@ overflow: hidden;
 .widget #app-navbar,
 .widget .book-title-header,
 .widget #progressBar,
+.widget #bookLinkCont,
 .widget #readium-page-btns {
     display: none;
 }
