@@ -14,7 +14,8 @@ define([], function(){
         getPathUrl : function(path){
             if (path == '/epub_library.json')
             {
-                return 'epub_content/epub_library.json';
+                // biblemesh_: added the leading slash for direct book loads
+                return '/epub_content/epub_library.json';
             }
             return path;
         },
