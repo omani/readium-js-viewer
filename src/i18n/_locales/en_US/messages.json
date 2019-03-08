@@ -465,6 +465,9 @@
   "biblemesh_highlight" : {
     "message": "Highlight"
   },
+  "biblemesh_no_cloud_save" : {
+    "message": "Note: Since you are using this eReader without a login, your highlights and notes will only be available on this device and in this browser, and are not backed up."
+  },
   "biblemesh_notes" : {
     "message": "Notes"
   },

@@ -1206,14 +1206,14 @@ BookmarkData){
         if(!iframe) return;
         var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
         var docEl = $( doc.documentElement );
-        var highlightOptsEl = docEl.children("#highlightOpts");
+        var highlightOptsContEl = docEl.children("#highlightOptsCont");
 
-        if(highlightOptsEl) {
+        if(highlightOptsContEl) {
 
             docEl.find('.highlightOpts-note-text').trigger('blur');
 
             readium.reader.plugins.highlights.removeHighlight("highlightOpts-sel-highlight");
-            highlightOptsEl.remove();
+            highlightOptsContEl.remove();
 
             Keyboard.scope('reader');
 
@@ -1403,6 +1403,7 @@ BookmarkData){
         var sel = win.getSelection();
         var selStr = sel.toString().replace(/\n/g,' ').trim();
         var cfiObj = readium.reader.plugins.highlights.getCurrentSelectionCfi();
+        var idpNoAuth = Settings.getUserAttr('idpNoAuth');
 
         biblemesh_initUserDataBook();
         biblemesh_delHighlightOpts();
@@ -1411,11 +1412,13 @@ BookmarkData){
 
             var highlightId = biblemesh_getHighlightId(cfiObj);
             
-            var highlightOptsEl = $( biblemesh_highlightOptions(
+            var highlightOptsContEl = $( biblemesh_highlightOptions(
                 {
                     strings: Strings
                 }
             ) );
+            var highlightOptsEl = highlightOptsContEl.find('#highlightOpts')
+            var highlightOptsNoCloudSaveEl = highlightOptsContEl.find('.highlightOpts-nocloudsave')
 
             var currentHighlight = biblemesh_getHighlightDataObj(cfiObj);
 
@@ -1472,6 +1475,9 @@ BookmarkData){
                     .addClass('highlightOpts-sel')
                     .siblings('.highlightOpts-box')
                     .removeClass('highlightOpts-sel');
+                highlightOptsContEl
+                    .find('.highlightOpts-nocloudsave')
+                    [idpNoAuth ? 'removeClass' : 'addClass']('hidden');
                 highlightOptsEl
                     .find('.highlightOpts-line:not(.highlightOpts-highlightline)')
                     [hasCurrentHighlight() ? 'removeClass' : 'addClass']('highlightOpts-faded');
@@ -1512,7 +1518,14 @@ BookmarkData){
             style.left = Math.max( SHADOW_WIDTH + pageShift , Math.min( docWd - docLeft - style.width - SHADOW_WIDTH , midLeft - parseInt(style.width/2) ) );
             style.top = Math.max( SHADOW_WIDTH , Math.min( docHt - style.height - SHADOW_WIDTH , moreRoomAtTop ? selectionVeryTop - style.height : selectionVeryBottom ) );;
 
+            var noCloudSaveStyle = {
+                left: pageShift
+            }
+
+            noCloudSaveStyle[moreRoomAtTop ? 'top' : 'bottom'] = 0
+
             highlightOptsEl.css(style);
+            highlightOptsNoCloudSaveEl.css(noCloudSaveStyle);
 
             if(!hasNote) {
                 highlightOptsEl.addClass('nonote');
@@ -1703,7 +1716,7 @@ BookmarkData){
 
             Keyboard.scope('reader');
 
-            docEl.append(highlightOptsEl);
+            docEl.append(highlightOptsContEl);
 
             highlightOptsEl.hide();  //needed to properly calculate visible area and place the highlight
             readium.reader.plugins.highlights.addSelectionHighlight("highlightOpts-sel-highlight", "sel-highlight", undefined, true);

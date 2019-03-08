@@ -41,9 +41,23 @@
     padding: 10px;
 }
 
+.highlightOpts-nocloudsave {
+    position: absolute;
+    z-index: 1990;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    background: #2f2f2f;
+    color: white;
+    padding: 10px 12px;
+    border-radius: 3px;
+    font-family: 'Open Sans', sans-serif;
+}
+
 .highlightOpts-addnote,
 #highlightOpts.nonote .highlightOpts-label,
-#highlightOpts.nonote .highlightOpts-line:nth-child(n+2) {
+#highlightOpts.nonote .highlightOpts-line:nth-child(n+2),
+.highlightOpts-nocloudsave.hidden {
     display: none;
 }
 
