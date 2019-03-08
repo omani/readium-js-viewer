@@ -74,6 +74,13 @@ function(biblemesh_Helpers){
 
             var runPatch = function() {
 
+                if(userInfo.idpNoAuth) {
+                    if (isLocalStorageEnabled()) {
+                        localStorage['userDataBooks'] = JSON.stringify(userData.books);
+                    }
+                    return;
+                }
+
                 var patchTime = biblemesh_Helpers.getUTCTimeStamp();
                 var newUserData = { books: {} };
                 var somethingToPatch = false;
@@ -238,6 +245,17 @@ function(biblemesh_Helpers){
                     
                     callbackWhenComplete();
 
+                } else if(userInfo.idpNoAuth && key.match(/^books\/[0-9]+$/)) {
+                    if(isLocalStorageEnabled()) {
+                        try {
+                            retVal[key] = (JSON.parse(localStorage['userDataBooks']) || {})[key.replace(/^books\/([0-9]+)$/, '$1')];
+                        } catch(e) {
+                            retVal['_err_' + key] = true;
+                        }
+                    }
+                    callbackWhenComplete();
+                    return;
+
                 } else {
 
                     var path = getUserDataPathPreface() + key + '.json';
@@ -274,6 +292,8 @@ function(biblemesh_Helpers){
             cachedGets = {};
         },
         refreshUserData: function(bookId, userData, callback) {
+            if(userInfo.idpNoAuth) return;
+
             var bookKey = 'books/' + bookId;
             Settings.get(bookKey, function(bookUserData) {
                 if(!bookUserData) throw "Unexpected blank response on refreshUserData";
