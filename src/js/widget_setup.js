@@ -248,6 +248,7 @@
                             refElA.appendChild(authorEl);
                             refElA.appendChild(newTabIconEl);
                             refEl.appendChild(refElA);
+                            iframeEl.parentNode.querySelectorAll(".erasereader-widget-reference").forEach(e => e.parentNode.removeChild(e));
                             iframeEl.parentNode.insertBefore(refEl, null);
                             
                             break;
