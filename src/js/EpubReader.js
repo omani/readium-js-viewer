@@ -665,6 +665,14 @@ BookmarkData){
                     history.replaceState({epub: "/epub_content/book_" + biblemesh_bookId}, null, url);
                 }
             }, 1);
+
+            Settings.startRecordReading(biblemesh_bookId, spineItem.idref);
+
+        });
+
+        readium.reader.on(ReadiumSDK.Events.CONTENT_DOCUMENT_UNLOADED, function($iframe, spineItem) {
+            Globals.logEvent("CONTENT_DOCUMENT_UNLOADED", "ON", "EpubReader.js [ " + spineItem.href + " ]");
+            Settings.endRecordReading();
         });
 
         readium.reader.on(ReadiumSDK.Events.CONTENT_DOCUMENT_LOAD_START, function (loadStartData, loadStartSpineItem)

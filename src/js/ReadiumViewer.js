@@ -98,6 +98,10 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
                 }
             });
 
+            Settings.sendRecordedReading();
+            $(window).on('beforeunload', Settings.endRecordReading);
+            $(document).on("visibilitychange", Settings.toggleRecordReading);
+
         }, function() {
             Dialogs.showErrorWithDetails(Strings.err_dlg_title, Strings.biblemesh_no_user_setup);
         });
@@ -152,6 +156,8 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
     }
 
     var libraryView = function(libraryURL, importEPUB){
+        Settings.endRecordReading();
+
         $(EpubReader.tooltipSelector()).tooltip('destroy');
         
         EpubReader.unloadUI();

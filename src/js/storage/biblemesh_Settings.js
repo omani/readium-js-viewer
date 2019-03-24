@@ -11,6 +11,12 @@ function(biblemesh_Helpers){
     var lastSuccessfulPatch = biblemesh_Helpers.getUTCTimeStamp();
     var currentlyPatching = false;
 
+    var currentReadingRecord_memory = false;
+    var readingRecords_memory = [];
+    var currentReadingRecordInterval = -1;
+    var currentlySendingReadingRecords = false;
+    var lastReadingRecordBookId, lastReadingRecordSpineIdRef;
+
     var getUserDataPathPreface = function() {
         return location.origin + '/users/' + userInfo.id + '/';
     }
@@ -50,6 +56,60 @@ function(biblemesh_Helpers){
             docEl[currentlyPatching ? 'addClass' : 'removeClass']('highlightssaving');
         } catch(e) { }
     }
+
+    var getReadingRecords = function() {
+        return isLocalStorageEnabled()
+            ? JSON.parse(localStorage['readingRecords'] || '[]')
+            : readingRecords_memory.slice(0);
+    }
+
+    var getCurrentReadingRecord = function() {
+        return isLocalStorageEnabled()
+            ? JSON.parse(localStorage['currentReadingRecord'] || 'false')
+            : currentReadingRecord_memory ? Object.assign({}, currentReadingRecord_memory) : false;
+    }
+
+    var setReadingRecords = function(readingRecords) {
+        if(isLocalStorageEnabled()) {
+            localStorage['readingRecords'] = JSON.stringify(readingRecords);
+        } else {
+            readingRecords_memory = readingRecords.slice(0);
+        }
+    }
+
+    var setCurrentReadingRecord = function(currentReadingRecord) {
+        if(isLocalStorageEnabled()) {
+            if(currentReadingRecord) {
+                localStorage['currentReadingRecord'] = JSON.stringify(currentReadingRecord);
+            } else {
+                localStorage.removeItem('currentReadingRecord');
+            }
+        } else {
+            currentReadingRecord_memory = currentReadingRecord ? Object.assign({}, currentReadingRecord) : false;
+        }
+    }
+
+    var updateEndTimeOnCurrentReadingRecord = function() {
+        var currentReadingRecord = getCurrentReadingRecord();
+        if(!currentReadingRecord) return;
+        
+        currentReadingRecord.endTime = Date.now();
+
+        setCurrentReadingRecord(currentReadingRecord);
+    }
+
+    var pushCurrentReadingRecordOnQueue = function() {
+        var currentReadingRecord = getCurrentReadingRecord();
+        if(!currentReadingRecord) return;
+        
+        var readingRecords = getReadingRecords();
+        readingRecords.push(currentReadingRecord);
+
+        setReadingRecords(readingRecords);
+        setCurrentReadingRecord();
+
+        Settings.sendRecordedReading();
+    }
     
     Settings = {
         put : function(key, val, callback){
@@ -64,6 +124,85 @@ function(biblemesh_Helpers){
 
             if (callback) callback();
 
+        },
+        startRecordReading : function(bookId, spineIdRef){
+            if(!userInfo.idpXapiOn) return;
+
+            // In case there was a reading record which was not ended...
+            pushCurrentReadingRecordOnQueue();
+
+            setCurrentReadingRecord({
+                bookId: bookId,
+                spineIdRef: spineIdRef,
+                startTime: Date.now(),
+            });
+
+            lastReadingRecordBookId = lastReadingRecordSpineIdRef = undefined;
+
+            updateEndTimeOnCurrentReadingRecord();
+
+            clearInterval(currentReadingRecordInterval);
+            currentReadingRecordInterval = setInterval(updateEndTimeOnCurrentReadingRecord, 1000);
+        },
+        endRecordReading : function(){
+            if(!userInfo.idpXapiOn) return;
+
+            clearInterval(currentReadingRecordInterval);
+            updateEndTimeOnCurrentReadingRecord();
+
+            pushCurrentReadingRecordOnQueue();
+
+            lastReadingRecordBookId = lastReadingRecordSpineIdRef = undefined;
+        },
+        toggleRecordReading : function(){
+            var currentReadingRecord = getCurrentReadingRecord();
+            if(
+                currentReadingRecord
+                && document.visibilityState == 'hidden'
+            ) {
+                Settings.endRecordReading();
+                lastReadingRecordBookId = currentReadingRecord.bookId;
+                lastReadingRecordSpineIdRef = currentReadingRecord.spineIdRef;
+
+            } else if(
+                !currentReadingRecord
+                && document.visibilityState == 'visible'
+                && lastReadingRecordBookId
+                && lastReadingRecordSpineIdRef
+            ) {
+                Settings.startRecordReading(lastReadingRecordBookId, lastReadingRecordSpineIdRef);
+            }
+
+        },
+        sendRecordedReading : function(){
+            if(!userInfo.idpXapiOn) return;
+            if(currentlySendingReadingRecords) return;
+
+            var readingRecords = getReadingRecords();
+            if(readingRecords.length == 0) return;
+
+            var path = location.origin + '/reportReading';
+
+            var ajaxRequest = {
+                url: path,
+                method: 'POST',
+                data: {
+                    readingRecords: readingRecords,
+                },
+                success: function () {
+                    console.log("Reading record report successful.");
+                    setReadingRecords(getReadingRecords().slice(readingRecords.length));
+                    currentlySendingReadingRecords = false;
+                    Settings.sendRecordedReading();
+                },
+                error: function (xhr, status, errorThrown) {
+                    console.log("ERROR: Could not send reading records.", xhr, status, errorThrown);
+                    currentlySendingReadingRecords = false;
+                }
+            }
+
+            currentlySendingReadingRecords = true;
+            $.ajax(ajaxRequest);
         },
         patch : function(userData, staleDataCallback, forceOnceCallback){
 
