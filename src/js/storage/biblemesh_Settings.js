@@ -101,11 +101,13 @@ function(biblemesh_Helpers){
     var pushCurrentReadingRecordOnQueue = function() {
         var currentReadingRecord = getCurrentReadingRecord();
         if(!currentReadingRecord) return;
-        
-        var readingRecords = getReadingRecords();
-        readingRecords.push(currentReadingRecord);
 
-        setReadingRecords(readingRecords);
+        if(currentReadingRecord.endTime - currentReadingRecord.startTime > 5*1000) {
+            var readingRecords = getReadingRecords();
+            readingRecords.push(currentReadingRecord);
+            setReadingRecords(readingRecords);
+        }
+
         setCurrentReadingRecord();
 
         Settings.sendRecordedReading();
