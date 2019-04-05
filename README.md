@@ -7,6 +7,7 @@ See the following submodule repositories:
 * ( https://github.com/educational-resources-and-services/readium-shared-js )
 * ( https://github.com/educational-resources-and-services/readium-cfi-js )
 
+## [Demo](https://toadreader.com/demo/)
 
 ## Changes to original Readium project
 * An express server has been developed for facilitating a server-based library
