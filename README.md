@@ -1,4 +1,4 @@
-# Forked from readium-js-viewer for BibleMesh implementation
+# Forked from readium-js-viewer
 
 **EPUB reader written in HTML, CSS and Javascript.**
 
