@@ -878,6 +878,32 @@ ul.nav-tabs li:not(.active) button:hover
   right: 0;
   background: #333;
   display: none;
+  text-align: left;
+  padding: 7px 0;
+}
+
+.navuserpulldownhr {
+  height: 1px;
+  background: white;
+  opacity: .2;
+  margin: 7px 0;
+}
+
+.navlaunchline1 {
+  font-weight: bold;
+}
+
+.navlaunchline2 {
+  opacity: .6;
+  margin-top: -6px;
+  font-size: 13px;
+  white-space: pre-wrap;
+  line-height: 1.2;
+  padding-bottom: 15px;
+}
+
+.navlink, .navlink:hover {
+  color: inherit;
 }
 
 #navusername {

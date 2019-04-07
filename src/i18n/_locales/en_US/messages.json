@@ -540,6 +540,18 @@
   "biblemesh_usage_costs" : {
     "message": "Usage costs report"
   },
+  "biblemesh_get_ios_app" : {
+    "message": "Get the iOS app"
+  },
+  "biblemesh_get_android_app" : {
+    "message": "Get the Android app"
+  },
+  "biblemesh_launch_ereader" : {
+    "message": "Launch your custom eReader"
+  },
+  "biblemesh_get_ereader" : {
+    "message": "Get a beautiful white-label eReader platform for your company."
+  },
   "biblemesh_refresh" : {
     "message": "Refresh Library"
   },

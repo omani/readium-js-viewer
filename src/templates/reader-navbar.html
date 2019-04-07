@@ -1,11 +1,13 @@
 <!-- biblemesh_ : several changes throughout this template -->
 <div class="btn-group navbar-left">
-    <img class="navlogo" src="{{idp_logo_src}}" onerror="$(document.body).addClass('navlogonone');" onload="$(document.body).addClass('navlogoloaded');">
-    <span class="navlogoalt">
-        <span class="navlogoalt-letter">{{idp_first_letter_of_name}}</span>
-        <span class="navlogoalt-name">{{idp_name}}</span>
-    </span>
-    <span class="navlogo-readertxt">{{reader_txt}}</span>
+    <a href="{{logo_link_href}}" class="navlink">
+        <img class="navlogo" src="{{idp_logo_src}}" onerror="$(document.body).addClass('navlogonone');" onload="$(document.body).addClass('navlogoloaded');">
+        <span class="navlogoalt">
+            <span class="navlogoalt-letter">{{idp_first_letter_of_name}}</span>
+            <span class="navlogoalt-name">{{idp_name}}</span>
+        </span>
+        <span class="navlogo-readertxt">{{reader_txt}}</span>
+    </a>
         <!-- <button type="button" class="btn btn-default icon icon-show-hide"></button>  -->
     <!--<button id="aboutButt1" tabindex="1" type="button" class="btn icon-logo" data-toggle="modal" data-target="#about-dialog" title="{{strings.about}}" aria-label="{{strings.about}}">
         <span class="icon-readium" aria-hidden="true"></span>
@@ -27,10 +29,12 @@
     
 </div>
 <div class="navbar-left navbar-left-small-logo">
-    <img class="navlogo" src="{{idp_small_logo_src}}">
-    <span class="navlogoalt">
-        <span class="navlogoalt-letter">{{idp_first_letter_of_name}}</span>
-    </span>
+    <a href="{{logo_link_href}}" class="navlink">
+        <img class="navlogo" src="{{idp_small_logo_src}}">
+        <span class="navlogoalt">
+            <span class="navlogoalt-letter">{{idp_first_letter_of_name}}</span>
+        </span>
+    </a>
 </div>
 <div class="btn-group navbar-right">
     
@@ -237,6 +241,16 @@
             <div id="navusersettings" class="navuseritem">{{strings.settings}}</div>
             <!--<a href="/logout/callback" class="linkbtn"><div id="navuserlogout" class="navuseritem">{{strings.biblemesh_logout_reader}}</div></a>-->
             <a href="/logout" class="linkbtn"><div id="navuserlogoutall" class="navuseritem">{{logout_of_idp}}</div></a>
+            <div class="navuserpulldownhr"></div>
+            <a target="_blank" href="{{idp_ios_app_href}}" class="linkbtn"><div id="navioslink" class="navuseritem">{{strings.biblemesh_get_ios_app}}</div></a>
+            <a target="_blank" href="{{idp_android_app_href}}" class="linkbtn"><div id="navandroidlink" class="navuseritem">{{strings.biblemesh_get_android_app}}</div></a>
+            <div class="navuserpulldownhr" style="{{non_toadreader_style}}"></div>
+            <a href="https://toadreader.com" class="linkbtn" style="{{non_toadreader_style}}" target="_blank">
+                <div id="navlaunch" class="navuseritem">
+                    <div class="navlaunchline1">{{strings.biblemesh_launch_ereader}}</div>
+                    <div class="navlaunchline2">{{strings.biblemesh_get_ereader}}</div>
+                </div>
+            </a>
         </div>
     </div>
     

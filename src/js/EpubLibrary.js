@@ -741,17 +741,23 @@ biblemesh_Helpers){
         var idpId = Settings.getUserAttr('idpId');  // biblemesh_
         var idpName = Settings.getUserAttr('idpName');  // biblemesh_
         var idpAssetsBaseUrl = Settings.getUserAttr('idpAssetsBaseUrl');  // biblemesh_
+        var idpIosAppURL = Settings.getUserAttr('idpIosAppURL');  // biblemesh_
+        var idpAndroidAppURL = Settings.getUserAttr('idpAndroidAppURL');  // biblemesh_
+        var isToadReader = idpName === "Toad Reader";  // biblemesh_
         $('nav').append(LibraryNavbar({
             strings: Strings,
             dialogs: Dialogs,
             keyboard: Keyboard,
             idp_logo_src: idpAssetsBaseUrl + 'logo-' + idpId + '.png',  // biblemesh_
+            logo_link_href: isToadReader ? "https://toadreader.com" : "#",  // biblemesh_
+            non_toadreader_style: isToadReader ? "" : "display:none;",  // biblemesh_
+            idp_ios_app_href: idpIosAppURL,  // biblemesh_
+            idp_android_app_href: idpAndroidAppURL,  // biblemesh_
             reader_txt: Settings.getUserAttr('idpUseReaderTxt') ? Strings.biblemesh_reader : "",  // biblemesh_
             idp_name: idpName,  // biblemesh_
             idp_first_letter_of_name: idpName.substr(0,1),  // biblemesh_
             idp_small_logo_src: idpAssetsBaseUrl + 'small-logo-' + idpId + '.png',  // biblemesh_
             logout_of_idp: Settings.getUserAttr('idpNoAuth') ? Strings.biblemesh_refresh : (Strings.biblemesh_logout_of + idpName),  // biblemesh_
-            view_usage: Strings.biblemesh_usage_costs,  // biblemesh_
             firstname: Settings.getUserAttr('firstname')  // biblemesh_
         }));
         if(!Settings.getUserAttr('isAdmin')) {  // biblemesh_
