@@ -601,10 +601,10 @@
     "message" : "Width permitting"
   },
   "biblemesh_android_app" : {
-    "message" : "Android App Available"
+    "message" : "App Available"
   },
   "biblemesh_about_the_app" : {
-    "message" : "Download the app from the Play Store for a smoother experience, more features and offline reading."
+    "message" : "Download the app for a smoother experience, more features and offline reading."
   },
   "biblemesh_get_the_app" : {
     "message" : "Get the App"

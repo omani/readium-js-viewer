@@ -57,6 +57,7 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
 
                 // biblemesh_ : The following block has been added
                 var isAndroid = navigator.userAgent.toLowerCase().indexOf("android") > -1;
+                var isIOS = !!navigator.userAgent.toLowerCase().match(/ipad|iphone/);
                 var idpExpire = Settings.getUserAttr('idpExpire');
                 if(idpExpire) {
                     var hours_until_expire = parseInt((idpExpire - new Date().getTime()) / (1000 * 60 * 60));
@@ -78,8 +79,8 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
                         '<p>' + '<span class="emphasize">' + demo_reader2_text + '</span> ' + Strings.biblemesh_demo_reader3 + '</p>' + 
                         '' // '<p>' + Strings.biblemesh_demo_reader4 + '</p>'
                     );
-                } else if(isAndroid) {
-                    Settings.get('alertedToAndroidApp', function(val){
+                } else if(isAndroid || isIOS) {
+                    Settings.get('alertedToNativeApp', function(val){
                         if (!val){
                             Dialogs.showModalPrompt(
                                 Strings.biblemesh_android_app,
@@ -87,12 +88,12 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
                                 Strings.biblemesh_get_the_app,
                                 Strings.biblemesh_no_thanks,
                                 function() {
-                                    window.open(Settings.getUserAttr('idpAndroidAppURL'));
+                                    window.open(Settings.getUserAttr(isAndroid ? 'idpAndroidAppURL' : 'idpIosAppURL'));
                                 }
                             );
         
                             //set localstorage variable so they are only alerted once.
-                            Settings.put('alertedToAndroidApp', true);
+                            Settings.put('alertedToNativeApp', true);
                         }
                     })
                 }

@@ -6,7 +6,7 @@ function(biblemesh_Helpers){
     var userInfo = {};
     var cachedGets = {};  // prevents need to go back to server for highlight data when they hit the back button
 
-    var settingsInLocalStorageOnly = /^(reader|needsMigration|replaceByDefault|404:.*|alertedToAndroidApp)$/;
+    var settingsInLocalStorageOnly = /^(reader|needsMigration|replaceByDefault|404:.*|alertedToNativeApp)$/;
 
     var lastSuccessfulPatch = biblemesh_Helpers.getUTCTimeStamp();
     var currentlyPatching = false;
