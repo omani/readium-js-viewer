@@ -929,6 +929,7 @@ define([
 
                         } else {
                             readium.reader.pauseMediaOverlay();
+                            pauseAudioAndVideoTags();
                             biblemesh_AppComm.postMsg('showPageListView');
                         }
                     
@@ -1156,6 +1157,19 @@ define([
 
             biblemesh_AppComm.postMsg('loaded');
 
+        }
+    
+        var pauseAudioAndVideoTags = function(){
+            var pauseAudioAndVideoInIframe = function($iframe) {
+                $('audio, video', $iframe.contents()).each(function() {
+                    this.pause()
+                });
+                $('iframe', $iframe.contents()).each(function() {
+                    pauseAudioAndVideoInIframe($( this ));
+                });
+            };
+
+            pauseAudioAndVideoInIframe($("#epub-reader-frame iframe"));
         }
     
         var unloadReaderUI = function(){
