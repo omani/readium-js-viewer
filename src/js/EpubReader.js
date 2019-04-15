@@ -829,6 +829,11 @@ define([
                 if(isTransitioning) return;
                 if(e.touches.length !== 1) return;
 
+                // If the epub has something special here with touch, then do not swipe
+                if(e.target && $(e.target).closest('[ontouchstart]')[0]) {
+                    return;
+                }
+
                 if(touchIsClick) {
                     touchIsClick = Math.sqrt((touchPageX - e.touches[0].pageX) * 2 + (touchPageY - e.touches[0].pageY) * 2) < 4;
                     touchIsSwipe = !touchIsClick;
