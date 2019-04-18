@@ -1162,7 +1162,7 @@ define([
         var pauseAudioAndVideoTags = function(){
             var pauseAudioAndVideoInIframe = function($iframe) {
                 $('audio, video', $iframe.contents()).each(function() {
-                    this.pause()
+                    this.pause();
                 });
                 $('iframe', $iframe.contents()).each(function() {
                     pauseAudioAndVideoInIframe($( this ));
