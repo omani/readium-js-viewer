@@ -3,7 +3,9 @@ define(['jquery', './EpubReader', 'readium_shared_js/helpers', 'biblemesh_AppCom
     if(typeof Sentry != 'undefined') Sentry.init({ dsn: 'https://0569beced42c4b068367c8d47cfddf36@sentry.io/144504' })
     window.addEventListener("error", function(e) { Sentry.captureException(e) })
     window.addEventListener("unhandledrejection", function(e) { Sentry.captureException(e) })
-        
+
+    window.addEventListener('unload', function() { biblemesh_AppComm.postMsg('unload') })
+
     var specialAssetRetrievalMethod = 'ajaxThroughPostMessage'  // or 'none'
     biblemesh_AppComm.subscribe('setSpecialAssetRetrievalMethod', function(payload) {
         if([ 'none', 'ajaxThroughPostMessage' ].indexOf(payload.method) != -1) {

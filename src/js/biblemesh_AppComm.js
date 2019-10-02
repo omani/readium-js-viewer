@@ -17,7 +17,16 @@ function(
           
             biblemesh_AppComm.postMsg('consoleLog', { message: errorMessage });
         }
-    }
+    };
+
+    // We also need a postMessage route for react native web
+    document.addEventListener('message', function(event) {
+        if(event.origin && event.origin !== window.location.origin) return;  // only allow from the the apps or the same origin
+
+        if(event.data.action === 'injectJS') {
+            eval(event.data.jsStr);
+        }
+    });
 
     var biblemesh_AppComm = {
         subscribe: function(identifier, func) {
@@ -27,7 +36,12 @@ function(
         },
         postMsg: function(identifier, payload) {
             var postIfReady = function() {
-                if(window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+                if(!window.isReactNativeWebView) {
+                    parent.postMessage(JSON.stringify({
+                        identifier: identifier,
+                        payload: payload,
+                    }), location.origin);
+                } else if(window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
                     // send a message to React Native
                     window.ReactNativeWebView.postMessage(JSON.stringify({
                         identifier: identifier,
