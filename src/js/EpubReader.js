@@ -628,7 +628,7 @@ define([
     
             var readerOptions =  {
                 el: "#epub-reader-frame",
-                annotationCSSUrl: moduleConfig.annotationCSSUrl + '?bust=VERSION_BUST_STRING',  // biblemesh_
+                annotationCSSUrl: moduleConfig.annotationCSSUrl + '?bust=VERSION_BUST*_STRING',  // biblemesh_
                 mathJaxUrl : moduleConfig.mathJaxUrl,
             };
     
