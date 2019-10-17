@@ -40,7 +40,7 @@ function(
                     parent.postMessage(JSON.stringify({
                         identifier: identifier,
                         payload: payload,
-                    }), location.origin);
+                    }), window.parentOriginForPostMessage);
                 } else if(window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
                     // send a message to React Native
                     window.ReactNativeWebView.postMessage(JSON.stringify({
