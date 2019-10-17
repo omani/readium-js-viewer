@@ -1,5 +1,5 @@
 define([
-    "readium_shared_js/globalsSetup",
+    // "readium_shared_js/globalsSetup",
         "readium_shared_js/globals",
     './ModuleConfig',
     'jquery',
@@ -8,7 +8,7 @@ define([
     'hgn!readium_js_viewer_html_templates/reader-body.html',
     './EpubReaderMediaOverlays',
     './EpubReaderBackgroundAudioTrack',
-    './gestures',
+    // './gestures',
     'readium_js/Readium',
     'readium_shared_js/helpers',
     'readium_shared_js/biblemesh_helpers',
@@ -16,7 +16,7 @@ define([
     'biblemesh_AppComm'],
     
     function (
-    globalSetup,
+    // globalSetup,
     Globals,
     moduleConfig,
     $,
@@ -25,7 +25,7 @@ define([
     ReaderBody,
     EpubReaderMediaOverlays,
     EpubReaderBackgroundAudioTrack,
-    GesturesHandler,
+    // GesturesHandler,
     Readium,
     Helpers,
     biblemesh_Helpers,
@@ -39,7 +39,7 @@ define([
         var readium = undefined;
     
         var biblemesh_isWidget = undefined;
-        var biblemesh_widgetMetaData = undefined;
+        // var biblemesh_widgetMetaData = undefined;
         var biblemesh_getPagesInfoFunc = undefined;
         var biblemesh_highlights = [];
         var biblemesh_highlightTouched = false;
@@ -141,12 +141,12 @@ define([
                         loadToc(dom)
                     });
     
-                    if(biblemesh_isWidget) {
-                        biblemesh_widgetMetaData = {
-                            title: metadata.title || "",
-                            author: metadata.author || metadata.publisher || ""
-                        };
-                    }
+                    // if(biblemesh_isWidget) {
+                    //     biblemesh_widgetMetaData = {
+                    //         title: metadata.title || "",
+                    //         author: metadata.author || metadata.publisher || ""
+                    //     };
+                    // }
     
                 },
     
@@ -206,136 +206,136 @@ define([
                 $iframe.attr("title", "EPUB");
                 $iframe.attr("aria-label", "EPUB");
     
-                if(biblemesh_isWidget) {
-                    if(typeof biblemesh_isWidget != 'boolean') {
+                // if(biblemesh_isWidget) {
+                //     if(typeof biblemesh_isWidget != 'boolean') {
     
-                        // put in start and end marker elements
-                        var widgetScopeBookmarkData = new BookmarkData(biblemesh_isWidget.idref, biblemesh_isWidget.elementCfi);
-                        var widgetScopeRange = readium.reader.getDomRangeFromRangeCfi(widgetScopeBookmarkData);
+                //         // put in start and end marker elements
+                //         var widgetScopeBookmarkData = new BookmarkData(biblemesh_isWidget.idref, biblemesh_isWidget.elementCfi);
+                //         var widgetScopeRange = readium.reader.getDomRangeFromRangeCfi(widgetScopeBookmarkData);
     
-                        var startMarkerEl = $('<span></span>');
-                        var endMarkerEl = $('<span></span>');
+                //         var startMarkerEl = $('<span></span>');
+                //         var endMarkerEl = $('<span></span>');
     
-                        widgetScopeRange.insertNode(startMarkerEl[0]);
-                        widgetScopeRange.collapse();
-                        widgetScopeRange.insertNode(endMarkerEl[0]);
+                //         widgetScopeRange.insertNode(startMarkerEl[0]);
+                //         widgetScopeRange.collapse();
+                //         widgetScopeRange.insertNode(endMarkerEl[0]);
     
-                        // hide all before start and after end
-                        var widgetHide = function(baseEl, direction) {
-                            var sibling = baseEl[0][direction + 'Sibling'];
-                            while(sibling) {
-                                if(sibling.nodeType == 3) {  // text node
-                                    $(sibling).wrap('<span></span>');
-                                    sibling = sibling.parentElement;
-                                }
-                                if(sibling.nodeType == 1) {  // element
-                                    $(sibling)
-                                        .css('cssText', $(sibling).attr('style') + ';display: none !important;')
-                                        .attr('data-hiddenbywidget', '');
-                                }
-                                sibling = sibling[direction + 'Sibling'];
-                            }
-                            var baseElParent = baseEl.parent();
-                            if(baseElParent.length > 0 && !baseElParent.is('body, html')) {
-                                widgetHide(baseElParent, direction);
-                            }
-                        }
-                        widgetHide(startMarkerEl, 'previous');
-                        widgetHide(endMarkerEl, 'next');
+                //         // hide all before start and after end
+                //         var widgetHide = function(baseEl, direction) {
+                //             var sibling = baseEl[0][direction + 'Sibling'];
+                //             while(sibling) {
+                //                 if(sibling.nodeType == 3) {  // text node
+                //                     $(sibling).wrap('<span></span>');
+                //                     sibling = sibling.parentElement;
+                //                 }
+                //                 if(sibling.nodeType == 1) {  // element
+                //                     $(sibling)
+                //                         .css('cssText', $(sibling).attr('style') + ';display: none !important;')
+                //                         .attr('data-hiddenbywidget', '');
+                //                 }
+                //                 sibling = sibling[direction + 'Sibling'];
+                //             }
+                //             var baseElParent = baseEl.parent();
+                //             if(baseElParent.length > 0 && !baseElParent.is('body, html')) {
+                //                 widgetHide(baseElParent, direction);
+                //             }
+                //         }
+                //         widgetHide(startMarkerEl, 'previous');
+                //         widgetHide(endMarkerEl, 'next');
     
-                        // get rid of margin-top at the beginning, and margin-bottom at the end
-                        var widgetRemoveMargin = function(baseEl, direction) {
-                            var sibling = baseEl[0][direction + 'Sibling'];
-                            while(sibling) {
-                                if(sibling.nodeType == 3) {  // text node
-                                    $(sibling).wrap('<span></span>');
-                                    sibling = sibling.parentElement;
-                                }
-                                if(sibling.nodeType == 1) {  // element
-                                    $(sibling)
-                                        .css('cssText', $(sibling).attr('style') + ';display: none !important;')
-                                        .attr('data-hiddenbywidget', '');
-                                }
-                                sibling = sibling[direction + 'Sibling'];
-                            }
-                            var baseElParent = baseEl.parent();
-                            if(baseElParent.length > 0 && !baseElParent.is('body, html')) {
-                                widgetHide(baseElParent, direction);
-                            }
-                        }
+                //         // get rid of margin-top at the beginning, and margin-bottom at the end
+                //         var widgetRemoveMargin = function(baseEl, direction) {
+                //             var sibling = baseEl[0][direction + 'Sibling'];
+                //             while(sibling) {
+                //                 if(sibling.nodeType == 3) {  // text node
+                //                     $(sibling).wrap('<span></span>');
+                //                     sibling = sibling.parentElement;
+                //                 }
+                //                 if(sibling.nodeType == 1) {  // element
+                //                     $(sibling)
+                //                         .css('cssText', $(sibling).attr('style') + ';display: none !important;')
+                //                         .attr('data-hiddenbywidget', '');
+                //                 }
+                //                 sibling = sibling[direction + 'Sibling'];
+                //             }
+                //             var baseElParent = baseEl.parent();
+                //             if(baseElParent.length > 0 && !baseElParent.is('body, html')) {
+                //                 widgetHide(baseElParent, direction);
+                //             }
+                //         }
     
-                        // remove markers
-                        startMarkerEl.remove();
-                        endMarkerEl.remove();
+                //         // remove markers
+                //         startMarkerEl.remove();
+                //         endMarkerEl.remove();
     
-                    }
+                //     }
     
-                    var doc = ( $iframe[0].contentWindow || $iframe[0].contentDocument ).document;
+                //     var doc = ( $iframe[0].contentWindow || $iframe[0].contentDocument ).document;
                     
-                    $(doc).find('a').off('click').on('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();                    
+                //     $(doc).find('a').off('click').on('click', function(e) {
+                //         e.preventDefault();
+                //         e.stopPropagation();                    
     
-                        var aHref = $(this).attr('href');
-                        var combinedPath = aHref.match(/^#/) ? $iframe.attr('data-src').replace(/#.*$/, '') + aHref : Helpers.ResolveContentRef(aHref, $iframe.attr('data-src'));
-                        var hashIndex = combinedPath.indexOf("#");
-                        var hrefPart;
-                        var elementId;
-                        if (hashIndex >= 0) {
-                            hrefPart = combinedPath.substr(0, hashIndex);
-                            elementId = combinedPath.substr(hashIndex + 1);
-                        }
-                        else {
-                            hrefPart = combinedPath;
-                            elementId = undefined;
-                        }
+                //         var aHref = $(this).attr('href');
+                //         var combinedPath = aHref.match(/^#/) ? $iframe.attr('data-src').replace(/#.*$/, '') + aHref : Helpers.ResolveContentRef(aHref, $iframe.attr('data-src'));
+                //         var hashIndex = combinedPath.indexOf("#");
+                //         var hrefPart;
+                //         var elementId;
+                //         if (hashIndex >= 0) {
+                //             hrefPart = combinedPath.substr(0, hashIndex);
+                //             elementId = combinedPath.substr(hashIndex + 1);
+                //         }
+                //         else {
+                //             hrefPart = combinedPath;
+                //             elementId = undefined;
+                //         }
     
-                        var linkSpineItem = readium.reader.spine().getItemByHref(hrefPart);
-                        var bookmark = new BookmarkData(linkSpineItem.idref, null);
+                //         var linkSpineItem = readium.reader.spine().getItemByHref(hrefPart);
+                //         var bookmark = new BookmarkData(linkSpineItem.idref, null);
                         
-                        bookmark.elementCfi = bookmark.contentCFI;
-                        bookmark.contentCFI = undefined;
-                        bookmark = JSON.stringify(bookmark);
+                //         bookmark.elementCfi = bookmark.contentCFI;
+                //         bookmark.contentCFI = undefined;
+                //         bookmark = JSON.stringify(bookmark);
                         
-                        ebookURL = ensureUrlIsRelativeToApp(ebookURL);
+                //         ebookURL = ensureUrlIsRelativeToApp(ebookURL);
     
-                        var url = biblemesh_Helpers.buildUrlQueryParameters(undefined, {
-                            epub: ebookURL,
-                            goto: bookmark,
-                            elementId: elementId
-                        }, true);
+                //         var url = biblemesh_Helpers.buildUrlQueryParameters(undefined, {
+                //             epub: ebookURL,
+                //             goto: bookmark,
+                //             elementId: elementId
+                //         }, true);
     
-                        window.open(url);
-                    });
+                //         window.open(url);
+                //     });
     
-                    $(document.body).removeClass("widgetloading");
+                //     $(document.body).removeClass("widgetloading");
     
-                    var spineInfo = biblemesh_spinelabels[spineItem.href.replace(/#.*$/,'')];
-                    var spineLabel = $('<textarea />').html((spineInfo && spineInfo.hrefsAndLabels && spineInfo.hrefsAndLabels[0] && spineInfo.hrefsAndLabels[0].label) || "").text();
-                    var title = $('<textarea />').html(biblemesh_widgetMetaData.title).text();
-                    var author = $('<textarea />').html(biblemesh_widgetMetaData.author).text();
-                    parent.postMessage({
-                        action: 'setReference',
-                        iframeid: window.name,
-                        payload: {
-                            spineLabel: spineLabel,
-                            title: title,
-                            author: author,
-                        }
-                    }, '*');
+                //     var spineInfo = biblemesh_spinelabels[spineItem.href.replace(/#.*$/,'')];
+                //     var spineLabel = $('<textarea />').html((spineInfo && spineInfo.hrefsAndLabels && spineInfo.hrefsAndLabels[0] && spineInfo.hrefsAndLabels[0].label) || "").text();
+                //     var title = $('<textarea />').html(biblemesh_widgetMetaData.title).text();
+                //     var author = $('<textarea />').html(biblemesh_widgetMetaData.author).text();
+                //     parent.postMessage({
+                //         action: 'setReference',
+                //         iframeid: window.name,
+                //         payload: {
+                //             spineLabel: spineLabel,
+                //             title: title,
+                //             author: author,
+                //         }
+                //     }, '*');
     
-                    var docHt = $(doc).find('html').height();
-                    parent.postMessage({
-                        action: 'setHeight',
-                        iframeid: window.name,
-                        payload: docHt,
-                    }, '*');
+                //     var docHt = $(doc).find('html').height();
+                //     parent.postMessage({
+                //         action: 'setHeight',
+                //         iframeid: window.name,
+                //         payload: docHt,
+                //     }, '*');
     
-                    $('.content-doc-frame, #scaler').css('height', docHt);
+                //     $('.content-doc-frame, #scaler').css('height', docHt);
        
-                    spin(false);
-                    $("#epub-reader-frame").css("opacity", "");
-                }
+                //     spin(false);
+                //     $("#epub-reader-frame").css("opacity", "");
+                // }
     
                 setTimeout(function() {
                     var urlParams = biblemesh_Helpers.getURLQueryParams();
@@ -497,29 +497,29 @@ define([
             return 0;
         }
     
-        var biblemesh_getBookmarkURL = function(){
-            if (!ebookURL) return;
+        // var biblemesh_getBookmarkURL = function(){
+        //     if (!ebookURL) return;
             
-            var bookmark = readium.reader.bookmarkCurrentPage();
-            bookmark = JSON.parse(bookmark);
+        //     var bookmark = readium.reader.bookmarkCurrentPage();
+        //     bookmark = JSON.parse(bookmark);
             
-            var cfi = new BookmarkData(bookmark.idref, bookmark.contentCFI);
+        //     var cfi = new BookmarkData(bookmark.idref, bookmark.contentCFI);
             
-            bookmark.elementCfi = bookmark.contentCFI;
-            bookmark.contentCFI = undefined;
-            bookmark = JSON.stringify(bookmark);
+        //     bookmark.elementCfi = bookmark.contentCFI;
+        //     bookmark.contentCFI = undefined;
+        //     bookmark = JSON.stringify(bookmark);
             
-            ebookURL = ensureUrlIsRelativeToApp(ebookURL);
+        //     ebookURL = ensureUrlIsRelativeToApp(ebookURL);
     
-            var url = biblemesh_Helpers.buildUrlQueryParameters(undefined, {
-                epub: ebookURL,
-                epubs: " ",
-                embedded: " ",
-                goto: bookmark
-            });
+        //     var url = biblemesh_Helpers.buildUrlQueryParameters(undefined, {
+        //         epub: ebookURL,
+        //         epubs: " ",
+        //         embedded: " ",
+        //         goto: bookmark
+        //     });
     
-            return url;
-        }
+        //     return url;
+        // }
     
         var biblemesh_showHighlightOptions = function(forceShowNote) {
 
@@ -583,14 +583,14 @@ define([
         var loadReaderUI = function (data) {
             ebookURL = data.epub;
             ebookURL_filepath = Helpers.getEbookUrlFilePath(ebookURL);
-            biblemesh_isWidget = !!data.widget;
+            // biblemesh_isWidget = !!data.widget;
     
-            if(biblemesh_isWidget) {
-                parent.postMessage({
-                    action: 'loading',
-                    iframeid: window.name
-                }, '*');
-            }
+            // if(biblemesh_isWidget) {
+            //     parent.postMessage({
+            //         action: 'loading',
+            //         iframeid: window.name
+            //     }, '*');
+            // }
     
             loadReaderUIPrivate();
     
@@ -674,9 +674,9 @@ define([
                     
                     
                     if (openPageRequest_) {
-                        if(biblemesh_isWidget) {
-                            biblemesh_isWidget = openPageRequest_;
-                        }
+                        // if(biblemesh_isWidget) {
+                        //     biblemesh_isWidget = openPageRequest_;
+                        // }
                         openPageRequest = openPageRequest_;
                         console.debug("Open request (goto): " + JSON.stringify(openPageRequest));
                     }
@@ -997,15 +997,15 @@ define([
                 columnMinWidth: 300
             }
     
-            if(biblemesh_isWidget) {
-                var urlParams = biblemesh_Helpers.getURLQueryParams();
-                defaultSettings.scroll = 'scroll-doc';
-                defaultSettings.theme = urlParams.theme || 'author-theme'; 
-                defaultSettings.columnMaxWidth = 99999;
-                defaultSettings.columnMinWidth = 100;
-                defaultSettings.syntheticSpread = 'single';
-                defaultSettings.fontSize = parseInt(urlParams.textsize, 10) || 100;
-            }
+            // if(biblemesh_isWidget) {
+            //     var urlParams = biblemesh_Helpers.getURLQueryParams();
+            //     defaultSettings.scroll = 'scroll-doc';
+            //     defaultSettings.theme = urlParams.theme || 'author-theme'; 
+            //     defaultSettings.columnMaxWidth = 99999;
+            //     defaultSettings.columnMinWidth = 100;
+            //     defaultSettings.syntheticSpread = 'single';
+            //     defaultSettings.fontSize = parseInt(urlParams.textsize, 10) || 100;
+            // }
 
             biblemesh_translateSettings(spotInfo.settings);
 
