@@ -6,13 +6,6 @@ define(['jquery', './EpubReader', 'readium_shared_js/helpers', 'biblemesh_AppCom
 
     window.addEventListener('unload', function() { biblemesh_AppComm.postMsg('unload') })
 
-    var specialAssetRetrievalMethod = 'ajaxThroughPostMessage'  // or 'none'
-    biblemesh_AppComm.subscribe('setSpecialAssetRetrievalMethod', function(payload) {
-        if([ 'none', 'ajaxThroughPostMessage' ].indexOf(payload.method) != -1) {
-            specialAssetRetrievalMethod = payload.method
-        }
-    })
-    
     // postMessageFileCache is irrelevant unless I have goToCfi switch pages
     // without reloading the window (which would probably be good).
     var postMessageFileCache = {}  
@@ -58,7 +51,7 @@ define(['jquery', './EpubReader', 'readium_shared_js/helpers', 'biblemesh_AppCom
         //     }
         // } catch(e) {}
 
-        if(specialAssetRetrievalMethod == 'ajaxThroughPostMessage') {
+        if(window.isReactNativeWebView) {
 
             if(postMessageFileCache[settings.url]) {
                 settings.success(postMessageFileCache[settings.url])

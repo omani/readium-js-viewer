@@ -95,8 +95,10 @@
     "prebuild:scripts": "npm run genPluginsConfig",
     "build:scripts": "npm run versioning && npm run build:scripts:multiple && npm run build:scripts:single && npm run build:scripts:single:LITE && npm run build:scripts:single:CHROMEAPP --readium-js-viewer:RJS_UGLY=no && npm run build:scripts:single:CHROMEAPPWORKER --readium-js-viewer:RJS_UGLY=no",
     "build:scripts:lite": "npm run versioning && npm run build:scripts:single:LITE",
+    "build:scripts:lite_noUgly": "npm run versioning && npm run build:scripts:single:LITE_noUgly",
     "build:scripts:single": "node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/requirejs/bin/r.js -o ./readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/RequireJS_config.js --rjs_bundle=single",
     "build:scripts:single:LITE": "node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/requirejs/bin/r.js -o ./readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/RequireJS_config.js --rjs_bundle=single --rjs_configCustomTarget=_LITE",
+    "build:scripts:single:LITE_noUgly": "node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/requirejs/bin/r.js -o ./readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/RequireJS_config.js --rjs_bundle=single --rjs_configCustomTarget=_LITE --rjs_noUgly=1",
     "build:scripts:single:CHROMEAPP": "node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/requirejs/bin/r.js -o ./readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/RequireJS_config.js --rjs_bundle=single --rjs_configCustomTarget=_CHROMEAPP",
     "build:scripts:single:CHROMEAPPWORKER": "node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/requirejs/bin/r.js -o ./readium-js/readium-shared-js/readium-cfi-js/readium-build-tools/RequireJS_config.js --rjs_bundle=single --rjs_configOverrideTarget=_CHROMEAPP-WORKER",
     "prebuild:scripts:multiple": "node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/mkdirp/bin/cmd.js build-output/XXX && node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/ncp/bin/ncp src/templates/ build-output/XXX/templates/ && node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/ncp/bin/ncp src/i18n/ build-output/XXX/i18n/ && node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/cpy-cli/cli.js build-output/version.json build-output/XXX/",
@@ -106,6 +108,7 @@
     "predist": "npm run build && node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/mkdirp/bin/cmd.js dist",
     "dist": "npm run dist:copy && npm run dist:cloudReader && npm run dist:server:build && npm run dist:zip && cp .env-dist dist/cloud-reader/.env && cd dist/cloud-reader && npm install --production && cd - ",
     "dist:lite": "rm -rf dist/* && npm run build:scripts:lite && node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/mkdirp/bin/cmd.js dist && npm run dist:copy && npm run dist:cloudReaderLite && npm run dist:lite:all-to-html && npm run dist:lite:html-to-text-export && npm run dist:lite:copy-to-apps",
+    "dist:lite_noUgly": "rm -rf dist/* && npm run build:scripts:lite_noUgly && node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/mkdirp/bin/cmd.js dist && npm run dist:copy && npm run dist:cloudReaderLite && npm run dist:lite:all-to-html && npm run dist:lite:html-to-text-export && npm run dist:lite:copy-to-apps",
     "dist:lite:all-to-html": "cd dist/cloud-reader-lite && sed -n '/SCRIPT_CONTENT/!p;//q' index.html > index-with-js.html && cat scripts/readium-js-viewer_all_LITE.js | sed 's/.\\{200\\}/&ENDSLASH/g' >> index-with-js.html && echo '\n' >> index-with-js.html && sed -e '1,/SCRIPT_CONTENT/ d' index.html >> index-with-js.html",
     "dist:lite:html-to-text-export": "cd dist/cloud-reader-lite && echo 'const getReaderCode = () => `' > getReaderCode.js && sed -e 's/\\\\/\\\\\\\\/g' -e 's/\\$/\\\\$/g' -e 's/`/\\\\`/g' -e 's/ENDSLASH/\\\\\\\n/g' index-with-js.html >> getReaderCode.js && echo '`\nexport default getReaderCode' >> getReaderCode.js",
     "dist:lite:copy-to-apps": "cp dist/cloud-reader-lite/getReaderCode.js ../toad-reader-apps/",
@@ -170,6 +173,7 @@
     "deploy:cloudReader:copy:sourcemap": "node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/ncp/bin/ncp dist/cloud-reader_sourcemap/ dist/cloud-reader/scripts/ && ( node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/ncp/bin/ncp dist/zip_sourcemap/ dist/cloud-reader/scripts/zip/ || echo \"=== SUCCESS [ignore previous error]: no sourcemaps were generated for zip web-worker, deflate, inflate (no uglification).\" )",
     "deploy:cloudReaderLite:copy:sourcemap": "node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/ncp/bin/ncp dist/cloud-reader-lite_sourcemap/ dist/cloud-reader-lite/scripts/ && ( node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/ncp/bin/ncp dist/zip_sourcemap/ dist/cloud-reader-lite/scripts/zip/ || echo \"=== SUCCESS [ignore previous error]: no sourcemaps were generated for zip web-worker, deflate, inflate (no uglification).\" )",
     "deploy:chromeApp:copy:sourcemap": "node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/ncp/bin/ncp dist/chrome-app_sourcemap/ dist/chrome-app/scripts/",
-    "start": "npm run dist:lite"
+    "start": "npm run dist:lite",
+    "dev": "npm run dist:lite_noUgly"
   }
 }
