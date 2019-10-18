@@ -20,7 +20,7 @@ function(
     };
 
     // We also need a postMessage route for react native web
-    document.addEventListener('message', function(event) {
+    window.addEventListener('message', function(event) {
         if(event.origin && event.origin !== window.location.origin) return;  // only allow from the the apps or the same origin
 
         if(event.data.action === 'injectJS') {
