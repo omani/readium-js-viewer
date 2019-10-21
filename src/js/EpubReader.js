@@ -735,13 +735,26 @@ define([
     
             });
 
+            var showPageListView = function() {
+                readium.reader.pauseMediaOverlay();
+                pauseAudioAndVideoTags();
+                biblemesh_AppComm.postMsg('showPageListView');
+            }
+
             readium.reader.addIFrameEventListener('keydown', function(e) {
-                // if ((e.keyCode === 9 || e.which === 9) && document.activeElement) {
-                //     e.preventDefault();
-                //     e.stopPropagation();
-                //     document.activeElement.blur();
-                //     return;
-                // }
+                if(e.keyCode === 27 || e.which === 27) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    var iframe = $("#epub-reader-frame iframe")[0];
+                    if([ iframe, iframe.contentWindow ].includes(document.activeElement)) {
+                        showPageListView();
+                    } else {
+                        iframe.contentWindow.focus();
+                    }
+
+                    return;
+                }
 
                 //biblemesh_ : Next if statement to prevent scroll on right/left arrows in FF
                 if(
@@ -962,9 +975,7 @@ define([
                             }
 
                         } else {
-                            readium.reader.pauseMediaOverlay();
-                            pauseAudioAndVideoTags();
-                            biblemesh_AppComm.postMsg('showPageListView');
+                            showPageListView();
                         }
                     
                     }
