@@ -6,6 +6,7 @@ define([
     'URIjs',
     './Spinner',
     'hgn!readium_js_viewer_html_templates/reader-body.html',
+    'hgn!readium_js_viewer_html_templates/reader-body-page-btns.html',
     './EpubReaderMediaOverlays',
     './EpubReaderBackgroundAudioTrack',
     // './gestures',
@@ -23,6 +24,7 @@ define([
     URI,
     spinner,
     ReaderBody,
+    ReaderBodyPageButtons,
     EpubReaderMediaOverlays,
     EpubReaderBackgroundAudioTrack,
     // GesturesHandler,
@@ -849,6 +851,30 @@ define([
                     docEl.css('left', (docElLeftBeforeStart + (touchPageXOnLastMove - touchPageXAtStart)) + 'px');
                 }
             }, 'document');
+
+            var flipPage = function(pageToDirection) {
+                var existsPageInDesiredDirection = pageExistsToThe(pageToDirection);
+                if(existsPageInDesiredDirection) {
+                    var pageWidth = $("#epub-reader-frame iframe").width();
+                    wrapInTransition(
+                        function() {
+                            docEl.css('left', (docElLeftBeforeStart + pageWidth * (pageToDirection === 'Left' ? 1 : -1)) + 'px')
+                        },
+                        250,
+                        readium.reader['openPage' + pageToDirection]
+                    );
+                } else {
+                    wrapInTransition(
+                        function() {
+                            var shakeAdjAmount = (pageToDirection === 'Left' ? 100 : -100);
+                            docEl.css('left', (docElLeftBeforeStart + shakeAdjAmount) + 'px');
+                            setTimeout(function() { docEl.css('left', (docElLeftBeforeStart - shakeAdjAmount) + 'px'); }, 50);
+                            setTimeout(function() { cancelSwipe(50); }, 100);
+                        },
+                        200
+                    );
+                }
+            }
             
             readium.reader.addIFrameEventListener('touchend', function(e) {
                 if(isTransitioning) return;
@@ -905,28 +931,7 @@ define([
                         if(pageToDirection) {
 
                             if(!spinner.willSpin && !spinner.isSpinning) {
-
-                                var existsPageInDesiredDirection = pageExistsToThe(pageToDirection);
-                                if(existsPageInDesiredDirection) {
-                                    var pageWidth = $("#epub-reader-frame iframe").width();
-                                    wrapInTransition(
-                                        function() {
-                                            docEl.css('left', (docElLeftBeforeStart + pageWidth * (pageToDirection === 'Left' ? 1 : -1)) + 'px')
-                                        },
-                                        250,
-                                        readium.reader['openPage' + pageToDirection]
-                                    );
-                                } else {
-                                    wrapInTransition(
-                                        function() {
-                                            var shakeAdjAmount = (pageToDirection === 'Left' ? 100 : -100);
-                                            docEl.css('left', (docElLeftBeforeStart + shakeAdjAmount) + 'px');
-                                            setTimeout(function() { docEl.css('left', (docElLeftBeforeStart - shakeAdjAmount) + 'px'); }, 50);
-                                            setTimeout(function() { cancelSwipe(50); }, 100);
-                                        },
-                                        200
-                                    );
-                                }
+                                flipPage(pageToDirection);
                             }
 
                         } else {
@@ -985,6 +990,35 @@ define([
 
                 biblemesh_highlightTouched = touchIsClick = touchIsSwipe = false;
 
+            }, 'document');
+
+            var $pageBtnsContainer = $('#readium-page-btns');
+            var clearLeftRightButtons = function() {
+                $("#left-page-btn").unbind("click");
+                $("#right-page-btn").unbind("click");
+                $pageBtnsContainer.empty();
+            }
+            clearLeftRightButtons();
+
+            var prepButtonFlip = function() {
+                var iframe = $("#epub-reader-frame iframe")[0];
+                var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
+                docEl = $( doc.documentElement );
+                docElLeftBeforeStart = parseInt(docEl.css('left'), 10);
+            }
+
+            readium.reader.addIFrameEventListener('mousemove', function(e) {
+                clearLeftRightButtons();
+                // var rtl = currentPackageDocument.getPageProgressionDirection() === "rtl"; //_package.spine.isLeftToRight()
+                $pageBtnsContainer.append(ReaderBodyPageButtons());
+                $("#left-page-btn").on("click", () => {
+                    prepButtonFlip();
+                    flipPage('Left');
+                });
+                $("#right-page-btn").on("click", () => {
+                    prepButtonFlip();
+                    flipPage('Right');
+                });
             }, 'document');
 
             readium.reader.addIFrameEventListener('selectionchange', biblemesh_showHighlightOptions, 'document');

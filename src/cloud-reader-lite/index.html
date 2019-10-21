@@ -61,6 +61,72 @@
             visibility: visible;
             overflow: hidden;
         }
+
+        #app-container {
+            overflow: hidden;
+        }
+
+        #reading-area {
+            text-align: center;
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            top: 0;
+            overflow: hidden;
+        }
+
+        #epub-reader-container {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 30px;
+            bottom: 30px;
+            overflow: hidden;
+        }
+
+        #epub-reader-frame {
+            display: inline-block;
+            height: 100%;
+            position: relative;
+            width: 100%;
+            overflow: auto;
+            border: none;
+        }
+
+        .page-switch-overlay-icon {
+            background-image: url('data:image/svg+xml;utf8,<svg height="512px" id="Layer_1" style="enable-background:new 0 0 512 512;" version="1.1" viewBox="0 0 512 512" width="512px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M298.3,256L298.3,256L298.3,256L131.1,81.9c-4.2-4.3-4.1-11.4,0.2-15.8l29.9-30.6c4.3-4.4,11.3-4.5,15.5-0.2l204.2,212.7  c2.2,2.2,3.2,5.2,3,8.1c0.1,3-0.9,5.9-3,8.1L176.7,476.8c-4.2,4.3-11.2,4.2-15.5-0.2L131.3,446c-4.3-4.4-4.4-11.5-0.2-15.8  L298.3,256z"/></svg>');
+            width: 50px;
+            height: 120px;
+            background-size: 18px;
+            overflow: hidden;
+            display: block;
+            position: absolute;
+            top: calc(50% - 60px);
+            opacity: 0.3;
+            z-index: 99 !important;
+            border: none;
+            border-radius: 50% 0 0 50%;
+            background-position: center;
+            background-repeat: no-repeat;
+            outline: none;
+        }
+
+        .page-switch-overlay-icon:focus,
+        .page-switch-overlay-icon:hover {
+            background-color: rgba(0,0,0,0.2);
+            opacity: 0.7;
+            cursor: pointer;
+        }
+
+        #left-page-btn {
+            left: -10px;
+            transform: rotate(180deg);
+        }
+
+        #right-page-btn {
+            right: -10px;
+        }
     </style>
 
     <script type="text/javascript">
