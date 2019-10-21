@@ -1061,6 +1061,9 @@ define([
                 $("#right-page-btn").on("click", function() {
                     turnPage('Right');
                 });
+                $("#view-toc").on("click", function() {
+                    showPageListView();
+                });
             }, 'document');
 
             readium.reader.addIFrameEventListener('selectionchange', biblemesh_showHighlightOptions, 'document');
