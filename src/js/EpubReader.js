@@ -208,6 +208,9 @@ define([
                 $iframe.attr("title", "EPUB");
                 $iframe.attr("aria-label", "EPUB");
     
+                // Following line needed to catch keyboard events
+                $iframe[0].contentWindow.focus()
+                
                 // if(biblemesh_isWidget) {
                 //     if(typeof biblemesh_isWidget != 'boolean') {
     
@@ -731,12 +734,36 @@ define([
                 }
     
             });
-    
+
             readium.reader.addIFrameEventListener('keydown', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            });
+                // if ((e.keyCode === 9 || e.which === 9) && document.activeElement) {
+                //     e.preventDefault();
+                //     e.stopPropagation();
+                //     document.activeElement.blur();
+                //     return;
+                // }
+
+                //biblemesh_ : Next if statement to prevent scroll on right/left arrows in FF
+                if(
+                    !$(e.target).is('textarea, input')
+                    && $(e.target).closest('[contenteditable="true"]').length == 0
+                    && ([37,39].indexOf(e.keyCode) != -1 || [37,39].indexOf(e.which) != -1)
+                ) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    if(e.keyCode === 37 || e.which === 37) {
+                        $("#left-page-btn").click();
+                    }
     
+                    if(e.keyCode === 39 || e.which === 39) {
+                        $("#right-page-btn").click();
+                    }
+
+                    return;
+                }
+            });
+
             var docEl, touchPageX, touchPageY, touchIsClick, touchIsSwipe,
                 docElLeftBeforeStart, touchPageXAtStart, touchPageXOnLastMove,
                 touchPageXOnSecondToLastMove, timeAtStart, timeOnLastMove, timeOnSecondToLastMove,
@@ -1005,17 +1032,22 @@ define([
                 var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
                 docEl = $( doc.documentElement );
                 docElLeftBeforeStart = parseInt(docEl.css('left'), 10);
+                iframe.contentWindow.focus();
             }
 
             readium.reader.addIFrameEventListener('mousemove', function(e) {
+                if($("#left-page-btn").length > 0) return;  // already setup
+
                 clearLeftRightButtons();
                 // var rtl = currentPackageDocument.getPageProgressionDirection() === "rtl"; //_package.spine.isLeftToRight()
                 $pageBtnsContainer.append(ReaderBodyPageButtons());
                 $("#left-page-btn").on("click", () => {
+                    if(isTransitioning) return;
                     prepButtonFlip();
                     flipPage('Left');
                 });
                 $("#right-page-btn").on("click", () => {
+                    if(isTransitioning) return;
                     prepButtonFlip();
                     flipPage('Right');
                 });
