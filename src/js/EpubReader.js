@@ -530,15 +530,13 @@ define([
 
             var iframe = $("#epub-reader-frame iframe")[0];
             var win = iframe.contentWindow || iframe;
-            var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
-            var docEl = $( doc.documentElement );
             var sel = win.getSelection();
             var selStr = sel.toString().replace(/\n/g,' ').trim();
             var cfiObj = readium.reader.plugins.highlights.getCurrentSelectionCfi();
     
             if(!sel.isCollapsed && selStr!='' && cfiObj) {
     
-                var highlightId = biblemesh_getHighlightId(cfiObj);
+                // var highlightId = biblemesh_getHighlightId(cfiObj);
                     
                 var currentHighlight = biblemesh_getHighlightDataObj(cfiObj);
                 
@@ -741,6 +739,24 @@ define([
                 biblemesh_AppComm.postMsg('showPageListView');
             }
 
+            var docEl, touchPageX, touchPageY, touchIsClick, touchIsSwipe,
+                docElLeftBeforeStart, touchPageXAtStart, touchPageXOnLastMove,
+                touchPageXOnSecondToLastMove, timeAtStart, timeOnLastMove, timeOnSecondToLastMove,
+                isTransitioning, textWasSelectedAtStart;
+
+            var turnPage = function(direction) {
+                if(isTransitioning) return;
+
+                var iframe = $("#epub-reader-frame iframe")[0];
+                var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
+                docEl = $( doc.documentElement );
+                docElLeftBeforeStart = parseInt(docEl.css('left'), 10);
+
+                flipPage(direction);
+
+                iframe.contentWindow.focus();
+            }
+
             readium.reader.addIFrameEventListener('keydown', function(e) {
                 if(e.keyCode === 27 || e.which === 27) {
                     e.preventDefault();
@@ -766,21 +782,16 @@ define([
                     e.stopPropagation();
 
                     if(e.keyCode === 37 || e.which === 37) {
-                        $("#left-page-btn").click();
+                        turnPage('Left');
                     }
     
                     if(e.keyCode === 39 || e.which === 39) {
-                        $("#right-page-btn").click();
+                        turnPage('Right');
                     }
 
                     return;
                 }
             });
-
-            var docEl, touchPageX, touchPageY, touchIsClick, touchIsSwipe,
-                docElLeftBeforeStart, touchPageXAtStart, touchPageXOnLastMove,
-                touchPageXOnSecondToLastMove, timeAtStart, timeOnLastMove, timeOnSecondToLastMove,
-                isTransitioning, textWasSelectedAtStart;
 
             var wrapInTransition = function(action, transitionTime, postAction) {
                 var gracePeriodToFinish = Math.min(transitionTime / 2, 100);
@@ -1038,14 +1049,6 @@ define([
             }
             clearLeftRightButtons();
 
-            var prepButtonFlip = function() {
-                var iframe = $("#epub-reader-frame iframe")[0];
-                var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
-                docEl = $( doc.documentElement );
-                docElLeftBeforeStart = parseInt(docEl.css('left'), 10);
-                iframe.contentWindow.focus();
-            }
-
             readium.reader.addIFrameEventListener('mousemove', function(e) {
                 if($("#left-page-btn").length > 0) return;  // already setup
 
@@ -1053,14 +1056,10 @@ define([
                 // var rtl = currentPackageDocument.getPageProgressionDirection() === "rtl"; //_package.spine.isLeftToRight()
                 $pageBtnsContainer.append(ReaderBodyPageButtons());
                 $("#left-page-btn").on("click", function() {
-                    if(isTransitioning) return;
-                    prepButtonFlip();
-                    flipPage('Left');
+                    turnPage('Left');
                 });
                 $("#right-page-btn").on("click", function() {
-                    if(isTransitioning) return;
-                    prepButtonFlip();
-                    flipPage('Right');
+                    turnPage('Right');
                 });
             }, 'document');
 
