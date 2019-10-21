@@ -1041,12 +1041,12 @@ define([
                 clearLeftRightButtons();
                 // var rtl = currentPackageDocument.getPageProgressionDirection() === "rtl"; //_package.spine.isLeftToRight()
                 $pageBtnsContainer.append(ReaderBodyPageButtons());
-                $("#left-page-btn").on("click", () => {
+                $("#left-page-btn").on("click", function() {
                     if(isTransitioning) return;
                     prepButtonFlip();
                     flipPage('Left');
                 });
-                $("#right-page-btn").on("click", () => {
+                $("#right-page-btn").on("click", function() {
                     if(isTransitioning) return;
                     prepButtonFlip();
                     flipPage('Right');
