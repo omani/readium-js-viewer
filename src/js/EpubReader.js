@@ -209,7 +209,7 @@ define([
                 $iframe.attr("aria-label", "EPUB");
     
                 // Following line needed to catch keyboard events
-                $iframe[0].contentWindow.focus()
+                $iframe[0].contentWindow.focus();
                 
                 // if(biblemesh_isWidget) {
                 //     if(typeof biblemesh_isWidget != 'boolean') {
