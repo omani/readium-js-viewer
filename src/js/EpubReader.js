@@ -628,7 +628,8 @@ define([
     
             var readerOptions =  {
                 el: "#epub-reader-frame",
-                annotationCSSUrl: moduleConfig.annotationCSSUrl + '?bust=VERSION_BUST*_STRING',  // biblemesh_
+                // annotationCSSUrl: moduleConfig.annotationCSSUrl + '?bust=VERSION_BUST*_STRING',  // biblemesh_
+                annotationCSSContent: moduleConfig.annotationCSSContent,
                 mathJaxUrl : moduleConfig.mathJaxUrl,
             };
     
@@ -699,7 +700,8 @@ define([
                     $('.icon-annotations').css("display", "none");  // biblemesh_ 
     
                     readium.reader.plugins.highlights.initialize({
-                        annotationCSSUrl: readerOptions.annotationCSSUrl
+                        // annotationCSSUrl: readerOptions.annotationCSSUrl
+                        annotationCSSContent: readerOptions.annotationCSSContent
                     });
     
                     readium.reader.plugins.highlights.on("annotationTouched", function(type, idref, cfi, id) {

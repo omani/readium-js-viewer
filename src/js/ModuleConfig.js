@@ -14,7 +14,8 @@ define(['module'], function(module) {
 
             'workerUrl': config.workerUrl || "/READIUMWORKER.js",
 
-            'annotationCSSUrl': config.annotationCSSUrl || "/ANNOTATIONS.css",
+            // 'annotationCSSUrl': config.annotationCSSUrl || "/ANNOTATIONS.css",
+            'annotationCSSContent': config.annotationCSSContent,
             'mathJaxUrl': config.mathJaxUrl || "/MATHJAX.js",
             'jsLibRoot': config.jsLibRoot || "/ZIPJS/",
 
