@@ -64,6 +64,10 @@ define(['jquery', './EpubReader', 'readium_shared_js/helpers', 'biblemesh_AppCom
 
             return
         } else {
+            var dataOrigin = Helpers.getURLQueryParams().epub.replace(/^(https?:\/\/[^\/]*).*$/i, '$1')
+            if(settings.url.indexOf(dataOrigin) === 0) {
+                settings.headers = window.epubFileFetchHeaders
+            }
             return $._ajax(settings)
         }
     }
