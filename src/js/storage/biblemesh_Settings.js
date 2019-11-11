@@ -1,7 +1,8 @@
 define([
-'readium_shared_js/biblemesh_helpers'
+'readium_shared_js/biblemesh_helpers',
+'biblemesh_AppComm'
 ],
-function(biblemesh_Helpers){
+function(biblemesh_Helpers, biblemesh_AppComm){
 
     var userInfo = {};
     var cachedGets = {};  // prevents need to go back to server for highlight data when they hit the back button
@@ -143,7 +144,14 @@ function(biblemesh_Helpers){
                                 },
                                 error: function (xhr, status, errorThrown) {
                                     if(xhr.status == 403) {
-                                        location.reload();
+                                        biblemesh_AppComm.postMsg('reportError', {
+                                            errorCode: 'permission denied',
+                                            info: {
+                                                request: 'patch',
+                                                url: path,
+                                            },
+                                        });
+        
                                         return;
                                     }
                                     currentlyPatching = false;
@@ -207,7 +215,13 @@ function(biblemesh_Helpers){
                     },
                     error: function (xhr, status, errorThrown) {
                         if(xhr.status == 403) {
-                            location.reload();
+                            biblemesh_AppComm.postMsg('reportError', {
+                                errorCode: 'permission denied',
+                                info: {
+                                    request: 'data get',
+                                    url: path,
+                                },
+                            });
                             return;
                         }
                         console.error('Error when AJAX fetching ' + path);
@@ -257,7 +271,13 @@ function(biblemesh_Helpers){
                         },
                         error: function (xhr, status, errorThrown) {
                             if(xhr.status == 403) {
-                                location.reload();
+                                biblemesh_AppComm.postMsg('reportError', {
+                                    errorCode: 'permission denied',
+                                    info: {
+                                        request: 'data getMultiple',
+                                        url: path,
+                                    },
+                                });
                                 return;
                             }
                             console.error('Error when AJAX fetching ' + path);
@@ -315,7 +335,13 @@ function(biblemesh_Helpers){
                 },
                 error: function (xhr, status, errorThrown) {
                     if(xhr.status == 403) {
-                        location.reload();
+                        biblemesh_AppComm.postMsg('reportError', {
+                            errorCode: 'permission denied',
+                            info: {
+                                request: 'initialize',
+                                url: location.origin + '/usersetup.json',
+                            },
+                        });
                         return;
                     }
                     console.error('Error setting up the user.');
