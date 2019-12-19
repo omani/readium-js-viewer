@@ -425,6 +425,7 @@ define([
             var idRef = bookmark.idref;
 
             // insert spaces for biblemesh_toolCfiCounts
+            var $elsToRemoveSpace = $(doc).find('[data-withtoolspacing]');
             for(var cfi in biblemesh_toolCfiCounts) {
                 var $el = readium.reader.getElementByCfi(idRef, cfi);
 
@@ -432,8 +433,11 @@ define([
                     $el
                         .attr('style', $el.attr('style') + '; --tool-spacing: ' + (34 * biblemesh_toolCfiCounts[cfi]) + 'px')
                         .attr('data-withtoolspacing', true);
+
+                    $elsToRemoveSpace = $elsToRemoveSpace.filter(function() { return this !== $el[0] });
                 }
             }
+            $elsToRemoveSpace.removeAttr('data-withtoolspacing');
 
             // calc block element cfis to make pagination change faster
             var staticBlockEls = $(doc).find('*').filter(function() { return isStaticBlock(this); }).toArray();
