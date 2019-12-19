@@ -279,7 +279,7 @@ define([
                     }
     
                     var doc = ( $iframe[0].contentWindow || $iframe[0].contentDocument ).document;
-                    
+
                     $(doc).find('a').off('click').on('click', function(e) {
                         e.preventDefault();
                         e.stopPropagation();                    
@@ -445,12 +445,12 @@ define([
                         var rect = lastRect = this.getBoundingClientRect();
                         if(
                             (  // left edge of the block is showing
-                                rect.x >= 0
-                                && rect.x <= window.innerWidth
+                                rect.x >= 50
+                                && rect.x <= window.innerWidth - 50
                             )
                             || (  // right edge of the block is showing
-                                rect.x + rect.width >= 0
-                                && rect.x + rect.width <= window.innerWidth
+                                rect.x + rect.width >= 50
+                                && rect.x + rect.width <= window.innerWidth - 50
                             )
                             ) {
                             this.calculatedCfi = this.calculatedCfi || readium.reader.getCfiForElement(this).contentCFI
@@ -464,13 +464,18 @@ define([
                     } catch(e) {}
                 }
             });
-            toolSpots.push({
-                y: lastRect.y + lastRect.height,
-                cfi: 'AT THE END',
-            });
+            if(!alreadyPassedThePage) {
+                toolSpots.push({
+                    y: lastRect.y + lastRect.height,
+                    cfi: 'AT THE END',
+                });
+            }
+
+            var iframeRect = iframe.getBoundingClientRect();
 
             biblemesh_AppComm.postMsg('reportToolSpots', {
                 toolSpots: toolSpots,
+                offsetX: iframeRect.x + 30,  // 30 is the offset margin
             });
         }
 
@@ -804,6 +809,8 @@ define([
 
             var turnPage = function(direction) {
                 if(isTransitioning) return;
+
+                biblemesh_AppComm.postMsg('reportPageTurnStart');
 
                 var iframe = $("#epub-reader-frame iframe")[0];
                 var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
