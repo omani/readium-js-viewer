@@ -44,7 +44,7 @@ define([
         var biblemesh_getPagesInfoFunc = undefined;
         var biblemesh_highlights = [];
         var biblemesh_highlightTouched = false;
-        var biblemesh_toolSpots = [];
+        var biblemesh_toolCfiCounts = {};
         var biblemesh_textSelected = false;
         var biblemesh_preventAnnotationClick = false;
         var biblemesh_isMobileSafari = !!navigator.userAgent.match(/(iPad|iPhone|iPod)/);
@@ -62,7 +62,9 @@ define([
         var gesturesHandler = undefined;
     
         var isStaticBlock = function(el) {
-            var cssObj = $(el).css(['position', 'top', 'left', 'bottom', 'right', 'display']);
+            if($(el).attr('data-withtoolspacing')) return true;
+
+            var cssObj = $(el).css(['position', 'top', 'left', 'bottom', 'right', 'display', 'borderTopWidth', 'backgroundColor']);
             var effectivelyZero = /^(0[^0-9]*)?$/
             var staticLikePosition = (
                 ['static'].includes(cssObj.position)
@@ -74,7 +76,13 @@ define([
                     && effectivelyZero.test(cssObj.bottom)
                 )
             );
-            return cssObj.display === 'block' && staticLikePosition;
+
+            return (
+                cssObj.display === 'block'
+                && staticLikePosition
+                && cssObj.borderTopWidth === '0px'
+                && /^rgba\(.*?, 0\)$/.test(cssObj.backgroundColor)
+            );
         }
 
         var ensureUrlIsRelativeToApp = function(ebookURL) {
@@ -413,7 +421,19 @@ define([
             var iframe = $("#epub-reader-frame iframe")[0];
             var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
 
-            // insert spaces for biblemesh_toolSpots
+            var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
+            var idRef = bookmark.idref;
+
+            // insert spaces for biblemesh_toolCfiCounts
+            for(var cfi in biblemesh_toolCfiCounts) {
+                var $el = readium.reader.getElementByCfi(idRef, cfi);
+
+                if($el) {
+                    $el
+                        .attr('style', $el.attr('style') + '; --tool-spacing: ' + (34 * biblemesh_toolCfiCounts[cfi]) + 'px')
+                        .attr('data-withtoolspacing', true);
+                }
+            }
 
             // calc block element cfis to make pagination change faster
             var staticBlockEls = $(doc).find('*').filter(function() { return isStaticBlock(this); }).toArray();
@@ -443,16 +463,8 @@ define([
                 if(isStaticBlock(this)) {
                     try {
                         var rect = lastRect = this.getBoundingClientRect();
-                        if(
-                            (  // left edge of the block is showing
-                                rect.x >= 50
-                                && rect.x <= window.innerWidth - 50
-                            )
-                            || (  // right edge of the block is showing
-                                rect.x + rect.width >= 50
-                                && rect.x + rect.width <= window.innerWidth - 50
-                            )
-                            ) {
+                        if(rect.x >= 0 && rect.x <= window.innerWidth - 50) {
+                            // left edge of the block is showing
                             this.calculatedCfi = this.calculatedCfi || readium.reader.getCfiForElement(this).contentCFI
                             toolSpots.push({
                                 y: parseInt(rect.y, 10),
@@ -476,6 +488,7 @@ define([
             biblemesh_AppComm.postMsg('reportToolSpots', {
                 toolSpots: toolSpots,
                 offsetX: iframeRect.x + 30,  // 30 is the offset margin
+                offsetY: iframeRect.y,
             });
         }
 
@@ -682,8 +695,8 @@ define([
     
         var initReadium = function(){
 
-            biblemesh_toolSpots = window.initialToolSpotsObjFromWebView || biblemesh_toolSpots;
-            delete window.initialToolSpotsObjFromWebView;
+            biblemesh_toolCfiCounts = window.initialToolCfiCountsObjFromWebView || biblemesh_toolCfiCounts;
+            delete window.initialToolCfiCountsObjFromWebView;
 
             biblemesh_highlights = window.initialHighlightsObjFromWebView || biblemesh_highlights;
             delete window.initialHighlightsObjFromWebView;
@@ -1273,7 +1286,7 @@ define([
             });
 
             biblemesh_AppComm.subscribe('insertTools', function(payload) {
-                biblemesh_toolSpots = payload.toolSpots;
+                biblemesh_toolCfiCounts = payload.toolCfiCounts;
                 biblemesh_insertTools();
             });
 
