@@ -466,10 +466,13 @@ define([
                         if(rect.x >= 0 && rect.x <= window.innerWidth - 50) {
                             // left edge of the block is showing
                             this.calculatedCfi = this.calculatedCfi || readium.reader.getCfiForElement(this).contentCFI
-                            toolSpots.push({
-                                y: parseInt(rect.y, 10),
-                                cfi: this.calculatedCfi,
-                            });
+                            for(var ordering=0; ordering <= (biblemesh_toolCfiCounts[this.calculatedCfi] || 0); ordering++) {
+                                toolSpots.push({
+                                    y: parseInt(rect.y, 10) + (ordering * 34),
+                                    cfi: this.calculatedCfi,
+                                    ordering: ordering,
+                                });
+                            }
                         } else {
                             alreadyPassedThePage = rect.x > window.innerWidth  // assumes ltr page
                         }
