@@ -44,6 +44,7 @@ define([
         var biblemesh_getPagesInfoFunc = undefined;
         var biblemesh_highlights = [];
         var biblemesh_highlightTouched = false;
+        var biblemesh_toolSpots = [];
         var biblemesh_textSelected = false;
         var biblemesh_preventAnnotationClick = false;
         var biblemesh_isMobileSafari = !!navigator.userAgent.match(/(iPad|iPhone|iPod)/);
@@ -60,6 +61,22 @@ define([
         // (variable not actually used anywhere here, but top-level to indicate that its lifespan is that of the reader object (not to be garbage-collected))
         var gesturesHandler = undefined;
     
+        var isStaticBlock = function(el) {
+            var cssObj = $(el).css(['position', 'top', 'left', 'bottom', 'right', 'display']);
+            var effectivelyZero = /^(0[^0-9]*)?$/
+            var staticLikePosition = (
+                ['static'].includes(cssObj.position)
+                || (
+                    cssObj.position === 'relative'
+                    && effectivelyZero.test(cssObj.top)
+                    && effectivelyZero.test(cssObj.left)
+                    && effectivelyZero.test(cssObj.right)
+                    && effectivelyZero.test(cssObj.bottom)
+                )
+            );
+            return cssObj.display === 'block' && staticLikePosition;
+        }
+
         var ensureUrlIsRelativeToApp = function(ebookURL) {
     
             if (!ebookURL) {
@@ -177,13 +194,13 @@ define([
                 
                 if (spinner.isSpinning)
                 {
-    //console.debug("!! SPIN: -- WILL: " + spinner.willSpin + " IS:" + spinner.isSpinning + " STOP REQ:" + spinner.stopRequested);
+        //console.debug("!! SPIN: -- WILL: " + spinner.willSpin + " IS:" + spinner.isSpinning + " STOP REQ:" + spinner.stopRequested);
                     spinner.stop();
                     spinner.isSpinning = false;
                 }
                 else if (spinner.willSpin)
                 {
-    //console.debug("!! SPIN REQ: -- WILL: " + spinner.willSpin + " IS:" + spinner.isSpinning + " STOP REQ:" + spinner.stopRequested);
+        //console.debug("!! SPIN REQ: -- WILL: " + spinner.willSpin + " IS:" + spinner.isSpinning + " STOP REQ:" + spinner.stopRequested);
                     spinner.stopRequested = true;
                 }
             }
@@ -392,6 +409,71 @@ define([
             });
         }
     
+        var biblemesh_insertTools = function() {
+            var iframe = $("#epub-reader-frame iframe")[0];
+            var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
+
+            // insert spaces for biblemesh_toolSpots
+
+            // calc block element cfis to make pagination change faster
+            var staticBlockEls = $(doc).find('*').filter(function() { return isStaticBlock(this); }).toArray();
+            var calcBlockElCfi = function() {
+                setTimeout(function() {
+                    var el = staticBlockEls.shift();
+                    if(!el) return;
+                    el.calculatedCfi = el.calculatedCfi || readium.reader.getCfiForElement(el).contentCFI
+                    calcBlockElCfi();
+                }, 0);
+            }
+            calcBlockElCfi();
+
+            // report all tool spots
+            biblemesh_reportToolSpots();
+        }
+    
+        var biblemesh_reportToolSpots = function() {
+            var iframe = $("#epub-reader-frame iframe")[0];
+            var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
+
+            var toolSpots = [];
+            var lastRect = { y: 0, height: 0 };
+            var alreadyPassedThePage = false;
+            $(doc).find('*').each(function() {
+                if(alreadyPassedThePage) return;
+                if(isStaticBlock(this)) {
+                    try {
+                        var rect = lastRect = this.getBoundingClientRect();
+                        if(
+                            (  // left edge of the block is showing
+                                rect.x >= 0
+                                && rect.x <= window.innerWidth
+                            )
+                            || (  // right edge of the block is showing
+                                rect.x + rect.width >= 0
+                                && rect.x + rect.width <= window.innerWidth
+                            )
+                            ) {
+                            this.calculatedCfi = this.calculatedCfi || readium.reader.getCfiForElement(this).contentCFI
+                            toolSpots.push({
+                                y: parseInt(rect.y, 10),
+                                cfi: this.calculatedCfi,
+                            });
+                        } else {
+                            alreadyPassedThePage = rect.x > window.innerWidth  // assumes ltr page
+                        }
+                    } catch(e) {}
+                }
+            });
+            toolSpots.push({
+                y: lastRect.y + lastRect.height,
+                cfi: 'AT THE END',
+            });
+
+            biblemesh_AppComm.postMsg('reportToolSpots', {
+                toolSpots: toolSpots,
+            });
+        }
+
         var biblemesh_drawHighlights = function() {
             if (readium && readium.reader.plugins.highlights) {
     
@@ -439,9 +521,11 @@ define([
                     // needed because highlights off screen when a new spine is loaded are not drawn
                     readium.reader.plugins.highlights.redrawAnnotations();
                     biblemesh_markHighlightsWithNotes();
+                    biblemesh_reportToolSpots();
                 } catch(e) {}
             } else {
                 biblemesh_drawHighlights();
+                biblemesh_insertTools();
             }
     
         }
@@ -592,6 +676,9 @@ define([
         }
     
         var initReadium = function(){
+
+            biblemesh_toolSpots = window.initialToolSpotsObjFromWebView || biblemesh_toolSpots;
+            delete window.initialToolSpotsObjFromWebView;
 
             biblemesh_highlights = window.initialHighlightsObjFromWebView || biblemesh_highlights;
             delete window.initialHighlightsObjFromWebView;
@@ -1176,6 +1263,11 @@ define([
             biblemesh_AppComm.subscribe('loadSpineAndGetPagesInfo', function(payload) {
                 biblemesh_loadSpineTime = Date.now();
                 biblemesh_getPagesInfoFunc = biblemesh_getPagesInfo(payload);
+            });
+
+            biblemesh_AppComm.subscribe('insertTools', function(payload) {
+                biblemesh_toolSpots = payload.toolSpots;
+                biblemesh_insertTools();
             });
 
             biblemesh_AppComm.subscribe('renderHighlights', function(payload) {
