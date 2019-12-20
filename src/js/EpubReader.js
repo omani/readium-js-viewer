@@ -466,7 +466,9 @@ define([
                 if(alreadyPassedThePage) return;
                 if(isStaticBlock(this)) {
                     try {
-                        var rect = lastRect = this.getBoundingClientRect();
+                        var rects = this.getClientRects();
+                        var rect = rects[0];
+                        lastRect = rects[rects.length - 1];
                         if(rect.x >= 0 && rect.x <= window.innerWidth - 50) {
                             // left edge of the block is showing
                             this.calculatedCfi = this.calculatedCfi || readium.reader.getCfiForElement(this).contentCFI
@@ -483,7 +485,7 @@ define([
                     } catch(e) {}
                 }
             });
-            if(!alreadyPassedThePage) {
+            if(lastRect.x >= 0 && lastRect.x <= window.innerWidth - 50) {
                 toolSpots.push({
                     y: lastRect.y + lastRect.height,
                     cfi: 'AT THE END',
