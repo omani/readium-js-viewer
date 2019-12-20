@@ -459,6 +459,10 @@ define([
             var iframe = $("#epub-reader-frame iframe")[0];
             var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
 
+            var iframeRect = iframe.getBoundingClientRect();
+            var offsetMargin = 30;
+            var offsetMarginWithBuffer = offsetMargin + 20;
+
             var toolSpots = [];
             var lastRect = { y: 0, height: 0 };
             var alreadyPassedThePage = false;
@@ -469,7 +473,7 @@ define([
                         var rects = this.getClientRects();
                         var rect = rects[0];
                         lastRect = rects[rects.length - 1];
-                        if(rect.x >= 0 && rect.x <= window.innerWidth - 50) {
+                        if(rect.x >= 0 && rect.x <= iframeRect.width - offsetMarginWithBuffer) {
                             // left edge of the block is showing
                             this.calculatedCfi = this.calculatedCfi || readium.reader.getCfiForElement(this).contentCFI
                             for(var ordering=0; ordering <= (biblemesh_toolCfiCounts[this.calculatedCfi] || 0); ordering++) {
@@ -480,23 +484,21 @@ define([
                                 });
                             }
                         } else {
-                            alreadyPassedThePage = rect.x > window.innerWidth  // assumes ltr page
+                            alreadyPassedThePage = rect.x > iframeRect.width  // assumes ltr page
                         }
                     } catch(e) {}
                 }
             });
-            if(lastRect.x >= 0 && lastRect.x <= window.innerWidth - 50) {
+            if(lastRect.x >= 0 && lastRect.x <= iframeRect.width - offsetMarginWithBuffer) {
                 toolSpots.push({
                     y: lastRect.y + lastRect.height,
                     cfi: 'AT THE END',
                 });
             }
 
-            var iframeRect = iframe.getBoundingClientRect();
-
             biblemesh_AppComm.postMsg('reportToolSpots', {
                 toolSpots: toolSpots,
-                offsetX: iframeRect.x + 30,  // 30 is the offset margin
+                offsetX: iframeRect.x + offsetMargin,
                 offsetY: iframeRect.y,
             });
         }
