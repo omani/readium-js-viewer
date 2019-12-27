@@ -996,7 +996,9 @@ define([
                 var existsPageInDesiredDirection = pageExistsToThe(pageToDirection);
                 if(existsPageInDesiredDirection) {
 
-                    biblemesh_AppComm.postMsg('flipToNewSpine', { newSpineIdRef: existsPageInDesiredDirection });
+                    if(typeof existsPageInDesiredDirection === 'string') {
+                        biblemesh_AppComm.postMsg('flipToNewSpine', { newSpineIdRef: existsPageInDesiredDirection });
+                    }
 
                     var pageWidth = $("#epub-reader-frame iframe").width();
                     wrapInTransition(
@@ -1007,6 +1009,8 @@ define([
                         readium.reader['openPage' + pageToDirection]
                     );
                 } else {
+                    biblemesh_AppComm.postMsg('flipToNewSpine');
+
                     wrapInTransition(
                         function() {
                             var shakeAdjAmount = (pageToDirection === 'Left' ? 100 : -100);
