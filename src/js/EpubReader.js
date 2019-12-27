@@ -920,13 +920,13 @@ define([
                     var lastOpenPage = paginationInfo.openPages[paginationInfo.openPages.length - 1];
             
                     if (lastOpenPage.spineItemPageIndex < lastOpenPage.spineItemPageCount - 1) {
-                        return 'same spine';
+                        return true;
                     }
             
                     var currentSpineItem = spine.getItemById(lastOpenPage.idref);
                     var nextSpineItem = spine.nextItem(currentSpineItem);
-            
-                    return nextSpineItem ? 'new spine' : false;
+
+                    return nextSpineItem ? nextSpineItem.idref : false;
 
                 } else {
                     
@@ -937,13 +937,13 @@ define([
                     var firstOpenPage = paginationInfo.openPages[0];
             
                     if (firstOpenPage.spineItemPageIndex > 0) {
-                        return 'same spine';
+                        return true;
                     }
             
                     var currentSpineItem = spine.getItemById(firstOpenPage.idref);
                     var prevSpineItem = spine.prevItem(currentSpineItem);
             
-                    return prevSpineItem ? 'new spine' : false;
+                    return prevSpineItem ? prevSpineItem.idref : false;
                 }            
             }
 
@@ -995,6 +995,9 @@ define([
             var flipPage = function(pageToDirection) {
                 var existsPageInDesiredDirection = pageExistsToThe(pageToDirection);
                 if(existsPageInDesiredDirection) {
+
+                    biblemesh_AppComm.postMsg('flipToNewSpine', { newSpineIdRef: existsPageInDesiredDirection });
+
                     var pageWidth = $("#epub-reader-frame iframe").width();
                     wrapInTransition(
                         function() {
