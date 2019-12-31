@@ -512,6 +512,8 @@ define([
     
                 // next line needed especially for switching between books
                 readium.reader.plugins.highlights.removeHighlightsByType("user-highlight");
+                readium.reader.plugins.highlights.removeHighlightsByType("instructor-highlight");
+                readium.reader.plugins.highlights.removeHighlightsByType("user-instructor-highlight");
     
                 biblemesh_highlights.forEach(function(highlight) {
                     // without this line, highlights are sometimes not added because they are listed as still there
@@ -531,7 +533,7 @@ define([
                             highlight.spineIdRef,
                             highlight.cfi,
                             biblemesh_getHighlightId(highlight),
-                            "user-highlight"
+                            (highlight.type || "user") + "-highlight"
                         );
                     } catch(e) {
                         // should never get here.
