@@ -72,6 +72,11 @@ define(['jquery', './EpubReader', 'readium_shared_js/helpers', 'biblemesh_AppCom
         }
     }
 
+    // For css and script files included in the xhtml.
+    var cookies = ((window.epubFileFetchHeaders || {})["x-cookie-override"] || '').split(';');
+    for(var i=0; i<cookies.length; i++) {
+        document.cookie = cookies[i].trim();
+    }
     
     $(function(){
 
