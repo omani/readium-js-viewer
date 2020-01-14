@@ -548,15 +548,15 @@ define([
             // biblemesh_ : IF and ELSE block new
             if(pageChangeData.spineItem == undefined) {  // i.e. if they are on the same chapter
                 try {
+                    biblemesh_reportToolSpots();
                     // quicker than running biblemesh_drawHighlights
                     // needed because highlights off screen when a new spine is loaded are not drawn
                     readium.reader.plugins.highlights.redrawAnnotations();
                     biblemesh_markHighlightsWithNotes();
-                    biblemesh_reportToolSpots();
                 } catch(e) {}
             } else {
-                biblemesh_drawHighlights();
                 biblemesh_insertTools();
+                biblemesh_drawHighlights();
             }
     
         }
@@ -1308,6 +1308,7 @@ define([
             biblemesh_AppComm.subscribe('insertTools', function(payload) {
                 biblemesh_toolCfiCounts = payload.toolCfiCounts;
                 biblemesh_insertTools();
+                readium.reader.plugins.highlights.redrawAnnotations();
             });
 
             biblemesh_AppComm.subscribe('renderHighlights', function(payload) {
