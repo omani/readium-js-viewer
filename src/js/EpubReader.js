@@ -1147,7 +1147,8 @@ define([
             }
             clearLeftRightButtons();
 
-            readium.reader.addIFrameEventListener('mousemove', function(e) {
+            readium.reader.addIFrameEventListener('pointerover', function(e) {
+                if(e.pointerType !== 'mouse') return;
                 if($("#left-page-btn").length > 0 || biblemesh_isWidget) return;  // already setup
 
                 clearLeftRightButtons();
