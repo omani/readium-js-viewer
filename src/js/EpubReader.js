@@ -472,7 +472,7 @@ define([
                     try {
                         var rects = this.getClientRects();
                         var rect = rects[0];
-                        lastRect = rects[rects.length - 1];
+                        lastRect = rects[rects.length - 1] || lastRect;
                         if(rect.x >= 0 && rect.x <= iframeRect.width - offsetMarginWithBuffer) {
                             // left edge of the block is showing
                             this.calculatedCfi = this.calculatedCfi || readium.reader.getCfiForElement(this).contentCFI
