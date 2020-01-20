@@ -46,7 +46,6 @@ define([
         var biblemesh_highlightTouched = false;
         var biblemesh_toolCfiCounts = {};
         var biblemesh_textSelected = false;
-        var biblemesh_preventAnnotationClick = false;
         var biblemesh_isMobileSafari = !!navigator.userAgent.match(/(iPad|iPhone|iPod)/);
         var biblemesh_currentLoadedPageBookmark;
 
@@ -804,8 +803,6 @@ define([
                         console.debug("ANNOTATION CLICK: " + id);
                         // biblemesh_ : this function has all new contents
 
-                        if(biblemesh_preventAnnotationClick) return;
-
                         var iframe = $("#epub-reader-frame iframe")[0];
                         var win = iframe.contentWindow || iframe;
                         var sel = win.getSelection();
@@ -896,8 +893,8 @@ define([
                 }, transitionTime + gracePeriodToFinish);
             }
         
-            var cancelSwipe = function(transitionTime) {
-                touchIsClick = touchIsSwipe = false;
+            var cancelSwipe = function(transitionTime, e) {
+                touchIsClick = touchIsSwipe = e.target.touchIsSwipe = false;
 
                 // bring back to original position
                 wrapInTransition(function() {
@@ -952,7 +949,7 @@ define([
             readium.reader.addIFrameEventListener('touchstart', function(e) {
                 if(isTransitioning) return;
                 if(e.touches.length !== 1) {
-                    cancelSwipe();
+                    cancelSwipe(null, e);
                     return;
                 }
 
@@ -966,7 +963,7 @@ define([
                 touchPageXAtStart = touchPageXOnLastMove = touchPageX = e.touches[0].pageX;
                 touchPageY = e.touches[0].pageY;
                 touchIsClick = true;
-                touchIsSwipe = false;
+                touchIsSwipe = e.target.touchIsSwipe = false;
                 docElLeftBeforeStart = parseInt(docEl.css('left'), 10);
                 timeAtStart = timeOnLastMove = Date.now();
             }, 'document');
@@ -982,7 +979,7 @@ define([
 
                 if(touchIsClick) {
                     touchIsClick = Math.sqrt((touchPageX - e.touches[0].pageX) * 2 + (touchPageY - e.touches[0].pageY) * 2) < 4;
-                    touchIsSwipe = !touchIsClick;
+                    touchIsSwipe = e.target.touchIsSwipe = !touchIsClick;
                 }
                 
                 if(touchIsSwipe) {
@@ -1018,7 +1015,7 @@ define([
                             var shakeAdjAmount = (pageToDirection === 'Left' ? 100 : -100);
                             docEl.css('left', (docElLeftBeforeStart + shakeAdjAmount) + 'px');
                             setTimeout(function() { docEl.css('left', (docElLeftBeforeStart - shakeAdjAmount) + 'px'); }, 50);
-                            setTimeout(function() { cancelSwipe(50); }, 100);
+                            setTimeout(function() { cancelSwipe(50, e); }, 100);
                         },
                         200
                     );
@@ -1126,16 +1123,13 @@ define([
                         }
                                 
                     } else {
-                        cancelSwipe();
+                        cancelSwipe(null, e);
                     }
 
-                    // prevent annotation click to fire after this
-                    biblemesh_preventAnnotationClick = true;
-                    setTimeout(function() { biblemesh_preventAnnotationClick = false; }, 300)
 
                 }
 
-                biblemesh_highlightTouched = touchIsClick = touchIsSwipe = false;
+                biblemesh_highlightTouched = touchIsClick = touchIsSwipe = e.target.touchIsSwipe = false;
 
             }, 'document');
 
