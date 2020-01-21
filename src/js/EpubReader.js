@@ -1232,6 +1232,14 @@ define([
                 var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
                 
                 if(bookmark.idref == payload.spineIdRef) {
+
+                    // check if they are already on this page, and if so just return and do nothing
+                    var paginationInfo = readium.reader.getPaginationInfo();
+                    var firstOpenPage = paginationInfo.openPages[0];
+                    if((firstOpenPage || {}).spineItemPageIndex == payload.pageIndexInSpine) {
+                        return;
+                    }
+
                     readium.reader.openPageIndex(payload.pageIndexInSpine);
                 } else {
                     readium.reader.openSpineItemPage(payload.spineIdRef, payload.pageIndexInSpine);
