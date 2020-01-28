@@ -472,7 +472,7 @@ define([
                         var rects = this.getClientRects();
                         var rect = rects[0];
                         lastRect = rects[rects.length - 1] || lastRect;
-                        if(rect.x >= 0 && rect.x <= iframeRect.width - offsetMarginWithBuffer) {
+                        if(rect.x >= 0 && rect.x <= iframeRect.width - offsetMarginWithBuffer && this.tagName !== 'BODY') {
                             // left edge of the block is showing
                             this.calculatedCfi = this.calculatedCfi || readium.reader.getCfiForElement(this).contentCFI
                             for(var ordering=0; ordering <= (biblemesh_toolCfiCounts[this.calculatedCfi] || 0); ordering++) {
@@ -482,7 +482,7 @@ define([
                                     ordering: ordering,
                                 });
                             }
-                        } else {
+                        } else if(this.tagName !== 'BODY' && rect.y >= 0) {
                             alreadyPassedThePage = rect.x > iframeRect.width  // assumes ltr page
                         }
                     } catch(e) {}
