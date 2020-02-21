@@ -995,17 +995,18 @@ define([
                 var existsPageInDesiredDirection = pageExistsToThe(pageToDirection);
                 if(existsPageInDesiredDirection) {
 
-                    if(typeof existsPageInDesiredDirection === 'string') {
-                        biblemesh_AppComm.postMsg('flipToNewSpine', { newSpineIdRef: existsPageInDesiredDirection });
-                    }
-
                     var pageWidth = $("#epub-reader-frame iframe").width();
                     wrapInTransition(
                         function() {
                             docEl.css('left', (docElLeftBeforeStart + pageWidth * (pageToDirection === 'Left' ? 1 : -1)) + 'px')
                         },
                         250,
-                        readium.reader['openPage' + pageToDirection]
+                        function() {
+                            if(typeof existsPageInDesiredDirection === 'string') {
+                                biblemesh_AppComm.postMsg('flipToNewSpine', { newSpineIdRef: existsPageInDesiredDirection });
+                            }
+                            readium.reader['openPage' + pageToDirection]
+                        },
                     );
                 } else {
                     biblemesh_AppComm.postMsg('flipToNewSpine');
@@ -1108,7 +1109,12 @@ define([
                                 docEl.css('left', (docElLeftBeforeStart + pageWidth * (direction === 'Left' ? 1 : -1)) + 'px')
                             },
                             transitionTime,
-                            readium.reader['openPage' + direction]
+                            function() {
+                                if(typeof existsPageInDesiredDirection === 'string') {
+                                    biblemesh_AppComm.postMsg('flipToNewSpine', { newSpineIdRef: existsPageInDesiredDirection });
+                                }
+                                readium.reader['openPage' + direction]()
+                            }
                         );
 
                         // unselect text
