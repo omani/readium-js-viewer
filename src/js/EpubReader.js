@@ -1210,7 +1210,13 @@ define([
 
             biblemesh_AppComm.subscribe('goToCfi', function(payload) {
                 try {
-                    readium.reader.openSpineItemElementCfi(payload.spineIdRef, payload.cfi);
+                    readium.reader.openSpineItemElementCfi(
+                        payload.spineIdRef,
+                        payload.lastPage
+                            ? payload
+                            : payload.cfi
+                    );
+
                 } catch(e) {
                     biblemesh_AppComm.postMsg('reportError', { errorCode: 'invalid cfi' });
                 }
