@@ -454,7 +454,7 @@ define([
             biblemesh_reportToolSpots();
         }
     
-        var biblemesh_reportToolSpots = function() {
+        var biblemesh_reportToolSpots = function(getEntireSpine) {
             var iframe = $("#epub-reader-frame iframe")[0];
             var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
 
@@ -466,7 +466,7 @@ define([
             var lastRect = { y: 0, height: 0 };
             var alreadyPassedThePage = false;
             $(doc).find('*').each(function() {
-                if(alreadyPassedThePage) return;
+                if(alreadyPassedThePage && !getEntireSpine) return;
                 if(isStaticBlock(this)) {
                     try {
                         var rects = this.getClientRects();
@@ -476,11 +476,18 @@ define([
                             // left edge of the block is showing
                             this.calculatedCfi = this.calculatedCfi || readium.reader.getCfiForElement(this).contentCFI
                             for(var ordering=0; ordering <= (biblemesh_toolCfiCounts[this.calculatedCfi] || 0); ordering++) {
-                                toolSpots.push({
+                                var tool = {
                                     y: parseInt(rect.y, 10) + (ordering * 34),
                                     cfi: this.calculatedCfi,
                                     ordering: ordering,
-                                });
+                                };
+                                if(getEntireSpine) {
+                                    var pageIndex = Math.floor(rect.x / iframeRect.width);
+                                    toolSpots[pageIndex] = toolSpots[pageIndex] || [];
+                                    toolSpots[pageIndex].push(tool);
+                                } else {
+                                    toolSpots.push(tool);
+                                }
                             }
                         } else if(this.tagName !== 'BODY' && rect.y >= 0) {
                             alreadyPassedThePage = rect.x > iframeRect.width  // assumes ltr page
@@ -488,18 +495,29 @@ define([
                     } catch(e) {}
                 }
             });
-            if(lastRect.x >= 0 && lastRect.x <= iframeRect.width - offsetMarginWithBuffer) {
-                toolSpots.push({
-                    y: lastRect.y + lastRect.height,
-                    cfi: 'AT THE END',
-                });
+            var toolAtTheEnd = {
+                y: lastRect.y + lastRect.height,
+                cfi: 'AT THE END',
+            };
+            if(getEntireSpine) {
+                var pageIndex = Math.floor(lastRect.x / iframeRect.width);
+                toolSpots[pageIndex] = toolSpots[pageIndex] || [];
+                toolSpots[pageIndex].push(toolAtTheEnd);
+            } else if(lastRect.x >= 0 && lastRect.x <= iframeRect.width - offsetMarginWithBuffer) {
+                toolSpots.push(toolAtTheEnd);
             }
 
-            biblemesh_AppComm.postMsg('reportToolSpots', {
+            var toolSpotInfo = {
                 toolSpots: toolSpots,
                 offsetX: iframeRect.x + offsetMargin,
                 offsetY: iframeRect.y,
-            });
+            }
+
+            if(getEntireSpine) {
+                return toolSpotInfo
+            }
+
+            biblemesh_AppComm.postMsg('reportToolSpots', toolSpotInfo);
         }
 
         var biblemesh_drawHighlights = function() {
@@ -1165,7 +1183,7 @@ define([
                 scroll: "auto",
                 theme: "author-theme",
                 columnGap: 60,
-                columnMaxWidth: 1000,
+                columnMaxWidth: 1000,  // Note that this relates to a hard-coded number in toad-reader-apps for creating page snapshots.
                 columnMinWidth: 300
             }
     
@@ -1296,6 +1314,8 @@ define([
                         pageCfis: pageCfis,
                         startIndex: startIndex,
                         completed: pageIndex === numPages,
+                        // The next line might need to be throttled.
+                        toolSpotSets: pageIndex === numPages ? biblemesh_reportToolSpots(true) : [],
                     });
 
                 } else {
