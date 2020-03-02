@@ -42,6 +42,7 @@ define([
     
         var biblemesh_isWidget = undefined;
         var biblemesh_getPagesInfoFunc = undefined;
+        var biblemesh_pageWidth = 0;
         var biblemesh_highlights = [];
         var biblemesh_highlightTouched = false;
         var biblemesh_toolCfiCounts = {};
@@ -482,7 +483,7 @@ define([
                                     ordering: ordering,
                                 };
                                 if(getEntireSpine) {
-                                    var pageIndex = Math.floor(rect.x / iframeRect.width);
+                                    var pageIndex = Math.floor((rect.x + offsetMarginWithBuffer) / biblemesh_pageWidth);
                                     toolSpots[pageIndex] = toolSpots[pageIndex] || [];
                                     toolSpots[pageIndex].push(tool);
                                 } else {
@@ -500,7 +501,7 @@ define([
                 cfi: 'AT THE END',
             };
             if(getEntireSpine) {
-                var pageIndex = Math.floor(lastRect.x / iframeRect.width);
+                var pageIndex = Math.floor((lastRect.x + offsetMarginWithBuffer) / biblemesh_pageWidth);
                 toolSpots[pageIndex] = toolSpots[pageIndex] || [];
                 toolSpots[pageIndex].push(toolAtTheEnd);
             } else if(lastRect.x >= 0 && lastRect.x <= iframeRect.width - offsetMarginWithBuffer) {
@@ -1284,7 +1285,8 @@ define([
                     var startIndex = payload.startIndex || 0;
                     var numPages = readium.reader.biblemesh_getColumnCount();
 
-                    var width = $iframe.width() * numPages;
+                    biblemesh_pageWidth = window.innerWidth;
+                    var width = biblemesh_pageWidth * numPages;
                     window.biblemesh_preventAllResizing = true;
                     $iframe.css("width", width);
                     $(document.body).css("width", width);
