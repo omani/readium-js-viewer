@@ -353,18 +353,24 @@ define([
             {
                 Globals.logEvent("PAGINATION_CHANGED", "ON", "EpubReader.js");
 
+                var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
+
+                if(!bookmark.contentCFI) {
+                    // Not really loaded yet.
+                    return;
+                }
+
                 // var biblemesh_isOnload = biblemesh_onload;  //first call to this function is always during onload
                 // biblemesh_onload = false;
     
                 // if(!biblemesh_isOnload) biblemesh_savePlace();
                 updateUI(pageChangeData);
-    
+
                 if(pageChangeData.spineItem && !biblemesh_isWidget) {  // biblemesh_
                     spin(false);
                     $("#epub-reader-frame").css("opacity", "");
                 }
     
-                var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
                 biblemesh_currentLoadedPageBookmark = bookmark;
 
                 biblemesh_getPagesInfoFunc && biblemesh_getPagesInfoFunc()
