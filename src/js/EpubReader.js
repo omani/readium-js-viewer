@@ -457,7 +457,7 @@ define([
             }
             calcBlockElCfi();
 
-            readium.reader.biblemesh_updateColumnCount();
+            readium.reader.biblemesh_updatePagination();
 
             // report all tool spots
             biblemesh_reportToolSpots();
