@@ -1048,8 +1048,9 @@ define([
                     function() {
                         if(typeof existsPageInDesiredDirection === 'string') {
                             biblemesh_AppComm.postMsg('flipToNewSpine', { newSpineIdRef: existsPageInDesiredDirection });
+                        } else {
+                            readium.reader['openPage' + direction]()
                         }
-                        readium.reader['openPage' + direction]()
                     }
                 );
             }
@@ -1259,7 +1260,12 @@ define([
                     var hrefUri = new URI(payload.href);
                     var hashFrag = hrefUri.fragment();
                     biblemesh_toolCfiCounts = payload.toolCfiCounts;
-                    readium.reader.openSpineItemElementId(spineItem.idref, hashFrag, undefined, biblemesh_insertTools);
+                    readium.reader.openSpineItemElementId(
+                        spineItem.idref,
+                        hashFrag,
+                        undefined,
+                        biblemesh_insertTools
+                    );
                 } catch(e) {
                     biblemesh_AppComm.postMsg('reportError', { errorCode: 'invalid href' });
                 }
@@ -1281,7 +1287,14 @@ define([
                     readium.reader.openPageIndex(payload.pageIndexInSpine);
                 } else {
                     biblemesh_toolCfiCounts = payload.toolCfiCounts;
-                    readium.reader.openSpineItemPage(payload.spineIdRef, payload.pageIndexInSpine, undefined, biblemesh_insertTools);
+                    readium.reader.openSpineItemPage(
+                        payload.spineIdRef,
+                        payload.lastPage
+                            ? payload
+                            : payload.pageIndexInSpine,
+                        undefined,
+                        biblemesh_insertTools
+                    );
                 }
             });
 
