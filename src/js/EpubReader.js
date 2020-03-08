@@ -928,9 +928,15 @@ define([
                 touchIsClick = touchIsSwipe = e.target.touchIsSwipe = false;
 
                 // bring back to original position
-                wrapInTransition(function() {
-                    docEl.css('left', docElLeftBeforeStart + 'px');
-                }, transitionTime || 200);
+                wrapInTransition(
+                    function() {
+                        docEl.css('left', docElLeftBeforeStart + 'px');
+                    },
+                    transitionTime || 200,
+                    function() {
+                        biblemesh_AppComm.postMsg('cancelPageTurn');
+                    }
+                );
             }
 
             var pageExistsToThe = function(direction) {
@@ -1011,6 +1017,10 @@ define([
                 if(touchIsClick) {
                     touchIsClick = Math.sqrt((touchPageX - e.touches[0].pageX) * 2 + (touchPageY - e.touches[0].pageY) * 2) < 4;
                     touchIsSwipe = e.target.touchIsSwipe = !touchIsClick;
+
+                    if(touchIsSwipe) {
+                        biblemesh_AppComm.postMsg('startPageTurn');
+                    }
                 }
                 
                 if(touchIsSwipe) {
@@ -1023,6 +1033,8 @@ define([
             }, 'document');
 
             var flipPage = function(pageToDirection) {
+                biblemesh_AppComm.postMsg('startPageTurn');
+
                 var existsPageInDesiredDirection = pageExistsToThe(pageToDirection);
                 if(existsPageInDesiredDirection) {
                     transitionToPage(existsPageInDesiredDirection, pageToDirection);
@@ -1151,7 +1163,7 @@ define([
                             var sel = win.getSelection();
                             sel.removeAllRanges();
                         }
-                                
+
                     } else {
                         cancelSwipe(null, e);
                     }
