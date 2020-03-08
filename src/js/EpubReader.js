@@ -1256,6 +1256,9 @@ define([
 
             biblemesh_AppComm.subscribe('goToHref', function(payload) {
                 try {
+                    if(payload.toolCfiCounts) {
+                        biblemesh_toolCfiCounts = payload.toolCfiCounts;
+                    }
                     var spineItem = readium.reader.spine().getItemByHref(payload.href);
                     var hrefUri = new URI(payload.href);
                     var hashFrag = hrefUri.fragment();
@@ -1264,7 +1267,7 @@ define([
                         spineItem.idref,
                         hashFrag,
                         undefined,
-                        biblemesh_insertTools
+                        payload.toolCfiCounts ? biblemesh_insertTools : undefined
                     );
                 } catch(e) {
                     biblemesh_AppComm.postMsg('reportError', { errorCode: 'invalid href' });
@@ -1286,14 +1289,16 @@ define([
 
                     readium.reader.openPageIndex(payload.pageIndexInSpine);
                 } else {
-                    biblemesh_toolCfiCounts = payload.toolCfiCounts;
+                    if(payload.toolCfiCounts) {
+                        biblemesh_toolCfiCounts = payload.toolCfiCounts;
+                    }
                     readium.reader.openSpineItemPage(
                         payload.spineIdRef,
                         payload.lastPage
                             ? payload
                             : payload.pageIndexInSpine,
                         undefined,
-                        biblemesh_insertTools
+                        payload.toolCfiCounts ? biblemesh_insertTools : undefined
                     );
                 }
             });
@@ -1365,9 +1370,11 @@ define([
             });
 
             biblemesh_AppComm.subscribe('insertTools', function(payload) {
-                biblemesh_toolCfiCounts = payload.toolCfiCounts;
-                biblemesh_insertTools();
-                readium.reader.plugins.highlights.redrawAnnotations();
+                if(JSON.stringify(biblemesh_toolCfiCounts) !== JSON.stringify(payload.toolCfiCounts)) {
+                    biblemesh_toolCfiCounts = payload.toolCfiCounts;
+                    biblemesh_insertTools();
+                    readium.reader.plugins.highlights.redrawAnnotations();
+                }
             });
 
             biblemesh_AppComm.subscribe('renderHighlights', function(payload) {
