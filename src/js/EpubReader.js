@@ -516,7 +516,10 @@ define([
                 toolSpots.push(toolAtTheEnd);
             }
 
+            var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
+
             var toolSpotInfo = {
+                spineIdRef: bookmark.idref,
                 toolSpots: toolSpots,
                 offsetX: iframeRect.x + offsetMargin,
                 offsetY: iframeRect.y,
