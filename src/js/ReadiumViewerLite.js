@@ -15,10 +15,14 @@ define(['jquery', './EpubReader', 'readium_shared_js/helpers', 'biblemesh_AppCom
         var uri = payload.uri
         if(fileAsTextCallbacksByURL[uri]) {
             if(payload.error) {
-                fileAsTextCallbacksByURL[uri].error({}, 'error', null)
+                $.each(fileAsTextCallbacksByURL[uri], function (idx, callbacks) {
+                    callbacks.error({}, 'error', null)
+                })
             } else {
                 postMessageFileCache[uri] = payload.fileText
-                fileAsTextCallbacksByURL[uri].success(payload.fileText)
+                $.each(fileAsTextCallbacksByURL[uri], function (idx, callbacks) {
+                    callbacks.success(payload.fileText)
+                })
             }
             delete fileAsTextCallbacksByURL[uri]
         }
@@ -58,7 +62,10 @@ define(['jquery', './EpubReader', 'readium_shared_js/helpers', 'biblemesh_AppCom
                 return
             }
 
-            fileAsTextCallbacksByURL[settings.url] = settings
+            if(!fileAsTextCallbacksByURL[settings.url]) {
+                fileAsTextCallbacksByURL[settings.url] = [];
+            }
+            fileAsTextCallbacksByURL[settings.url].push(settings);
 
             biblemesh_AppComm.postMsg('getFileAsText', { uri: settings.url });
 
