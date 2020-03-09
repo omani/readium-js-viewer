@@ -42,7 +42,6 @@ define([
     
         var biblemesh_isWidget = undefined;
         var biblemesh_getPagesInfoFunc = undefined;
-        var biblemesh_pageWidth = 0;
         var biblemesh_highlights = [];
         var biblemesh_highlightTouched = false;
         var biblemesh_toolCfiCounts = {};
@@ -463,7 +462,7 @@ define([
             biblemesh_reportToolSpots();
         }
     
-        var biblemesh_reportToolSpots = function(getEntireSpine) {
+        var biblemesh_reportToolSpots = function(getEntireSpine, pageWidth) {
             var iframe = $("#epub-reader-frame iframe")[0];
             var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
 
@@ -491,7 +490,7 @@ define([
                                     ordering: ordering,
                                 };
                                 if(getEntireSpine) {
-                                    var pageIndex = Math.floor((rect.x + offsetMarginWithBuffer) / biblemesh_pageWidth);
+                                    var pageIndex = Math.floor((rect.x + offsetMarginWithBuffer) / pageWidth);
                                     toolSpots[pageIndex] = toolSpots[pageIndex] || [];
                                     toolSpots[pageIndex].push(tool);
                                 } else {
@@ -509,7 +508,7 @@ define([
                 cfi: 'AT THE END',
             };
             if(getEntireSpine) {
-                var pageIndex = Math.floor((lastRect.x + offsetMarginWithBuffer) / biblemesh_pageWidth);
+                var pageIndex = Math.floor((lastRect.x + offsetMarginWithBuffer) / pageWidth);
                 toolSpots[pageIndex] = toolSpots[pageIndex] || [];
                 toolSpots[pageIndex].push(toolAtTheEnd);
             } else if(lastRect.x >= 0 && lastRect.x <= iframeRect.width - offsetMarginWithBuffer) {
@@ -1334,8 +1333,7 @@ define([
                     var startIndex = payload.startIndex || 0;
                     var numPages = readium.reader.biblemesh_getColumnCount();
 
-                    biblemesh_pageWidth = window.innerWidth;
-                    var width = biblemesh_pageWidth * numPages;
+                    var width = payload.width * numPages;
                     window.biblemesh_preventAllResizing = true;
                     $iframe.css("width", width);
                     $(document.body).css("width", width);
@@ -1366,7 +1364,7 @@ define([
                         startIndex: startIndex,
                         completed: pageIndex === numPages,
                         // The next line might need to be throttled.
-                        toolSpotSets: pageIndex === numPages ? biblemesh_reportToolSpots(true) : [],
+                        toolSpotSets: pageIndex === numPages ? biblemesh_reportToolSpots(true, payload.width) : [],
                     });
 
                 } else {
