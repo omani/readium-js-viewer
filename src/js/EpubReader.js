@@ -911,10 +911,10 @@ define([
                 }
             });
 
-            var wrapInTransition = function(action, transitionTime, postAction) {
+            var wrapInTransition = function(action, transitionTime, postAction, transitionType) {
                 var gracePeriodToFinish = Math.min(transitionTime / 2, 100);
                 isTransitioning = true;
-                docEl.css("transition", "left " + (transitionTime / 1000) + "s linear");
+                docEl.css("transition", "left " + (transitionTime / 1000) + "s " + (transitionType || "ease-in-out"));
                 requestAnimationFrame(action);
                 setTimeout(function() {
                     docEl.css("transition", "");
@@ -924,7 +924,11 @@ define([
             }
         
             var cancelSwipe = function(transitionTime, e) {
-                touchIsClick = touchIsSwipe = e.target.touchIsSwipe = false;
+                touchIsClick = touchIsSwipe = false;
+
+                if(e) {
+                    e.target.touchIsSwipe = false;
+                }
 
                 // bring back to original position
                 wrapInTransition(
@@ -1031,7 +1035,7 @@ define([
                 }
             }, 'document');
 
-            var flipPage = function(pageToDirection) {
+            var flipPage = function(pageToDirection, e) {
                 biblemesh_AppComm.postMsg('startPageTurn');
 
                 var existsPageInDesiredDirection = pageExistsToThe(pageToDirection);
@@ -1039,15 +1043,24 @@ define([
                     transitionToPage(existsPageInDesiredDirection, pageToDirection);
                 } else {
                     biblemesh_AppComm.postMsg('flipToNewSpine');
+                    var shakeAdjAmount = (pageToDirection === 'Left' ? 80 : -80);
 
                     wrapInTransition(
                         function() {
-                            var shakeAdjAmount = (pageToDirection === 'Left' ? 100 : -100);
                             docEl.css('left', (docElLeftBeforeStart + shakeAdjAmount) + 'px');
-                            setTimeout(function() { docEl.css('left', (docElLeftBeforeStart - shakeAdjAmount) + 'px'); }, 50);
-                            setTimeout(function() { cancelSwipe(50, e); }, 100);
                         },
-                        200
+                        50,
+                        function() {
+                            wrapInTransition(
+                                function() {
+                                    docEl.css('left', (docElLeftBeforeStart - parseInt(shakeAdjAmount/2)) + 'px');
+                                },
+                                75,
+                                function() {
+                                    cancelSwipe(50, e);
+                                }
+                            )
+                        }
                     );
                 }
             }
@@ -1065,7 +1078,8 @@ define([
                         } else {
                             readium.reader['openPage' + direction]()
                         }
-                    }
+                    },
+                    "linear",
                 );
             }
 
@@ -1124,7 +1138,7 @@ define([
                         if(pageToDirection) {
 
                             if(!spinner.willSpin && !spinner.isSpinning) {
-                                flipPage(pageToDirection);
+                                flipPage(pageToDirection, e);
                             }
 
                         } else {
