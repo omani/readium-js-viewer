@@ -1053,13 +1053,13 @@ define([
                         function() {
                             wrapInTransition(
                                 function() {
-                                    docEl.css('left', (docElLeftBeforeStart - parseInt(shakeAdjAmount/2)) + 'px');
+                                    docEl.css('left', (docElLeftBeforeStart - parseInt(shakeAdjAmount/2, 10)) + 'px');
                                 },
                                 75,
                                 function() {
                                     cancelSwipe(50, e);
                                 }
-                            )
+                            );
                         }
                     );
                 }
@@ -1079,7 +1079,7 @@ define([
                             readium.reader['openPage' + direction]()
                         }
                     },
-                    "linear",
+                    "linear"
                 );
             }
 
