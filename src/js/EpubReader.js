@@ -36,6 +36,7 @@ define([
     
         var biblemesh_ALLOTTED_PAGE_CFIS_FETCH_MILLISECONDS = 250;
         var biblemesh_MIN_NUMBER_OF_PAGES_IN_CFIS_FETCH = 3;
+        var biblemesh_COLUMN_MAX_WIDTH = 1000;  // Note that this relates to a hard-coded number in toad-reader-apps for creating page snapshots.
 
         // initialised in initReadium()
         var readium = undefined;
@@ -1083,6 +1084,24 @@ define([
                 );
             }
 
+            $('#epub-reader-container')[0].addEventListener('touchend', function(e) {
+                if((e.touches || []).length !== 0) return;
+
+                var winWd = window.innerWidth;
+                var touchPageX = e.changedTouches[0].pageX;
+                var sideWd = (winWd - biblemesh_COLUMN_MAX_WIDTH) / 2;
+ 
+                if(touchPageX < sideWd) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    turnPage('Left');
+                } else if(touchPageX > winWd - sideWd) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    turnPage('Right');
+                }
+            });
+
             readium.reader.addIFrameEventListener('touchend', function(e) {
                 if(isTransitioning) return;
                 if(e.touches.length !== 0) return;
@@ -1125,13 +1144,14 @@ define([
                         e.stopPropagation();
 
                         var winWd = window.innerWidth;
+                        var sideWd = Math.max((winWd - biblemesh_COLUMN_MAX_WIDTH) / 2, 0);
                         var pageToDirection = '';
 
-                        if(touchPageX / winWd < .3) {
+                        if((touchPageX + sideWd) / winWd < .3) {
                             pageToDirection = 'Left';
                         }
 
-                        if(touchPageX / winWd > .7) {
+                        if((touchPageX + sideWd) / winWd > .7) {
                             pageToDirection = 'Right';
                         }
 
@@ -1222,7 +1242,7 @@ define([
                 scroll: "auto",
                 theme: "author-theme",
                 columnGap: 60,
-                columnMaxWidth: 1000,  // Note that this relates to a hard-coded number in toad-reader-apps for creating page snapshots.
+                columnMaxWidth: biblemesh_COLUMN_MAX_WIDTH,
                 columnMinWidth: 300
             }
     
