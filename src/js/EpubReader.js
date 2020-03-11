@@ -46,6 +46,7 @@ define([
         var biblemesh_highlights = [];
         var biblemesh_highlightTouched = false;
         var biblemesh_toolCfiCounts = {};
+        var biblemesh_doReportToolSpots = false;
         var biblemesh_textSelected = false;
         var biblemesh_isMobileSafari = !!navigator.userAgent.match(/(iPad|iPhone|iPod)/);
         var biblemesh_currentLoadedPageBookmark;
@@ -464,6 +465,8 @@ define([
         }
     
         var biblemesh_reportToolSpots = function(getEntireSpine, pageWidth) {
+            if(!biblemesh_doReportToolSpots) return null;
+
             var iframe = $("#epub-reader-frame iframe")[0];
             var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
 
@@ -736,6 +739,7 @@ define([
     
         var initReadium = function(){
 
+            biblemesh_doReportToolSpots = !!window.doReportToolSpots;
             biblemesh_toolCfiCounts = window.initialToolCfiCountsObjFromWebView || biblemesh_toolCfiCounts;
             delete window.initialToolCfiCountsObjFromWebView;
 
@@ -1398,7 +1402,7 @@ define([
                         startIndex: startIndex,
                         completed: pageIndex === numPages,
                         // The next line might need to be throttled.
-                        toolSpotSets: pageIndex === numPages ? biblemesh_reportToolSpots(true, payload.width) : [],
+                        toolSpotSets: pageIndex === numPages ? biblemesh_reportToolSpots(true, payload.width) : null,
                     });
 
                 } else {
