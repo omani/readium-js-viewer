@@ -328,6 +328,7 @@ define([
     
                     $(document.body).removeClass("widgetloading");
     
+                    $('.content-doc-frame, #scaler').css('height', 0);
                     var docHt = $(doc).find('html').height();
                     biblemesh_AppComm.postMsg('setHeight', docHt + 5);
     
