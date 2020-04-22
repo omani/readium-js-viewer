@@ -351,37 +351,47 @@ define([
                 }, 1);
             });
     
+            var execPageChangeTimeout;
             readium.reader.on(ReadiumSDK.Events.PAGINATION_CHANGED, function (pageChangeData)
             {
                 Globals.logEvent("PAGINATION_CHANGED", "ON", "EpubReader.js");
 
+                clearTimeout(execPageChangeTimeout);
+
                 var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
 
-                if(!bookmark.contentCFI) {
-                    // Not really loaded yet.
+                var execPageChange = function() {
+
+                    // var biblemesh_isOnload = biblemesh_onload;  //first call to this function is always during onload
+                    // biblemesh_onload = false;
+        
+                    // if(!biblemesh_isOnload) biblemesh_savePlace();
+                    updateUI(pageChangeData);
+    
+                    if(pageChangeData.spineItem && !biblemesh_isWidget) {  // biblemesh_
+                        spin(false);
+                        $("#epub-reader-frame").css("opacity", "");
+                    }
+        
+                    biblemesh_currentLoadedPageBookmark = bookmark;
+    
+                    biblemesh_getPagesInfoFunc && biblemesh_getPagesInfoFunc()
+    
+                    biblemesh_AppComm.postMsg('pageChanged', {
+                        newCfi: bookmark.contentCFI,
+                        newSpineIdRef: bookmark.idref,
+                    });
+        
+                }
+
+                if(bookmark.contentCFI) {
+                    execPageChange();
+                } else {
+                    // May not really be loaded yet.
+                    execPageChangeTimeout = setTimeout(execPageChange, 100);
                     return;
                 }
 
-                // var biblemesh_isOnload = biblemesh_onload;  //first call to this function is always during onload
-                // biblemesh_onload = false;
-    
-                // if(!biblemesh_isOnload) biblemesh_savePlace();
-                updateUI(pageChangeData);
-
-                if(pageChangeData.spineItem && !biblemesh_isWidget) {  // biblemesh_
-                    spin(false);
-                    $("#epub-reader-frame").css("opacity", "");
-                }
-    
-                biblemesh_currentLoadedPageBookmark = bookmark;
-
-                biblemesh_getPagesInfoFunc && biblemesh_getPagesInfoFunc()
-
-                biblemesh_AppComm.postMsg('pageChanged', {
-                    newCfi: bookmark.contentCFI,
-                    newSpineIdRef: bookmark.idref,
-                });
-    
             });
     
         } // end of loadToc
@@ -1329,9 +1339,11 @@ define([
 
             biblemesh_AppComm.subscribe('goToPage', function(payload) {
 
+biblemesh_AppComm.postMsg('consoleLog', { message: 'data - 1' });
                 var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
                 
                 if(bookmark.idref == payload.spineIdRef) {
+biblemesh_AppComm.postMsg('consoleLog', { message: 'data - 2' });
 
                     // check if they are already on this page, and if so just return and do nothing
                     var paginationInfo = readium.reader.getPaginationInfo();
@@ -1342,9 +1354,11 @@ define([
 
                     readium.reader.openPageIndex(payload.pageIndexInSpine);
                 } else {
+biblemesh_AppComm.postMsg('consoleLog', { message: 'data - 3' });
                     if(payload.toolCfiCounts) {
                         biblemesh_toolCfiCounts = payload.toolCfiCounts;
                     }
+biblemesh_AppComm.postMsg('consoleLog', { message: 'data - 4' });
                     readium.reader.openSpineItemPage(
                         payload.spineIdRef,
                         payload.lastPage
