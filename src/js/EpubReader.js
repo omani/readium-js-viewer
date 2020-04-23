@@ -1298,6 +1298,30 @@ define([
     
             loadEbook(openPageRequest);
 
+            var setSelectionText = function(payload) {
+                var iframe = $("#epub-reader-frame iframe")[0];
+                var win = iframe.contentWindow || iframe;
+                var sel = win.getSelection();
+                var textSelectedBefore = biblemesh_textSelected
+
+                if(!payload || !payload.spineIdRef || !payload.cfi) {
+                    sel.removeAllRanges();
+                    biblemesh_textSelected = false;
+                    return;
+                }
+
+                // select the text of a highlight
+                var highlightBookmarkData = new BookmarkData(payload.spineIdRef, payload.cfi);
+                var highlightRange = readium.reader.getDomRangeFromRangeCfi(highlightBookmarkData);
+
+                sel.removeAllRanges();
+                sel.addRange(highlightRange);
+
+                if(biblemesh_isMobileSafari) {
+                    biblemesh_textSelected = textSelectedBefore
+                }
+            }
+
             biblemesh_AppComm.subscribe('goToCfi', function(payload) {
                 try {
                     if(payload.toolCfiCounts) {
@@ -1309,9 +1333,13 @@ define([
                             ? payload
                             : payload.cfi,
                         undefined,
-                        payload.toolCfiCounts ? biblemesh_insertTools : undefined
+                        payload.toolCfiCounts ? biblemesh_insertTools : undefined,
+                        function() {
+                            if(payload.autoSelectHighlight && payload.cfi) {
+                                setSelectionText(payload);
+                            }
+                        }
                     );
-
                 } catch(e) {
                     biblemesh_AppComm.postMsg('reportError', { errorCode: 'invalid cfi' });
                 }
@@ -1339,11 +1367,9 @@ define([
 
             biblemesh_AppComm.subscribe('goToPage', function(payload) {
 
-biblemesh_AppComm.postMsg('consoleLog', { message: 'data - 1' });
                 var bookmark = JSON.parse(readium.reader.bookmarkCurrentPage());
                 
                 if(bookmark.idref == payload.spineIdRef) {
-biblemesh_AppComm.postMsg('consoleLog', { message: 'data - 2' });
 
                     // check if they are already on this page, and if so just return and do nothing
                     var paginationInfo = readium.reader.getPaginationInfo();
@@ -1354,11 +1380,9 @@ biblemesh_AppComm.postMsg('consoleLog', { message: 'data - 2' });
 
                     readium.reader.openPageIndex(payload.pageIndexInSpine);
                 } else {
-biblemesh_AppComm.postMsg('consoleLog', { message: 'data - 3' });
                     if(payload.toolCfiCounts) {
                         biblemesh_toolCfiCounts = payload.toolCfiCounts;
                     }
-biblemesh_AppComm.postMsg('consoleLog', { message: 'data - 4' });
                     readium.reader.openSpineItemPage(
                         payload.spineIdRef,
                         payload.lastPage
@@ -1453,30 +1477,7 @@ biblemesh_AppComm.postMsg('consoleLog', { message: 'data - 4' });
                 readium.reader.updateSettings(payload);
             });
 
-            biblemesh_AppComm.subscribe('setSelectionText', function(payload) {
-                var iframe = $("#epub-reader-frame iframe")[0];
-                var win = iframe.contentWindow || iframe;
-                var sel = win.getSelection();
-                var textSelectedBefore = biblemesh_textSelected
-
-                if(!payload || !payload.spineIdRef || !payload.cfi) {
-                    sel.removeAllRanges();
-                    biblemesh_textSelected = false;
-                    return;
-                }
-
-                // select the text of a highlight
-                var highlightBookmarkData = new BookmarkData(payload.spineIdRef, payload.cfi);
-                var highlightRange = readium.reader.getDomRangeFromRangeCfi(highlightBookmarkData);
-
-                sel.removeAllRanges();
-                sel.addRange(highlightRange);
-
-                if(biblemesh_isMobileSafari) {
-                    biblemesh_textSelected = textSelectedBefore
-                }
-
-            });
+            biblemesh_AppComm.subscribe('setSelectionText', setSelectionText);
 
             biblemesh_AppComm.postMsg('loaded');
 
