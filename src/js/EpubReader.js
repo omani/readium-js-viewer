@@ -658,7 +658,6 @@ define([
         // }
     
         var biblemesh_showHighlightOptions = function(forceShowNote) {
-Sentry.captureMessage('biblemesh_showHighlightOptions called.');
 
             var iframe = $("#epub-reader-frame iframe")[0];
             var win = iframe.contentWindow || iframe;
@@ -1004,7 +1003,6 @@ Sentry.captureMessage('biblemesh_showHighlightOptions called.');
             }
 
             readium.reader.addIFrameEventListener('touchstart', function(e) {
-Sentry.captureMessage('touchstart fired.');
                 var iframe = $("#epub-reader-frame iframe")[0];
                 var win = iframe.contentWindow || iframe;
                 var sel = win.getSelection();
