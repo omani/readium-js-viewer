@@ -46,6 +46,7 @@ define([
         var biblemesh_highlights = [];
         var biblemesh_highlightTouched = false;
         var biblemesh_toolCfiCounts = {};
+        var biblemesh_isWebPlatform = false;
         var biblemesh_doReportToolSpots = false;
         var biblemesh_textSelected = false;
         var biblemesh_isMobileSafari = !!navigator.userAgent.match(/(iPad|iPhone|iPod)/);
@@ -750,6 +751,7 @@ define([
     
         var initReadium = function(){
 
+            biblemesh_isWebPlatform = !!window.isWebPlatform;
             biblemesh_doReportToolSpots = !!window.doReportToolSpots;
             biblemesh_toolCfiCounts = window.initialToolCfiCountsObjFromWebView || biblemesh_toolCfiCounts;
             delete window.initialToolCfiCountsObjFromWebView;
@@ -1239,10 +1241,7 @@ define([
             }
             clearLeftRightButtons();
 
-            readium.reader.addIFrameEventListener('pointerover', function(e) {
-                if(e.pointerType !== 'mouse') return;
-                if($("#left-page-btn").length > 0 || biblemesh_isWidget) return;  // already setup
-
+            if(biblemesh_isWebPlatform && $("#left-page-btn").length === 0 && !biblemesh_isWidget) {
                 clearLeftRightButtons();
                 // var rtl = currentPackageDocument.getPageProgressionDirection() === "rtl"; //_package.spine.isLeftToRight()
                 $pageBtnsContainer.append(ReaderBodyPageButtons());
@@ -1255,7 +1254,7 @@ define([
                 $("#view-toc").on("click", function() {
                     showPageListView();
                 });
-            }, 'document');
+            }
 
             readium.reader.addIFrameEventListener('selectionchange', biblemesh_showHighlightOptions, 'document');
     
