@@ -942,6 +942,8 @@ define([
             }
         
             var cancelSwipe = function(transitionTime, e) {
+                if(biblemesh_isWebPlatform) return
+
                 touchIsClick = touchIsSwipe = false;
 
                 if(e) {
@@ -1005,6 +1007,8 @@ define([
             }
 
             readium.reader.addIFrameEventListener('touchstart', function(e) {
+                if(biblemesh_isWebPlatform) return
+
                 var iframe = $("#epub-reader-frame iframe")[0];
                 var win = iframe.contentWindow || iframe;
                 var sel = win.getSelection();
@@ -1035,6 +1039,7 @@ define([
             }, 'document');
 
             readium.reader.addIFrameEventListener('touchmove', function(e) {
+                if(biblemesh_isWebPlatform) return
                 if(isTransitioning) return;
                 if(e.touches.length !== 1) return;
 
@@ -1110,6 +1115,7 @@ define([
             }
 
             $('#epub-reader-container')[0].addEventListener('touchend', function(e) {
+                if(biblemesh_isWebPlatform) return
                 if((e.touches || []).length !== 0) return;
 
                 var winWd = window.innerWidth;
@@ -1128,6 +1134,7 @@ define([
             });
 
             readium.reader.addIFrameEventListener('touchend', function(e) {
+                if(biblemesh_isWebPlatform) return
                 if(isTransitioning) return;
                 if(e.touches.length !== 0) return;
 
