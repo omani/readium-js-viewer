@@ -942,7 +942,6 @@ define([
             }
         
             var cancelSwipe = function(transitionTime, e) {
-                if(biblemesh_isWebPlatform) return
 
                 touchIsClick = touchIsSwipe = false;
 
@@ -1034,9 +1033,11 @@ define([
                 timeAtStart = timeOnLastMove = Date.now();
             }, 'document');
 
-            readium.reader.addIFrameEventListener('selectionchange', function(e) {
-                cancelSwipe(null, e);
-            }, 'document');
+            if(!biblemesh_isWebPlatform) {
+                readium.reader.addIFrameEventListener('selectionchange', function(e) {
+                    cancelSwipe(null, e);
+                }, 'document');
+            }
 
             readium.reader.addIFrameEventListener('touchmove', function(e) {
                 if(biblemesh_isWebPlatform) return
