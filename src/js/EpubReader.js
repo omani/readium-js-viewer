@@ -1344,7 +1344,7 @@ define([
                     }
                     readium.reader.openSpineItemElementCfi(
                         payload.spineIdRef,
-                        payload.lastPage
+                        (payload.lastPage || payload.textNodeInfo)
                             ? payload
                             : payload.cfi,
                         undefined,
