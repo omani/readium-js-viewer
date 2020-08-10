@@ -188,10 +188,22 @@
 
                 // 'annotationCSSUrl': HTTPServerRootFolder + '/css/annotations.css',
                 'annotationCSSContent': `
-                    .rd-highlight.hover-user-highlight,
-                    .rd-highlight.user-highlight,
-                    .rd-highlight.hide-hover-user-highlight {
+                    .rd-highlight.hover-user1-highlight,
+                    .rd-highlight.user1-highlight,
+                    .rd-highlight.hide-hover-user1-highlight {
                         background: #1C60AB;
+                    }
+
+                    .rd-highlight.hover-user2-highlight,
+                    .rd-highlight.user2-highlight,
+                    .rd-highlight.hide-hover-user2-highlight {
+                        background: #b3112d;
+                    }
+
+                    .rd-highlight.hover-user3-highlight,
+                    .rd-highlight.user3-highlight,
+                    .rd-highlight.hide-hover-user3-highlight {
+                        background: #0a8a0a;
                     }
 
                     .rd-highlight.hover-instructor-highlight,
@@ -200,19 +212,40 @@
                         background: #d8ac0c;
                     }
 
-                    .rd-highlight.hover-user-highlight,
+                    .rd-highlight.hover-classroom-highlight,
+                    .rd-highlight.classroom-highlight,
+                    .rd-highlight.hide-hover-classroom-highlight {
+                        background: #9a9a9a;
+                    }
+
+                    .rd-highlight.hover-user1-highlight,
+                    .rd-highlight.hover-user2-highlight,
+                    .rd-highlight.hover-user3-highlight,
                     .rd-highlight.hover-instructor-highlight,
-                    .rd-highlight.hover-user-instructor-highlight {
+                    .rd-highlight.hover-classroom-highlight,
+                    .rd-highlight.hover-user1-instructor-highlight,
+                    .rd-highlight.hover-user2-instructor-highlight,
+                    .rd-highlight.hover-user3-instructor-highlight {
                         position: absolute;
                         opacity: 0.4;
                     }
 
-                    .rd-highlight.user-highlight,
-                    .rd-highlight.hide-hover-user-highlight,
+                    .rd-highlight.user1-highlight,
+                    .rd-highlight.user2-highlight,
+                    .rd-highlight.user3-highlight,
+                    .rd-highlight.hide-hover-user1-highlight,
+                    .rd-highlight.hide-hover-user2-highlight,
+                    .rd-highlight.hide-hover-user3-highlight,
                     .rd-highlight.instructor-highlight,
                     .rd-highlight.hide-hover-instructor-highlight,
-                    .rd-highlight.user-instructor-highlight,
-                    .rd-highlight.hide-hover-user-instructor-highlight {
+                    .rd-highlight.classroom-highlight,
+                    .rd-highlight.hide-hover-classroom-highlight,
+                    .rd-highlight.user1-instructor-highlight,
+                    .rd-highlight.user2-instructor-highlight,
+                    .rd-highlight.user3-instructor-highlight,
+                    .rd-highlight.hide-hover-user1-instructor-highlight,
+                    .rd-highlight.hide-hover-user2-instructor-highlight,
+                    .rd-highlight.hide-hover-user3-instructor-highlight {
                         position: absolute;
                         opacity: 0.2;
                     }
@@ -223,25 +256,13 @@
                         background-color: black;
                     }
 
-                    .highlight-with-note::before {
-                        content: "";
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background: repeating-linear-gradient(
-                            45deg,
-                            rgba(255,255,255,.9),
-                            rgba(255,255,255,.9) 5px,
-                            transparent 5px,
-                            transparent 10px
-                        );
+                    .highlight-with-note {
+                        border-bottom: 1px solid rgba(0,0,0,1);
                     }
 
-                    .rd-highlight.hover-user-instructor-highlight::before,
-                    .rd-highlight.user-instructor-highlight::before,
-                    .rd-highlight.hide-hover-user-instructor-highlight::before {
+                    .rd-highlight.hover-user1-instructor-highlight::before,
+                    .rd-highlight.user1-instructor-highlight::before,
+                    .rd-highlight.hide-hover-user1-instructor-highlight::before {
                         content: "";
                         position: absolute;
                         top: 0;
@@ -252,6 +273,42 @@
                             45deg,
                             #1C60AB,
                             #1C60AB 5px,
+                            #d8ac0c 5px,
+                            #d8ac0c 10px
+                        );
+                    }
+
+                    .rd-highlight.hover-user2-instructor-highlight::before,
+                    .rd-highlight.user2-instructor-highlight::before,
+                    .rd-highlight.hide-hover-user2-instructor-highlight::before {
+                        content: "";
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: repeating-linear-gradient(
+                            45deg,
+                            #b3112d,
+                            #b3112d 5px,
+                            #d8ac0c 5px,
+                            #d8ac0c 10px
+                        );
+                    }
+
+                    .rd-highlight.hover-user3-instructor-highlight::before,
+                    .rd-highlight.user3-instructor-highlight::before,
+                    .rd-highlight.hide-hover-user3-instructor-highlight::before {
+                        content: "";
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: repeating-linear-gradient(
+                            45deg,
+                            #0a8a0a,
+                            #0a8a0a 5px,
                             #d8ac0c 5px,
                             #d8ac0c 10px
                         );

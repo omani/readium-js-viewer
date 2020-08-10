@@ -555,9 +555,14 @@ define([
                 var highlightsToDraw = [];
     
                 // next line needed especially for switching between books
-                readium.reader.plugins.highlights.removeHighlightsByType("user-highlight");
+                readium.reader.plugins.highlights.removeHighlightsByType("user1-highlight");
+                readium.reader.plugins.highlights.removeHighlightsByType("user2-highlight");
+                readium.reader.plugins.highlights.removeHighlightsByType("user3-highlight");
                 readium.reader.plugins.highlights.removeHighlightsByType("instructor-highlight");
-                readium.reader.plugins.highlights.removeHighlightsByType("user-instructor-highlight");
+                readium.reader.plugins.highlights.removeHighlightsByType("classroom-highlight");
+                readium.reader.plugins.highlights.removeHighlightsByType("user1-instructor-highlight");
+                readium.reader.plugins.highlights.removeHighlightsByType("user2-instructor-highlight");
+                readium.reader.plugins.highlights.removeHighlightsByType("user3-instructor-highlight");
     
                 biblemesh_highlights.forEach(function(highlight) {
                     // without this line, highlights are sometimes not added because they are listed as still there
