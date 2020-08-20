@@ -310,7 +310,6 @@ define([
     
                         var linkSpineItem = readium.reader.spine().getItemByHref(hrefPart);
                         var bookmark = new BookmarkData(linkSpineItem.idref, null);
-                        debugBookmarkData(bookmark);
                         
                         bookmark.elementCfi = bookmark.contentCFI;
                         bookmark.contentCFI = undefined;
