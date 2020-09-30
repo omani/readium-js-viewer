@@ -449,7 +449,7 @@ define([
 
                 if($el) {
                     $el
-                        .attr('style', $el.attr('style') + '; --tool-spacing: ' + (34 * biblemesh_toolCfiCounts[cfi]) + 'px')
+                        .attr('style', ($el.attr('style') || "").replace(/; --tool-spacing: [0-9]+px/g, '') + '; --tool-spacing: ' + (34 * biblemesh_toolCfiCounts[cfi]) + 'px')
                         .attr('data-withtoolspacing', true);
 
                     $elsToRemoveSpace = $elsToRemoveSpace.filter(function() { return this !== $el[0] });
