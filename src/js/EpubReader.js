@@ -296,6 +296,9 @@ define([
     
                         var aHref = $(this).attr('href');
                         var combinedPath = aHref.match(/^#/) ? $iframe.attr('data-src').replace(/#.*$/, '') + aHref : Helpers.ResolveContentRef(aHref, $iframe.attr('data-src'));
+                        if(!combinedPath.match(/^http/)) {
+                            combinedPath = doc.getElementsByTagName('base')[0].href.match(/^https?:\/\/[^\/]*/)[0] + combinedPath;
+                        }
                         var hashIndex = combinedPath.indexOf("#");
                         var hrefPart;
                         var elementId;
@@ -307,7 +310,6 @@ define([
                             hrefPart = combinedPath;
                             elementId = undefined;
                         }
-    
                         var linkSpineItem = readium.reader.spine().getItemByHref(hrefPart);
                         var bookmark = new BookmarkData(linkSpineItem.idref, null);
                         
