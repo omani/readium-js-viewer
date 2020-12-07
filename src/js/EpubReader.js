@@ -314,6 +314,9 @@ define([
                         var bookmark = new BookmarkData(linkSpineItem.idref, null);
                         
                         bookmark.elementCfi = bookmark.contentCFI;
+                        if(elementId) {
+                            bookmark.elementCfi = 'ID:' + elementId;
+                        }
                         bookmark.contentCFI = undefined;
                         bookmark = JSON.stringify(bookmark);
                         
@@ -322,7 +325,6 @@ define([
                         var url = biblemesh_Helpers.buildUrlQueryParameters(undefined, {
                             epub: ebookURL,
                             goto: bookmark,
-                            elementId: elementId
                         }, true);
     
                         window.open(url);
