@@ -51,6 +51,7 @@ define([
         var biblemesh_textSelected = false;
         var biblemesh_isMobileSafari = !!navigator.userAgent.match(/(iPad|iPhone|iPod)/);
         var biblemesh_currentLoadedPageBookmark;
+        var biblemesh_doSafariInitialLoadFix = !!navigator.userAgent.match(/safari/i) && !navigator.userAgent.match(/chrome/i);
 
         // initialised in loadReaderUI(), with passed data.epub
         var ebookURL = undefined;
@@ -341,7 +342,7 @@ define([
                     spin(false);
                     $("#epub-reader-frame").css("opacity", "");
                 }
-    
+
                 setTimeout(function() {
                     var urlParams = biblemesh_Helpers.getURLQueryParams();
                     if(!biblemesh_isWidget && urlParams.elementId) {
@@ -359,6 +360,30 @@ define([
             readium.reader.on(ReadiumSDK.Events.PAGINATION_CHANGED, function (pageChangeData)
             {
                 Globals.logEvent("PAGINATION_CHANGED", "ON", "EpubReader.js");
+
+                if(biblemesh_doSafariInitialLoadFix) {
+                    // Safari appears to have a bug in the layout of columns where a line can get
+                    // cut in half between two columns on the initial load. This hack fixes the issue.
+
+                    setTimeout(function() {
+
+                        biblemesh_doSafariInitialLoadFix = false;
+
+                        var iframe = $("#epub-reader-frame iframe")[0];
+                        if(!iframe) return;
+                        var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
+                        var docEl = doc.documentElement;
+
+                        const adjustedHeight = docEl.style.height.replace(/^([0-9]+)px$/, function(match, num) {
+                            return (parseInt(num) - 1) + ".999px"
+                        });
+
+                        docEl.style.height = adjustedHeight;
+                        docEl.style.minHeight = adjustedHeight;
+                        docEl.style.maxHeight = adjustedHeight;
+
+                    }, 1);
+                }
 
                 clearTimeout(execPageChangeTimeout);
 
