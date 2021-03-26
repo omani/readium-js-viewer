@@ -234,61 +234,67 @@ define([
                 if(biblemesh_isWidget) {
                     if(typeof biblemesh_isWidget != 'boolean') {
     
-                        // put in start and end marker elements
-                        var widgetScopeBookmarkData = new BookmarkData(biblemesh_isWidget.idref, biblemesh_isWidget.elementCfi);
-                        var widgetScopeRange = readium.reader.getDomRangeFromRangeCfi(widgetScopeBookmarkData);
-    
-                        var startMarkerEl = $('<span></span>');
-                        var endMarkerEl = $('<span></span>');
-    
-                        widgetScopeRange.insertNode(startMarkerEl[0]);
-                        widgetScopeRange.collapse();
-                        widgetScopeRange.insertNode(endMarkerEl[0]);
-    
-                        if(!startMarkerEl[0].nextSibling) {
-                            $(startMarkerEl[0]).insertAfter($(startMarkerEl[0].parentElement))
-                        }
-    
-                        if(!endMarkerEl[0].previousSibling) {
-                            $(endMarkerEl[0]).insertBefore($(endMarkerEl[0].parentElement))
-                        }
-    
-                        // hide all before start and after end
-                        var widgetHide = function(baseEl, direction) {
-                            var sibling = baseEl[0][direction + 'Sibling'];
-                            while(sibling) {
-                                if(sibling.nodeType == 3) {  // text node
-                                    if(sibling.textContent.trim() !== '') {
-                                        $(sibling).wrap('<span data-addedbywidget=""></span>');
-                                        biblemesh_isWidgetWithAddedElements = true;
-                                        sibling = sibling.parentElement;
+                        try {
+
+                            // put in start and end marker elements
+                            var widgetScopeBookmarkData = new BookmarkData(biblemesh_isWidget.idref, biblemesh_isWidget.elementCfi);
+                            var widgetScopeRange = readium.reader.getDomRangeFromRangeCfi(widgetScopeBookmarkData);
+        
+                            var startMarkerEl = $('<span></span>');
+                            var endMarkerEl = $('<span></span>');
+        
+                            widgetScopeRange.insertNode(startMarkerEl[0]);
+                            widgetScopeRange.collapse();
+                            widgetScopeRange.insertNode(endMarkerEl[0]);
+        
+                            if(!startMarkerEl[0].nextSibling) {
+                                $(startMarkerEl[0]).insertAfter($(startMarkerEl[0].parentElement))
+                            }
+        
+                            if(!endMarkerEl[0].previousSibling) {
+                                $(endMarkerEl[0]).insertBefore($(endMarkerEl[0].parentElement))
+                            }
+        
+                            // hide all before start and after end
+                            var widgetHide = function(baseEl, direction) {
+                                var sibling = baseEl[0][direction + 'Sibling'];
+                                while(sibling) {
+                                    if(sibling.nodeType == 3) {  // text node
+                                        if(sibling.textContent.trim() !== '') {
+                                            $(sibling).wrap('<span data-addedbywidget=""></span>');
+                                            biblemesh_isWidgetWithAddedElements = true;
+                                            sibling = sibling.parentElement;
+                                        }
                                     }
+                                    if(sibling.nodeType == 1) {  // element
+                                        $(sibling)
+                                            .css('cssText', $(sibling).attr('style') + ';display: none !important;')
+                                            .attr('data-hiddenbywidget', '');
+                                    }
+                                    sibling = sibling[direction + 'Sibling'];
                                 }
-                                if(sibling.nodeType == 1) {  // element
-                                    $(sibling)
-                                        .css('cssText', $(sibling).attr('style') + ';display: none !important;')
-                                        .attr('data-hiddenbywidget', '');
+                                var baseElParent = baseEl.parent();
+                                if(baseElParent.length > 0 && !baseElParent.is('body, html')) {
+                                    widgetHide(baseElParent, direction);
                                 }
-                                sibling = sibling[direction + 'Sibling'];
                             }
-                            var baseElParent = baseEl.parent();
-                            if(baseElParent.length > 0 && !baseElParent.is('body, html')) {
-                                widgetHide(baseElParent, direction);
-                            }
+                            widgetHide(startMarkerEl, 'previous');
+                            widgetHide(endMarkerEl, 'next');
+        
+                            // remove markers
+                            var startMarkerParent = startMarkerEl[0].parentNode;
+                            var endMarkerParent = endMarkerEl[0].parentNode;
+                            startMarkerEl.remove();
+                            endMarkerEl.remove();
+                            startMarkerParent.normalize();
+                            endMarkerParent.normalize();
+
+                        } catch(err) {
+                            console.error("Widget not set up properly. Displaying entire spine as a fallback.", biblemesh_isWidget, err);
                         }
-                        widgetHide(startMarkerEl, 'previous');
-                        widgetHide(endMarkerEl, 'next');
-    
-                        // remove markers
-                        var startMarkerParent = startMarkerEl[0].parentNode;
-                        var endMarkerParent = endMarkerEl[0].parentNode;
-                        startMarkerEl.remove();
-                        endMarkerEl.remove();
-                        startMarkerParent.normalize();
-                        endMarkerParent.normalize();
-    
+
                     }
-    
+
                     var doc = ( $iframe[0].contentWindow || $iframe[0].contentDocument ).document;
 
                     $(doc).find('a').off('click').on('click', function(e) {
