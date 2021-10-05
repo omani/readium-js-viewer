@@ -299,7 +299,7 @@ define([
 
                     $(doc).find('a').off('click').on('click', function(e) {
                         e.preventDefault();
-                        e.stopPropagation();                    
+                        e.stopPropagation();
     
                         var aHref = $(this).attr('href');
                         var combinedPath = aHref.match(/^#/) ? $iframe.attr('data-src').replace(/#.*$/, '') + aHref : Helpers.ResolveContentRef(aHref, $iframe.attr('data-src'));
@@ -333,7 +333,7 @@ define([
                             epub: ebookURL,
                             goto: bookmark,
                         }, true);
-    
+
                         window.open(url);
                     });
     
@@ -367,6 +367,11 @@ define([
             {
                 Globals.logEvent("PAGINATION_CHANGED", "ON", "EpubReader.js");
 
+                var initiatedByInteralLinkClick = false;
+                try {
+                    initiatedByInteralLinkClick = !!pageChangeData.initiator.isInternalLink;
+                } catch(e) {}
+
                 if(biblemesh_doSafariInitialLoadFix) {
                     // Safari appears to have a bug in the layout of columns where a line can get
                     // cut in half between two columns on the initial load. This hack fixes the issue.
@@ -380,7 +385,7 @@ define([
                         var doc = ( iframe.contentWindow || iframe.contentDocument ).document;
                         var docEl = doc.documentElement;
 
-                        const adjustedHeight = docEl.style.height.replace(/^([0-9]+)px$/, function(match, num) {
+                        var adjustedHeight = docEl.style.height.replace(/^([0-9]+)px$/, function(match, num) {
                             return (parseInt(num) - 1) + ".999px"
                         });
 
@@ -415,8 +420,9 @@ define([
                     biblemesh_AppComm.postMsg('pageChanged', {
                         newCfi: bookmark.contentCFI,
                         newSpineIdRef: bookmark.idref,
+                        initiatedByInteralLinkClick: initiatedByInteralLinkClick,
                     });
-        
+
                 }
 
                 if(bookmark.contentCFI) {
