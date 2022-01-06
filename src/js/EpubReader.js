@@ -1382,6 +1382,10 @@ define([
                 }
             }
 
+            var clearSelectionText = function() { setSelectionText(); };
+            $(document.body).on("touchstart", clearSelectionText);
+            $(document.body).on("mousedown", clearSelectionText);
+
             biblemesh_AppComm.subscribe('goToCfi', function(payload) {
                 try {
                     if(payload.toolCfiCounts) {
