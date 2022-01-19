@@ -32,7 +32,7 @@ See ( https://github.com/readium/readium-js ) for more extensive information rel
 
 ### Git initialisation
 
-* `git clone --recursive -b for-version-2 https://github.com/educational-resources-and-services/readium-js-viewer.git`
+* `git clone --recursive -b for-version-2 https://github.com/omani/readium-js-viewer.git`
 * `cd readium-js-viewer`
 * `git submodule update --init --recursive` to ensure that the readium-js-viewer chain of dependencies is initialised (readium-js, readium-shared-js and readium-cfi-js)
 * `git checkout for-version-2 && git submodule foreach --recursive "git checkout for-version-2"`
